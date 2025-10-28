@@ -15,7 +15,7 @@ from utility_plots import *
 
 """ Dictionary of default input values for time series plots. """
 default_inputs_time_series = {
-    'aggregation_type_in_each_year': 'mean',
+    'aggregation_type_in_each_year': 'area_weighted_mean',
     'category_label': 'sector',
     'end_year': 2100,
     'error_bars_alpha': 0.2,
@@ -288,7 +288,7 @@ def plot_time_series(inputs):
                         df_this_region = df_this_category[df_this_category[region_label] == region]
                     else:
                         #df_this_region = df_this_category 
-                        if category in landtype_groups:
+                        if (aggregation_type_in_each_year == 'area_weighted_mean') and (category in landtype_groups):
                             landtypes = landtype_groups[category]
                             df_this_region = df_this_scenario[df_this_scenario[category_label].isin(landtypes)]
                         else:
@@ -297,12 +297,11 @@ def plot_time_series(inputs):
                     # The linestyles (e.g., solid, dotted, dashed) on the plot will vary by region.
                     linestyle = linestyle_tuples[region_index][1]
                     
-                    print(df_this_region.columns)
-                    print(df_this_scenario.columns)
                     # For each year, take either a mean or sum over all rows that matches the current scenario, category, and region.
                     x = df_this_region[year_label].unique()
                     if aggregation_type_in_each_year == 'mean':
-                        #y = df_this_region.groupby(year_label)[value_label].mean()*multiplier
+                        y = df_this_region.groupby(year_label)[value_label].mean()*multiplier
+                    elif aggregation_type_in_each_year == 'area_weighted_mean':
                         y = df_this_region.groupby(year_label).apply(
                              lambda g: (g[value_label] * g['area']).sum() / g['area'].sum()
                              ) * multiplier 
@@ -409,12 +408,21 @@ def plot_time_series(inputs):
                         if region != 'Global':
                             df_this_region = df_this_category[df_this_category[region_label] == region]
                         else:
-                            df_this_region = df_this_category
+                            #df_this_region = df_this_category
+                            if (aggregation_type_in_each_year == 'area_weighted_mean') and (category in landtype_groups):
+                               landtypes = landtype_groups[category]
+                               df_this_region = df_this_scenario[df_this_scenario[category_label].isin(landtypes)]
+                            else:
+                                df_this_region = df_this_category
 
                         # For each year, take either a mean or sum over all rows that matches the current scenario, category, and region.
                         x = df_this_region[year_label].unique()
                         if aggregation_type_in_each_year == 'mean':
                             y = df_this_region.groupby(year_label)[value_label].mean()*multiplier
+                        elif aggregation_type_in_each_year == 'area_weighted_mean':
+                            y = df_this_region.groupby(year_label).apply(
+                             lambda g: (g[value_label] * g['area']).sum() / g['area'].sum()
+                             ) * multiplier 
                         elif aggregation_type_in_each_year == 'sum':
                             y = df_this_region.groupby(year_label)[value_label].sum()*multiplier
 
