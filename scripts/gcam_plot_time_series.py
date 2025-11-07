@@ -285,9 +285,13 @@ def plot_time_series(inputs):
                 for region_index, region in enumerate(inputs['regions'][category]):
                     
                     if region != 'Global':
-                        df_this_region = df_this_category[df_this_category[region_label] == region]
+                        if (aggregation_type_in_each_year == 'area_weighted_mean') and (category in landtype_groups):
+                            landtypes = landtype_groups[category]
+                            df_this_region = df_this_scenario[df_this_scenario[category_label].isin(landtypes)]
+                            df_this_region = df_this_region[df_this_region[region_label] == region]
+                        else:
+                            df_this_region = df_this_category[df_this_category[region_label] == region]
                     else:
-                        #df_this_region = df_this_category 
                         if (aggregation_type_in_each_year == 'area_weighted_mean') and (category in landtype_groups):
                             landtypes = landtype_groups[category]
                             df_this_region = df_this_scenario[df_this_scenario[category_label].isin(landtypes)]
@@ -405,13 +409,17 @@ def plot_time_series(inputs):
                         df_this_category = df_this_scenario[df_this_scenario[category_label] == category]
                     for region_index, region in enumerate(inputs['regions'][category]):
 
-                        if region != 'Global':
-                            df_this_region = df_this_category[df_this_category[region_label] == region]
-                        else:
-                            #df_this_region = df_this_category
+                        if region != 'Global':   
                             if (aggregation_type_in_each_year == 'area_weighted_mean') and (category in landtype_groups):
-                               landtypes = landtype_groups[category]
-                               df_this_region = df_this_scenario[df_this_scenario[category_label].isin(landtypes)]
+                                landtypes = landtype_groups[category]
+                                df_this_region = df_this_scenario[df_this_scenario[category_label].isin(landtypes)]
+                                df_this_region = df_this_region[df_this_region[region_label] == region]
+                            else:
+                                df_this_region = df_this_category[df_this_category[region_label] == region]
+                        else:
+                            if (aggregation_type_in_each_year == 'area_weighted_mean') and (category in landtype_groups):
+                                landtypes = landtype_groups[category]
+                                df_this_region = df_this_scenario[df_this_scenario[category_label].isin(landtypes)]
                             else:
                                 df_this_region = df_this_category
 

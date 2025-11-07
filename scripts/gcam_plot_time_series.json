@@ -72,6 +72,7 @@
         "output_file": "./../2025_DiVittorio_et_al_gcam/co2_emissions_regions_processed.csv",
         "scenarios": ["Control", "Full feedback"],
         "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/direct",
+        "aggregation_type_in_each_year": "sum",
         "legend_num_columns": 1,
         "use_latex": true
     },
@@ -83,6 +84,7 @@
         "legend_x_offset": 1.45,
         "legend_num_columns": 1,
         "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/direct_regions",
+        "aggregation_type_in_each_year": "sum",
         "use_latex": true
     },
     {
@@ -97,6 +99,7 @@
         "scenario_sets": ["Control", "Full feedback"],
         "categories": ["agricultural energy use", "construction energy use", "trn_aviation_intl", "refining"],
         "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/ensemble",
+        "aggregation_type_in_each_year": "sum",
         "legend_num_columns": 1,
         "legend_x_offset": 1.55,
         "use_latex": true
@@ -113,6 +116,7 @@
         "scenario_sets": ["Control", "Full feedback"],
         "categories": ["agricultural energy use", "construction energy use", "trn_aviation_intl", "refining"],
         "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/ensemble_percent_difference",
+        "aggregation_type_in_each_year": "sum",
         "legend_num_columns": 1,
         "legend_x_offset": 1.35,
         "plot_percent_difference": true,
