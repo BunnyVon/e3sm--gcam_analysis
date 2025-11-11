@@ -157,9 +157,14 @@ def standardize_crop_names(df, columns, mean_or_sum_if_more_than_one_row_for_cro
 
         def weighted_mean(g):
             result = {}
+            total_area = g['area'].sum()
+    
             for col in numeric_cols:
-                result[col] = (g[col] * g['area']).sum() / g['area'].sum()
-            result['area'] = g['area'].sum()
+                if total_area != 0:
+                    result[col] = (g[col] * g['area']).sum() / total_area
+                else:
+                    result[col] = float('nan')  # avoid division by zero
+            result['area'] = total_area
             return pd.Series(result)
 
         return df.groupby(columns).apply(weighted_mean).reset_index()
