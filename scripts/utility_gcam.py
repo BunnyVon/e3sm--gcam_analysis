@@ -152,6 +152,14 @@ def standardize_crop_names(df, columns, mean_or_sum_if_more_than_one_row_for_cro
     elif mean_or_sum_if_more_than_one_row_for_crop_name == 'sum':
         return df.groupby(columns).sum().reset_index()
     elif mean_or_sum_if_more_than_one_row_for_crop_name == 'area_weighted_mean':
-        df.groupby(columns).apply(lambda g: pd.Series({
-                 'value': (g['value']*g['area']).sum()/g['area'].sum(),
-                 'area': g['area'].sum()})).reset_index()
+        numeric_cols = df.select_dtypes('number').columns.tolist()
+        numeric_cols = [col for col in numeric_cols if col not in columns + ['area']]
+
+        def weighted_mean(g):
+            result = {}
+            for col in numeric_cols:
+                result[col] = (g[col] * g['area']).sum() / g['area'].sum()
+            result['area'] = g['area'].sum()
+            return pd.Series(result)
+
+        return df.groupby(columns).apply(weighted_mean).reset_index()
