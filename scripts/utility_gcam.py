@@ -142,6 +142,16 @@ def standardize_crop_names(df, columns, mean_or_sum_if_more_than_one_row_for_cro
     """
     df = df.replace(gcam_crop_mappings)
     if mean_or_sum_if_more_than_one_row_for_crop_name == 'mean':
-        return df.groupby(columns).mean().reset_index()
+        mean_df = df.groupby(columns).mean().reset_index()
+        if 'area' in df.columns:
+            # sum of area
+            area_sum = df.groupby(columns)['area'].sum().reset_index()
+            # replace/merge the area column in mean_df
+            mean_df = mean_df.drop(columns='area', errors='ignore').merge(area_sum, on=columns)
+        return mean_df
     elif mean_or_sum_if_more_than_one_row_for_crop_name == 'sum':
         return df.groupby(columns).sum().reset_index()
+    elif mean_or_sum_if_more_than_one_row_for_crop_name == 'area_weighted_mean':
+        df.groupby(columns).apply(lambda g: pd.Series({
+                 'value': (g['value']*g['area']).sum()/g['area'].sum(),
+                 'area': g['area'].sum()})).reset_index()
