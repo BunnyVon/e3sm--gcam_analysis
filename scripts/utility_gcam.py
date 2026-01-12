@@ -142,6 +142,29 @@ def standardize_crop_names(df, columns, mean_or_sum_if_more_than_one_row_for_cro
     """
     df = df.replace(gcam_crop_mappings)
     if mean_or_sum_if_more_than_one_row_for_crop_name == 'mean':
-        return df.groupby(columns).mean().reset_index()
+        mean_df = df.groupby(columns).mean().reset_index()
+        if 'area' in df.columns:
+            # sum of area
+            area_sum = df.groupby(columns)['area'].sum().reset_index()
+            # replace/merge the area column in mean_df
+            mean_df = mean_df.drop(columns='area', errors='ignore').merge(area_sum, on=columns)
+        return mean_df
     elif mean_or_sum_if_more_than_one_row_for_crop_name == 'sum':
         return df.groupby(columns).sum().reset_index()
+    elif mean_or_sum_if_more_than_one_row_for_crop_name == 'area_weighted_mean':
+        numeric_cols = df.select_dtypes('number').columns.tolist()
+        numeric_cols = [col for col in numeric_cols if col not in columns + ['area']]
+
+        def weighted_mean(g):
+            result = {}
+            total_area = g['area'].sum()
+    
+            for col in numeric_cols:
+                if total_area != 0:
+                    result[col] = (g[col] * g['area']).sum() / total_area
+                else:
+                    result[col] = float('nan')  # avoid division by zero
+            result['area'] = total_area
+            return pd.Series(result)
+
+        return df.groupby(columns).apply(weighted_mean).reset_index()

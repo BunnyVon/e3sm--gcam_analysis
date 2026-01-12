@@ -5,7 +5,7 @@ import sys
 import time
 from utility_dataframes import read_file_into_dataframe, write_dataframe_to_fwf
 from utility_functions import get_all_files_in_path
-from utility_gcam import standardize_crop_names
+#from utility_gcam import standardize_crop_names
 
 def process_and_compile_ehc_scalars(inputs):
     """ 
@@ -22,7 +22,7 @@ def process_and_compile_ehc_scalars(inputs):
     start_time = time.time()
     input_directories = inputs['input_directories']
     output_file = inputs['output_file']
-    call_standardize_crop_names = inputs.get('call_standardize_crop_names', False)
+    #call_standardize_crop_names = inputs.get('call_standardize_crop_names', False)
     scenarios = inputs['scenarios']
     dataframes_for_all_scenarios = []
     for index, scenario in enumerate(scenarios):
@@ -45,8 +45,8 @@ def process_and_compile_ehc_scalars(inputs):
     df = df[key_columns + ['vegetation', 'soil']]
 
     # Update any non-standard crop names to belong to the standard set. No action is performed by this function is there are no non-standard names.
-    if call_standardize_crop_names:
-        df = standardize_crop_names(df, key_columns)
+    #if call_standardize_crop_names:
+    #    df = standardize_crop_names(df, key_columns)
 
     if output_file.endswith('.csv'):
         df.to_csv(output_file, index=False)

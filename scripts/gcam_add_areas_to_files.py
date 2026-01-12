@@ -6,6 +6,7 @@ import sys
 import time
 from utility_constants import *
 from utility_dataframes import read_file_into_dataframe, write_dataframe_to_fwf
+from utility_gcam import standardize_crop_names
 
 def add_areas_to_subset_of_file(df, df_land, geographical_label, category_label, scenario, geography, category):
     """ 
@@ -81,6 +82,8 @@ def add_areas_to_file(inputs):
     land_allocation_file = inputs['land_allocation_file']
     df = read_file_into_dataframe(input_file)
     df_land = read_file_into_dataframe(land_allocation_file)
+    mean_or_sum_if_more_than_one_row_in_same_landtype_group = inputs.get('mean_or_sum_if_more_than_one_row_in_same_landtype_group', None) 
+    call_standardize_crop_names = inputs.get('call_standardize_crop_names', False)
     
     # Form a list of tuples that represents the Cartesian product of all scenarios, geographies, and categories, along with the DataFrames and labels.
     scenarios = df['scenario'].unique()
@@ -99,6 +102,10 @@ def add_areas_to_file(inputs):
     # Concatenate all DataFrames in the list together to form a single DataFrame for this file. Sort by all the given key columns.
     df = pd.concat(dataframes_for_each_subset)
     df.sort_values(key_columns, inplace=True)
+
+    # Update any non-standard crop names to belong to the standard set. No action is performed by this function is there are no non-standard names.
+    if call_standardize_crop_names:
+        df = standardize_crop_names(df, key_columns, mean_or_sum_if_more_than_one_row_in_same_landtype_group)
 
     if output_file.endswith('.csv'):
         df.to_csv(output_file, index=False)

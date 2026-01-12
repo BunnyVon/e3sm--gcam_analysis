@@ -5,7 +5,9 @@
         "key_columns": ["scenario", "region", "sector", "year"],
         "geographical_label": "region",
         "category_label": "sector",
-        "land_allocation_file": "./../2025_DiVittorio_et_al_gcam/land_allocation_detailed_processed.csv"
+        "land_allocation_file": "./../2025_DiVittorio_et_al_gcam/land_allocation_detailed_processed.csv",
+        "call_standardize_crop_names": false,
+        "mean_or_sum_if_more_than_one_row_in_same_landtype_group": "area_weighted_mean"
     },
     {
         "input_file": "./../2025_DiVittorio_et_al_gcam/ag_commodity_prices_processed_ensemble.csv",
@@ -13,7 +15,9 @@
         "key_columns": ["scenario", "region", "sector", "year"],
         "geographical_label": "region",
         "category_label": "sector",
-        "land_allocation_file": "./../2025_DiVittorio_et_al_gcam/land_allocation_detailed_processed_ensemble.csv"
+        "land_allocation_file": "./../2025_DiVittorio_et_al_gcam/land_allocation_detailed_processed_ensemble.csv",
+        "call_standardize_crop_names": false,
+        "mean_or_sum_if_more_than_one_row_in_same_landtype_group": "area_weighted_mean"
     },
     {
         "input_file": "./../2025_DiVittorio_et_al_gcam/scalars_control+full_feedback.csv",
@@ -21,7 +25,9 @@
         "key_columns": ["scenario", "region", "basin", "landtype", "year"],
         "geographical_label": "basin",
         "category_label": "landtype",
-        "land_allocation_file": "./../2025_DiVittorio_et_al_gcam/land_allocation_detailed_processed.csv"
+        "land_allocation_file": "./../2025_DiVittorio_et_al_gcam/land_allocation_detailed_processed_nonstandard_crop.csv",
+        "call_standardize_crop_names": true,
+        "mean_or_sum_if_more_than_one_row_in_same_landtype_group": "area_weighted_mean"
     },
     {
         "input_file": "./../2025_DiVittorio_et_al_gcam/scalars_control+full_feedback_ensemble.csv",
@@ -29,6 +35,8 @@
         "key_columns": ["scenario", "region", "basin", "landtype", "year"],
         "geographical_label": "basin",
         "category_label": "landtype",
-        "land_allocation_file": "./../2025_DiVittorio_et_al_gcam/land_allocation_detailed_processed_ensemble.csv"
+        "land_allocation_file": "./../2025_DiVittorio_et_al_gcam/land_allocation_detailed_processed_nonstandard_crop.csv",
+        "call_standardize_crop_names": true,
+        "mean_or_sum_if_more_than_one_row_in_same_landtype_group": "area_weighted_mean"
     }
 ]
