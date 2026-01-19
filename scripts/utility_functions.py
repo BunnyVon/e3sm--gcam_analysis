@@ -72,23 +72,6 @@ def check_substrings_in_string(substrings, string, all_or_any='all'):
     else:
         return any(substring in string for substring in substrings)
 
-def convert_month_numbers_to_(substrings, string, all_or_any='all'):
-    """
-    Checks if either all or any of the elements of the substrings list are substrings of the string.
-
-    Parameters:
-        substring: A list of strings (substrings to search for).
-        string: String to search within.
-        all_or_any: String whose value should be either 'all' or 'any'.
-
-    Returns:
-        True if either all or any of the elements of substrings are substrings of the string, False otherwise.
-    """
-    if all_or_any == 'all':
-        return all(substring in string for substring in substrings)
-    else:
-        return any(substring in string for substring in substrings)
-
 def create_numpy_array_from_ds(ds, variables, fill_nan_values):
     """
     Creates a list of NumPy arrays from the specified variables of an xarray Dataset. 

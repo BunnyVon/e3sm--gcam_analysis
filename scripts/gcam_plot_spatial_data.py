@@ -14,7 +14,7 @@ from utility_gcam import *
 from utility_plots import *
 
 """ Dictionary of default input values for spatial plots. """
-default_inputs_time_series = {
+default_inputs = {
     'basin_label': 'basin',
     'category_label': 'sector',
     'cbar_limits': None,
@@ -23,9 +23,10 @@ default_inputs_time_series = {
     'end_year': 2090,
     'height': height_default,
     'key_columns': None,
-    'landtype_groups': 'standard',
+    'landtype_groups': 'modified',
     'linewidth': 0.5,
     'multiplier': 1,
+    'mean_or_sum_for_time_aggregation': 'mean',
     'mean_or_sum_if_more_than_one_row_in_same_landtype_group': 'area_weighted_mean',
     'mean_or_sum_if_more_than_one_row_in_same_region_and_or_basin': 'mean',
     'p_value_file': 'p_values.dat',
@@ -42,7 +43,6 @@ default_inputs_time_series = {
     'start_year': 2070,
     'stippling_hatches': 'xxxx',
     'stippling_on': True,
-    'time_calculation': 'mean',
     'use_latex': use_latex_default, 
     'value_label': 'value',
     'width': width_default,   
@@ -64,8 +64,9 @@ def process_inputs(inputs):
     """
     df = read_file_into_dataframe(inputs['output_file'])
 
+    # If the category label (e.g., sector or landtype) has not been specified, use the default value.
     if 'category_label' not in inputs:
-        category_label = default_inputs_time_series['category_label']
+        category_label = default_inputs['category_label']
         inputs['category_label'] = category_label
     else:
         category_label = inputs['category_label']
@@ -86,11 +87,11 @@ def process_inputs(inputs):
 
     # Create the plot directory if it does not already exist. By default, put the name of the file containing p-value results in this directory.
     if 'plot_directory' not in inputs:
-        inputs['plot_directory'] = default_inputs_time_series['plot_directory']
+        inputs['plot_directory'] = default_inputs['plot_directory']
     if not os.path.exists(inputs['plot_directory']):
         os.makedirs(inputs['plot_directory'])
     if 'p_value_file' not in inputs:
-        inputs['p_value_file'] = os.path.join(inputs['plot_directory'], default_inputs_time_series['p_value_file'])
+        inputs['p_value_file'] = os.path.join(inputs['plot_directory'], default_inputs['p_value_file'])
 
     # Use the name of the output file itself (without its path) to set defaults for the title and the name of the plot.
     index_of_last_backslash = inputs['output_file'].rfind('/')
@@ -103,11 +104,14 @@ def process_inputs(inputs):
         inputs['title'] = output_file_name
     if 'plot_name' not in inputs:
         inputs['plot_name'] = os.path.join(inputs['plot_directory'], 'spatial_' + output_file_name)
+    elif 'plot_name' in inputs and '/' not in inputs['plot_name']:
+        # If the user specified only a file name (no path) for the plot name, put the plot in the plot directory.
+        inputs['plot_name'] = os.path.join(inputs['plot_directory'], inputs['plot_name'])
 
     # Add keys for plotting options that have not been specified in the inputs dictionary and use default values for them.
-    for key in default_inputs_time_series.keys():
+    for key in default_inputs.keys():
         if key not in inputs:
-            inputs[key] = default_inputs_time_series[key]
+            inputs[key] = default_inputs[key]
 
     # If the scenarios have not been specified, use all the scenarios in the Pandas DataFrame.
     if 'scenarios' not in inputs:
@@ -119,7 +123,7 @@ def process_inputs(inputs):
 def plot_spatial_data(inputs):
     """ 
     Creates a spatial plot and perform statistical analysis for a single output file. The data in the file are organized
-    into scenarios or scenario sets, categories, and regions.
+    into individual scenarios or scenario sets (ensembles), categories, and regions.
 
     Parameters:
         input: Dictionary containing user inputs for different plotting options, where the keys are options and values are choices for those options.
@@ -145,6 +149,7 @@ def plot_spatial_data(inputs):
     landtype_groups = inputs['landtype_groups']
     linewidth = inputs['linewidth']
     multiplier = inputs['multiplier']
+    mean_or_sum_for_time_aggregation = inputs['mean_or_sum_for_time_aggregation']
     mean_or_sum_if_more_than_one_row_in_same_landtype_group = inputs['mean_or_sum_if_more_than_one_row_in_same_landtype_group']
     mean_or_sum_if_more_than_one_row_in_same_region_and_or_basin = inputs['mean_or_sum_if_more_than_one_row_in_same_region_and_or_basin']
     p_value_file = inputs['p_value_file']
@@ -162,7 +167,6 @@ def plot_spatial_data(inputs):
     start_year = inputs['start_year']
     stippling_hatches = inputs['stippling_hatches']
     stippling_on = inputs['stippling_on']
-    time_calculation = inputs['time_calculation']
     title = inputs['title']
     use_latex = inputs['use_latex']
     value_label = inputs['value_label']
@@ -171,7 +175,7 @@ def plot_spatial_data(inputs):
     y_tick_label_size = inputs['y_tick_label_size']
     year_label = inputs['year_label']
 
-    # Set the plotting options.
+    # Set the plotting options. Add percent difference to the title if not already present.
     if plot_type == 'percent_difference' and title and (f'%' not in title or 'percent' not in title):
         title += rf' (\% difference)'
     plot_options = dict(width=width, height=height, name=plot_name, produce_png=produce_png)
@@ -185,13 +189,14 @@ def plot_spatial_data(inputs):
     # Read the data file into a Pandas DataFrame and select rows between the start and end years.
     df = read_file_into_dataframe(output_file)
     df = df[(df[year_label] >= start_year) & (df[year_label] <= end_year)]
+    # Apply the multiplier to the value column (this could be used to change units, for example).
     df[value_label] *= multiplier
 
     # Set the appropriate dictionary for the landtype group.
-    if landtype_groups == 'standard':
+    if landtype_groups == 'modified':
         landtype_groups = gcam_landtype_groups
-    elif landtype_groups == 'nonstandard':
-        landtype_groups = gcam_landtype_groups_nonstandard
+    elif landtype_groups == 'original':
+        landtype_groups = gcam_landtype_groups_original
 
     # Create separate DataFrames for the following cases: 1) all categories (create a copy of the entire DataFrame), 2) categories that correspond to
     # a group of landtypes (e.g., forest, crop, grass, shrub, pasture), and 3) a set of individual categories. Concatenate into a single DataFrame.
@@ -217,15 +222,15 @@ def plot_spatial_data(inputs):
     gdf = gpd.read_file(shape_file)
     regions = gdf[shape_file_region_label].unique()
 
-    # Create a common variable called scenario_list that will contain a 1D list of all scenarios for both the direct plots and ensemble plots.
+    # For both the individual plots and ensemble plots, create a common variable called scenario_list that will contain a 1D list of all scenarios.
     if not check_is_list_of_lists(scenarios):
-        # Direct plots, in which each such spatial plot can include one or more individual (not grouped) data sets and the scenarios is already a 1D list.
+        # Option 1: Individual plots, in which each such spatial plot can include one or more individual (not grouped) data sets.
         scenario_list = scenarios
-        # Column labels for these scenarios.
+        # Create column labels for these scenarios.
         scenario_columns = [f'scen={i}' for i in range(len(scenarios))]
     else:
-        # Ensemble plots, in which the ensemble is further subdivided into groups, where each group represents a set of scenarios.
-        # The scenarios in this case are contained in a list of lists (i.e., a 2D list).
+        # Option 2: Ensemble plots, in which the ensemble is further subdivided into groups, where each group represents a set of scenarios.
+        # The scenarios in this case are contained in a list of lists (i.e., a 2D or nested list). These will be unraveled into the 1D scenario_list.
         scenario_list = []
         scenario_columns = []
         num_scenario_sets = len(scenarios[0])
@@ -243,7 +248,7 @@ def plot_spatial_data(inputs):
         for region in regions:
             region_filter = gdf[shape_file_region_label] == region
             if basin_label in df_this_scenario.columns:
-                # If the DataFrame containing the data of interest are organized into basins, add basin-level information.
+                # If the DataFrame containing the data of interest are further organized into basins, add basin-level information.
                 basins = gdf[region_filter][shape_file_basin_label].unique()
                 for basin in basins:
                     basin_filter = gdf[shape_file_basin_label] == basin
@@ -253,7 +258,7 @@ def plot_spatial_data(inputs):
                     else:
                         # Basin names are fully written out in the GeoDataFrame (shape file), while they are abbreviated in the DataFrame (data file).
                         basin_abbrv = gcam_basin_names_and_abbrevations[basin]
-                        # Calculate the mean or sum of all relevant categories over all years for the current region in the for-loop iteration.
+                        # Calculate the mean or sum of all relevant categories over all years for the current region and basin.
                         if mean_or_sum_if_more_than_one_row_in_same_region_and_or_basin == 'mean':
                             df_grouped_by_year = \
                             df_this_scenario[(df_this_scenario[region_label] == region) & \
@@ -262,9 +267,9 @@ def plot_spatial_data(inputs):
                             df_grouped_by_year = \
                             df_this_scenario[(df_this_scenario[region_label] == region) & \
                                         (df_this_scenario[basin_label] == basin_abbrv)].groupby('year')[value_label].sum()
-                        if time_calculation == 'mean':
+                        if mean_or_sum_for_time_aggregation == 'mean':
                             gdf.loc[region_filter & basin_filter, scenario_columns[index]] = df_grouped_by_year.mean()
-                        elif time_calculation == 'sum':
+                        elif mean_or_sum_for_time_aggregation == 'sum':
                             gdf.loc[region_filter & basin_filter, scenario_columns[index]] = df_grouped_by_year.sum()
             else:
                 # If the DataFrame containing the data of interest does not provide basin-level information (only regions), calculate the mean or sum
@@ -274,10 +279,11 @@ def plot_spatial_data(inputs):
                     df_grouped_by_year = df_this_scenario[df_this_scenario[region_label] == region].groupby('year')[value_label].mean()
                 elif mean_or_sum_if_more_than_one_row_in_same_region_and_or_basin == 'sum':
                     df_grouped_by_year = df_this_scenario[df_this_scenario[region_label] == region].groupby('year')[value_label].sum()
-                if time_calculation == 'mean':
+                if mean_or_sum_for_time_aggregation == 'mean':
                     gdf.loc[region_filter, scenario_columns[index]] = df_grouped_by_year.mean()
-                elif time_calculation == 'sum':
+                elif mean_or_sum_for_time_aggregation == 'sum':
                     gdf.loc[region_filter, scenario_columns[index]] = df_grouped_by_year.sum()
+    # Fill any missing values in the GeoDataFrame with 0.
     gdf.fillna(0, inplace=True)
 
     if len(scenario_list) == 1:
@@ -288,7 +294,7 @@ def plot_spatial_data(inputs):
         gdf['plot'] = gdf[scenario_columns].mean(axis=1)
     elif plot_type == 'absolute_difference' or plot_type == 'percent_difference':
         if not check_is_list_of_lists(scenarios):
-            # If a direct plot, assume the first column is the reference for the absolute difference or percent difference calculation.
+            # If an individual plot, assume the first column is the reference for the absolute difference or percent difference calculation.
             columns_control = [scenario_columns[0]]
             columns_test = [x for x in scenario_columns[1:]] 
         else:
@@ -299,8 +305,8 @@ def plot_spatial_data(inputs):
                 # If there are two scenario sets, do a t-test at each individual region-and-basin combination and put results into the GeoDataFrame.
                 df = pd.DataFrame()
                 df[columns_control], df[columns_test] = gdf[columns_control], gdf[columns_test]
-                gdf['p_value'] = df.apply(perform_ttest, columns_set_1=columns_control, \
-                                                               columns_set_2=columns_test, axis=1).fillna(1)
+                gdf['p_value'] = df.apply(perform_ttest, columns_set_1=columns_control, columns_set_2=columns_test, axis=1).fillna(1)
+        # Calculate either the absolute difference or percent difference between the means of the test and control data sets.
         control_data = gdf.loc[:, columns_control].mean(axis=1)
         test_data = gdf.loc[:, columns_test].mean(axis=1)
         if plot_type == 'percent_difference':
@@ -319,6 +325,7 @@ def plot_spatial_data(inputs):
         vmin, vmax = cbar_limits[0], cbar_limits[1]
     else:
         vmin, vmax = None, None
+        
     # Generate the plot and optionally add stippling to indicate statistically significant differences at individual regions and/or basins.
     gdf.plot('plot', ax=ax, legend=cbar_on, cmap=cmap_color, vmin=vmin, vmax=vmax, legend_kwds={"shrink": .5}, edgecolor='k', linewidth=linewidth)
     if 'p_value' in gdf.columns and stippling_on:
@@ -365,7 +372,7 @@ if __name__ == '__main__':
         if os.path.exists(file): 
             os.remove(file)
 
-    # Create all of the bpx plots in parallel.
+    # Create all of the box plots in parallel.
     with multiprocessing.Pool(processes=multiprocessing.cpu_count()) as pool:
         pool.map(plot_spatial_data, list_of_inputs)
     

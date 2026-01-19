@@ -1,21 +1,21 @@
 [
     {
-        "input_file": "./../2025_DiVittorio_et_al_gcam/land_allocation_detailed.csv",
-        "output_file": "./../2025_DiVittorio_et_al_gcam/land_allocation_detailed_processed.csv",
+        "input_file": "./../2025_DiVittorio_et_al_gcam/land_allocation.csv",
+        "output_file": "./../2025_DiVittorio_et_al_gcam/land_allocation_processed.csv",
         "columns_to_drop": ["Unnamed: 0", "Units"],
         "columns_to_split": {"landleaf": ["landtype", "basin"]},
         "key_columns": ["scenario", "region", "basin", "landtype", "year"],
         "mean_or_sum_if_more_than_one_row_in_same_landtype_group": "sum",
-        "call_standardize_crop_names": true
+        "call_modify_crop_names": true
     },
     {
-        "input_file": "./../2025_DiVittorio_et_al_gcam/land_allocation_detailed.csv",
-        "output_file": "./../2025_DiVittorio_et_al_gcam/land_allocation_detailed_processed_nonstandard_crop.csv",
+        "input_file": "./../2025_DiVittorio_et_al_gcam/land_allocation.csv",
+        "output_file": "./../2025_DiVittorio_et_al_gcam/land_allocation_processed_original_crop_names.csv",
         "columns_to_drop": ["Unnamed: 0", "Units"],
         "columns_to_split": {"landleaf": ["landtype", "basin"]},
         "key_columns": ["scenario", "region", "basin", "landtype", "year"],
         "mean_or_sum_if_more_than_one_row_in_same_landtype_group": "sum",
-        "call_standardize_crop_names": false
+        "call_modify_crop_names": false
     },
     {
         "input_file": "./../2025_DiVittorio_et_al_gcam/ag_commodity_prices.csv",
@@ -23,7 +23,7 @@
         "columns_to_drop": ["Unnamed: 0", "Units"],
         "key_columns": ["scenario", "region", "sector", "year"],
         "mean_or_sum_if_more_than_one_row_in_same_landtype_group": "mean",
-        "call_standardize_crop_names": true
+        "call_modify_crop_names": true
     },
     {
         "input_file": "./../2025_DiVittorio_et_al_gcam/co2_emissions_sectors.csv",

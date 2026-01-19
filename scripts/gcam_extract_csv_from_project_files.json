@@ -22,7 +22,7 @@
     },
     {
         "variable": "detailed land allocation",
-        "outputFile": "./../2025_DiVittorio_et_al_gcam/land_allocation_detailed.csv",
+        "outputFile": "./../2025_DiVittorio_et_al_gcam/land_allocation.csv",
         "scenarios": ["Control", "Full feedback"],
         "projectFiles": ["./../2025_DiVittorio_et_al_gcam/20240730_SSP245_ZATM_control.dat",
         "./../2025_DiVittorio_et_al_gcam/20240730_SSP245_ZATM_full_feedback.dat"]

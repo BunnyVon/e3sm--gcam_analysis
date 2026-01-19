@@ -5,8 +5,8 @@ import pandas as pd
 import sys
 import time
 from utility_constants import *
-from utility_dataframes import read_file_into_dataframe, write_dataframe_to_fwf
-from utility_gcam import standardize_crop_names
+from utility_dataframes import read_file_into_dataframe, write_dataframe_to_file
+from utility_gcam import modify_crop_names
 
 def add_areas_to_subset_of_file(df, df_land, geographical_label, category_label, scenario, geography, category):
     """ 
@@ -25,7 +25,8 @@ def add_areas_to_subset_of_file(df, df_land, geographical_label, category_label,
     Returns:
         DataFrame that is the same as the input df, but with an extra column for the corresponding land allocation areas.
     """
-    # Read in the DataFrames for the data and the land allocations, get the appropriate subset for them, and put these subset DataFrames into a list.
+    # Read in two DataFrames: one for the data and the other land allocations, get the appropriate subset for each of them, 
+    # and put these two subset DataFrames into a list that we will then work with below.
     dataframes = [df, df_land]
     columns = {0: ['scenario', geographical_label, category_label], 1: ['scenario', geographical_label, 'landtype']}
     matches = [scenario, geography, category]
@@ -47,7 +48,7 @@ def add_areas_to_subset_of_file(df, df_land, geographical_label, category_label,
             df['area'] = df_land.groupby('year').sum()['value'].to_numpy()
         if geographical_label == 'basin':
             # If matching on the basin, there could be multiple regions that contain parts of this basin. As a result, for each year, 
-            # add up the areas of all matching regions that correspond to the given scenario, category, and basin.
+            # collect the areas of all matching regions that correspond to the given scenario, category, and basin.
             regions = df['region'].unique()
             dataframes_for_this_region = []
             for region in regions:
@@ -83,7 +84,7 @@ def add_areas_to_file(inputs):
     df = read_file_into_dataframe(input_file)
     df_land = read_file_into_dataframe(land_allocation_file)
     mean_or_sum_if_more_than_one_row_in_same_landtype_group = inputs.get('mean_or_sum_if_more_than_one_row_in_same_landtype_group', None) 
-    call_standardize_crop_names = inputs.get('call_standardize_crop_names', False)
+    call_modify_crop_names = inputs.get('call_modify_crop_names', False)
     
     # Form a list of tuples that represents the Cartesian product of all scenarios, geographies, and categories, along with the DataFrames and labels.
     scenarios = df['scenario'].unique()
@@ -103,14 +104,11 @@ def add_areas_to_file(inputs):
     df = pd.concat(dataframes_for_each_subset)
     df.sort_values(key_columns, inplace=True)
 
-    # Update any non-standard crop names to belong to the standard set. No action is performed by this function is there are no non-standard names.
-    if call_standardize_crop_names:
-        df = standardize_crop_names(df, key_columns, mean_or_sum_if_more_than_one_row_in_same_landtype_group)
+    # Update original crop names to a common, standardized set of names. 
+    if call_modify_crop_names:
+        df = modify_crop_names(df, key_columns, mean_or_sum_if_more_than_one_row_in_same_landtype_group)
 
-    if output_file.endswith('.csv'):
-        df.to_csv(output_file, index=False)
-    else:
-        write_dataframe_to_fwf(output_file, df)
+    write_dataframe_to_file(df, output_file)
     end_time = time.time()
     elapsed_time = end_time - start_time
     print(f"Elapsed time for adding areas to {output_file}: {elapsed_time:.2f} seconds")

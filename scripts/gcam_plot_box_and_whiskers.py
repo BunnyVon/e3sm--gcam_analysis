@@ -10,11 +10,11 @@ import time
 from utility_constants import *
 from utility_dataframes import read_file_into_dataframe
 from utility_functions import check_is_list_of_lists
-from utility_gcam import gcam_landtype_groups, gcam_landtype_groups_nonstandard, produce_dataframe_for_landtype_group
+from utility_gcam import gcam_landtype_groups, gcam_landtype_groups_original, produce_dataframe_for_landtype_group
 from utility_plots import *
 
 """ Dictionary of default input values for box plots (i.e., box-and-whisker plots). """
-default_inputs_time_series = {
+default_inputs = {
     'basin_label': 'basin',
     'basins': None,
     'category_label': 'sector',
@@ -23,7 +23,7 @@ default_inputs_time_series = {
     'height': height_default,
     'hue': None,
     'key_columns': None,
-    'landtype_groups': 'standard',
+    'landtype_groups': 'modified',
     'legend_x_offset': None,
     'legend_label_size': legend_label_size_default,
     'legend_num_columns': 1,
@@ -66,12 +66,13 @@ def process_inputs(inputs):
 
     Returns:
         Dictionary that completely specifies all plotting options. 
-        If the user did not select a plotting option fora particular category, the default choice for that plotting option will be selected.
+        If the user did not make a choice for a particular option, the default choice for that plotting option will be selected.
     """
     df = read_file_into_dataframe(inputs['output_file'])
 
+    # If the category label (e.g., sector or landtype) has not been specified, use the default value.
     if 'category_label' not in inputs:
-        category_label = default_inputs_time_series['category_label']
+        category_label = default_inputs['category_label']
         inputs['category_label'] = category_label
     else:
         category_label = inputs['category_label']
@@ -92,7 +93,7 @@ def process_inputs(inputs):
 
     # Create the plot directory if it does not already exist.
     if 'plot_directory' not in inputs:
-        inputs['plot_directory'] = default_inputs_time_series['plot_directory']
+        inputs['plot_directory'] = default_inputs['plot_directory']
     if not os.path.exists(inputs['plot_directory']):
         os.makedirs(inputs['plot_directory'])
 
@@ -107,11 +108,14 @@ def process_inputs(inputs):
         inputs['y_label'] = output_file_name
     if 'plot_name' not in inputs:
         inputs['plot_name'] = os.path.join(inputs['plot_directory'], 'box_plot_' + output_file_name)
+    elif 'plot_name' in inputs and '/' not in inputs['plot_name']:
+        # If the user specified only a file name (no path) for the plot name, put the plot in the plot directory.
+        inputs['plot_name'] = os.path.join(inputs['plot_directory'], inputs['plot_name'])
 
     # Add keys for plotting options that have not been specified in the inputs dictionary and use default values for them.
-    for key in default_inputs_time_series.keys():
+    for key in default_inputs.keys():
         if key not in inputs:
-            inputs[key] = default_inputs_time_series[key]
+            inputs[key] = default_inputs[key]
 
     # If the scenarios have not been specified, use all the scenarios in the Pandas DataFrame.
     if 'scenarios' not in inputs:
@@ -122,11 +126,11 @@ def process_inputs(inputs):
 
 def plot_box_and_whiskers(inputs):
     """ 
-    Creates a box plot (box-and-whisker plot) and perform statistical analysis for a single output file. The data in the file are organized
+    Creates a box plot (box-and-whisker plot) and perform basic statistical analysis for a single output file. The data in the file are organized
     into scenarios or scenario sets, categories, and regions.
-    Types of plots: 1) Direct plots in which each scenario is treated as an individual data set in the collection. 
-    2) Ensemble plots in which the scenarios are grouped into sets and results from of each set are plotted. The scenarios must be specified as a 
-    list of lists for ensemble plots.
+    Types of plots: 1) Plots in which each scenario is treated as an individual data set (not grouped into an ensemble) in the collection. 
+    2) Ensemble plots in which the scenarios are grouped into sets (referred to as an ensemble) and results from of each set are plotted. 
+    The scenarios must be specified as a list of lists (nested list) for ensemble plots.
 
     Parameters:
         input: Dictionary containing user inputs for different plotting options, where the keys are options and values are choices for those options.
@@ -202,7 +206,7 @@ def plot_box_and_whiskers(inputs):
     plt.rcParams['xtick.labelsize'] = x_tick_label_size
     plt.rcParams['ytick.labelsize'] = y_tick_label_size
 
-    # Read the file, select rows between the start and end years, create the figure and axis objects for the plot.
+    # Read the file, select rows between the start and end years, apply user-specified multiplier, create the figure and axis objects for the plot.
     df = read_file_into_dataframe(output_file)
     df = df[(df[year_label] >= start_year) & (df[year_label] <= end_year)]
     df[value_label] *= multiplier
@@ -223,11 +227,12 @@ def plot_box_and_whiskers(inputs):
         dataframes.append(df_these_basins) 
     df = pd.concat(dataframes)
 
-    # Direct plots, in which each such box plot can include one or more individual (not grouped) data sets.
-    if not check_is_list_of_lists(scenarios) or plot_type == 'direct':
+    # Option 1: individual plots, in which each such box plot can include one or more individual (not grouped) data sets.
+    if not check_is_list_of_lists(scenarios) or plot_type == 'individual':
         
-        # If scenarios is a list of lists, but we want a direct plot, unpack scenarios into a list of strings, with one string for each output file.
-        if check_is_list_of_lists(scenarios) and plot_type == 'direct':
+        # If scenarios is a list of lists, but we do not actually want to group each inner list into an ensemble, 
+        # unpack scenarios into a list of strings, with one string for each output file.
+        if check_is_list_of_lists(scenarios) and plot_type == 'individual':
             scenarios = list(itertools.chain.from_iterable(scenarios))
             # Turn the corresponding plot_colors to list of lists with enough rows to match, then unpack them.
             plot_colors = list(itertools.chain.from_iterable(plot_colors))
@@ -236,23 +241,29 @@ def plot_box_and_whiskers(inputs):
         df = df[df[scenario_label].isin(scenarios)]
         scenario_list = scenarios
     
-    # Ensemble plots, in which the ensemble is further subdivided into groups, where each group represents a set of scenarios.
+    # Option 2: ensemble plots, in which the outputs are subdivided into groups, where each group (ensemble) represents a set of scenarios.
     elif check_is_list_of_lists(scenarios) and plot_type == 'ensemble_averages':
         # For each scenario set, collect all scenarios that belong to that set and put in a DataFrame, then concatenate the DataFrames for all sets.
         dataframes = []
         for index, scenario_set_name in enumerate(scenario_sets):
             scenarios_in_set = [scenarios[i][index] for i in range(len(scenarios))]
             df_this_set = df[df[scenario_label].isin(scenarios_in_set)].copy()
+            # All scenarios in this set will be collected together and have the same label.
             df_this_set[scenario_label] = scenario_set_name
             dataframes.append(df_this_set)
+        # Concatenate all DataFrames for all scenario sets by row. 
+        # Averages over each scenario set will be automatically computed later when creating the box plot.
         df = pd.concat(dataframes)
         scenario_list = scenario_sets
 
+    # The rest of the script involves creating DataFrames for different categories (e.g., landtypes or sectors) and producing the box plot.
+    # This applies to both individual and ensemble plots.
+
     # Set the appropriate dictionary for the landtype group.
-    if landtype_groups == 'standard':
+    if landtype_groups == 'modified':
         landtype_groups = gcam_landtype_groups
-    elif landtype_groups == 'nonstandard':
-        landtype_groups = gcam_landtype_groups_nonstandard
+    elif landtype_groups == 'original':
+        landtype_groups = gcam_landtype_groups_original
 
     # Create DataFrames for 1) all categories (create a copy of the entire DataFrame), 2) categories that correspond to
     # a group of landtypes (e.g., forest, crop, grass, shrub, pasture), and 3) a set of individual categories.

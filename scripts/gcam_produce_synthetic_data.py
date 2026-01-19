@@ -7,7 +7,7 @@ from utility_dataframes import read_file_into_dataframe, write_dataframe_to_fwf
 def produce_synthetic_time_series(inputs):
     """ 
     Produces a synthetic ensemble set of time series using random numbers to introduce perturbations to the time series in a given file. 
-    Each new synthetic time series in the ensemble is output as a .dat or .csv file.
+    Each new synthetic time series in the ensemble is output into a .dat or .csv file.
 
     Parameters:
         inputs: List with five items. The first item is the name of the file containing the base time series. 
@@ -24,10 +24,12 @@ def produce_synthetic_time_series(inputs):
     scenarios = inputs[1]
     scenario_label = inputs[2]
     columns_to_modify = inputs[3]
+    # Subtract by 1 because the base time series is already included in the file.
     num_synthetic_sets_in_ensemble = inputs[4] - 1
     df = read_file_into_dataframe(file)
     df_ensemble = df.copy()
     base_multipliers = np.linspace(1.02, 1.05, num_synthetic_sets_in_ensemble)
+    # Iterate through each scenario and produce the specified number of variations for each scenario.
     for scenario in scenarios:
         df_this_scenario = df[df[scenario_label] == scenario]
         for set_index in range(num_synthetic_sets_in_ensemble):
@@ -35,6 +37,7 @@ def produce_synthetic_time_series(inputs):
             random_multipliers = np.random.uniform(low=-0.02, high=0.02, size=len(df_this_scenario))
             multipliers = base_multipliers[set_index] + random_multipliers
             df_new[columns_to_modify] = df_this_scenario[columns_to_modify].multiply(multipliers, axis='index')
+            # Start numbering the new synthetic time series from 2 onwards to avoid confusion with the base time series.
             df_new[scenario_label] = f'{scenario}_{set_index+2}'
             df_ensemble = pd.concat([df_ensemble, df_new], axis=0)
     if file.endswith('.csv'):
@@ -61,10 +64,11 @@ if __name__ == '__main__':
     files = ["./../2025_DiVittorio_et_al_gcam/ag_commodity_prices_processed.csv", 
              "./../2025_DiVittorio_et_al_gcam/co2_emissions_regions_processed.csv", 
              "./../2025_DiVittorio_et_al_gcam/co2_emissions_sectors_processed.csv",
-             "./../2025_DiVittorio_et_al_gcam/land_allocation_detailed_processed.csv",
+             "./../2025_DiVittorio_et_al_gcam/land_allocation_processed.csv",
+             "./../2025_DiVittorio_et_al_gcam/land_allocation_processed_original_crop_names.csv",
              "./../2025_DiVittorio_et_al_gcam/scalars_control+full_feedback.csv"]
-    columns_to_modify = [['value'], ['value'], ['value'], ['value'], ['vegetation', 'soil']]
-    scenario_labels = ['scenario', 'scenario', 'scenario', 'scenario', 'scenario']
+    columns_to_modify = [['value'], ['value'], ['value'], ['value'], ['value'], ['vegetation', 'soil']]
+    scenario_labels = ['scenario', 'scenario', 'scenario', 'scenario', 'scenario', 'scenario']
 
     # Create inputs: list of scenarios for each file and scenario label for each file, columns with the numerical data (to later produce variations).
     all_scenarios = []

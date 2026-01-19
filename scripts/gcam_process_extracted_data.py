@@ -3,8 +3,8 @@ import multiprocessing
 import pandas as pd
 import sys
 import time
-from utility_dataframes import read_file_into_dataframe, write_dataframe_to_fwf
-from utility_gcam import standardize_crop_names
+from utility_dataframes import read_file_into_dataframe, write_dataframe_to_file
+from utility_gcam import modify_crop_names
 
 def process_extracted_data(inputs):
     """ 
@@ -24,7 +24,7 @@ def process_extracted_data(inputs):
     columns_to_split = inputs.get('columns_to_split', None) 
     key_columns = inputs.get('key_columns', None) 
     mean_or_sum_if_more_than_one_row_in_same_landtype_group = inputs.get('mean_or_sum_if_more_than_one_row_in_same_landtype_group', None) 
-    call_standardize_crop_names = inputs.get('call_standardize_crop_names', False)
+    call_modify_crop_names = inputs.get('call_modify_crop_names', False)
     
     df = read_file_into_dataframe(input_file)
     if columns_to_drop:
@@ -48,14 +48,11 @@ def process_extracted_data(inputs):
     elif mean_or_sum_if_more_than_one_row_in_same_landtype_group == 'mean' and key_columns:
         df = df.groupby(key_columns).mean().reset_index()
 
-    # Update any non-standard crop names to belong to the standard set. No action is performed by this function is there are no non-standard names.
-    if call_standardize_crop_names:
-        df = standardize_crop_names(df, key_columns, mean_or_sum_if_more_than_one_row_in_same_landtype_group)
+    # Update original crop names to a common, standardized set of names. 
+    if call_modify_crop_names:
+        df = modify_crop_names(df, key_columns, mean_or_sum_if_more_than_one_row_in_same_landtype_group)
 
-    if output_file.endswith('.csv'):
-        df.to_csv(output_file, index=False)
-    else:
-        write_dataframe_to_fwf(output_file, df)
+    write_dataframe_to_file(df, output_file)
     end_time = time.time()
     elapsed_time = end_time - start_time
     print(f"Elapsed time for producing {output_file}: {elapsed_time:.2f} seconds")

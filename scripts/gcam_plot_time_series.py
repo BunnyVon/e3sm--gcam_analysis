@@ -10,11 +10,11 @@ import time
 from utility_constants import *
 from utility_dataframes import perform_ttest, read_file_into_dataframe
 from utility_functions import check_is_list_of_lists, print_p_values, sort_file
-from utility_gcam import gcam_landtype_groups, gcam_landtype_groups_nonstandard, produce_dataframe_for_landtype_group
+from utility_gcam import gcam_landtype_groups, gcam_landtype_groups_original, produce_dataframe_for_landtype_group
 from utility_plots import *
 
 """ Dictionary of default input values for time series plots. """
-default_inputs_time_series = {
+default_inputs = {
     'aggregation_type_in_each_year': 'area_weighted_mean',
     'category_label': 'sector',
     'end_year': 2100,
@@ -22,7 +22,7 @@ default_inputs_time_series = {
     'height': height_default,
     'include_mean_across_all_data': False,
     'key_columns': None,
-    'landtype_groups': 'standard',
+    'landtype_groups': 'modified',
     'legend_x_offset': None,
     'legend_label_size': legend_label_size_default,
     'legend_num_columns': None,
@@ -73,12 +73,13 @@ def process_inputs(inputs):
 
     Returns:
         Dictionary that completely specifies all plotting options. 
-        If the user did not select a plotting option fora particular category, the default choice for that plotting option will be selected.
+        If the user did not make a choice for a particular option, the default choice for that plotting option will be selected.
     """
     df = read_file_into_dataframe(inputs['output_file'])
 
+    # If the category label (e.g., sector or landtype) has not been specified, use the default value.
     if 'category_label' not in inputs:
-        category_label = default_inputs_time_series['category_label']
+        category_label = default_inputs['category_label']
         inputs['category_label'] = category_label
     else:
         category_label = inputs['category_label']
@@ -99,11 +100,11 @@ def process_inputs(inputs):
 
     # Create the plot directory if it does not already exist. By default, put the name of the file containing p-value results in this directory.
     if 'plot_directory' not in inputs:
-        inputs['plot_directory'] = default_inputs_time_series['plot_directory']
+        inputs['plot_directory'] = default_inputs['plot_directory']
     if not os.path.exists(inputs['plot_directory']):
         os.makedirs(inputs['plot_directory'])
     if 'p_value_file' not in inputs:
-        inputs['p_value_file'] = os.path.join(inputs['plot_directory'], default_inputs_time_series['p_value_file'])
+        inputs['p_value_file'] = os.path.join(inputs['plot_directory'], default_inputs['p_value_file'])
 
     # Use the name of the output file itself (without its path) to set defaults for the y-axis label and the name of the plot.
     index_of_last_backslash = inputs['output_file'].rfind('/')
@@ -116,11 +117,14 @@ def process_inputs(inputs):
         inputs['y_label'] = output_file_name
     if 'plot_name' not in inputs:
         inputs['plot_name'] = os.path.join(inputs['plot_directory'], 'time_series_' + output_file_name)
+    elif 'plot_name' in inputs and '/' not in inputs['plot_name']:
+        # If the user specified only a file name (no path) for the plot name, put the plot in the plot directory.
+        inputs['plot_name'] = os.path.join(inputs['plot_directory'], inputs['plot_name'])
 
     # Add keys for plotting options that have not been specified in the inputs dictionary and use default values for them.
-    for key in default_inputs_time_series.keys():
+    for key in default_inputs.keys():
         if key not in inputs:
-            inputs[key] = default_inputs_time_series[key]
+            inputs[key] = default_inputs[key]
 
     # If the scenarios have not been specified, use all the scenarios in the Pandas DataFrame.
     if 'scenarios' not in inputs:
@@ -137,9 +141,9 @@ def plot_time_series(inputs):
     """ 
     Creates a time series plot with years on the x-axis and perform statistical analysis for a single output file. The data in the file are organized
     into scenarios or scenario sets, categories, and regions.
-    Types of plots: 1) Direct plots in which each scenario is treated as an individual curve in the time series collection. 
-    2) Ensemble plots in which the scenarios are grouped into sets and averages of each set are plotted. The scenarios must be specified as a 
-    list of lists for ensemble plots.
+    Types of plots: 1) Plots in which each scenario is treated as an individual curve (not grouped into an ensemble) in the time series collection. 
+    2) Ensemble plots in which the scenarios are grouped into sets (referred to as an ensemble) and averages of each set are plotted. 
+    The scenarios must be specified as a list of lists (nested list) for ensemble plots.
 
     Parameters:
         input: Dictionary containing user inputs for different plotting options, where the keys are options and values are choices for those options.
@@ -207,10 +211,10 @@ def plot_time_series(inputs):
     reference_data = {}
 
     # Set the appropriate dictionary for the landtype group.
-    if landtype_groups == 'standard':
+    if landtype_groups == 'modified':
         landtype_groups = gcam_landtype_groups
-    elif landtype_groups == 'nonstandard':
-        landtype_groups = gcam_landtype_groups_nonstandard
+    elif landtype_groups == 'original':
+        landtype_groups = gcam_landtype_groups_original
 
     # Set the plotting options.
     if plot_percent_difference and (f'%' not in y_label or 'percent' not in y_label):
@@ -232,16 +236,19 @@ def plot_time_series(inputs):
     df_all_time_series = pd.DataFrame()
     have_not_stored_time_in_df = True
 
+    # Create the figure and axis for the time series plot.
     fig, ax = plt.subplots(nrows=1, ncols=1)
 
+    # Read the output file into a DataFrame and filter it to only include data within the specified year range.
     df = read_file_into_dataframe(output_file)
     df = df[(df[year_label] >= start_year) & (df[year_label] <= end_year)]
 
-    # Direct plots, in which each such time series plot can include one or more sets of individual (not grouped) curves.
-    if not check_is_list_of_lists(scenarios) or plot_type == 'direct':
-        
-        # If scenarios is a list of lists, but we want a direct plot, unpack scenarios into a list of strings, one string for each output file.
-        if check_is_list_of_lists(scenarios) and plot_type == 'direct':
+    # Option 1: individual plots, in which each such time series plot includes one or more individual (not grouped) curves.
+    if not check_is_list_of_lists(scenarios) or plot_type == 'individual':
+
+        # If scenarios is a list of lists, but we do not actually want to group each inner list into an ensemble, 
+        # unpack scenarios into a list of strings, with one string for each output file.
+        if check_is_list_of_lists(scenarios) and plot_type == 'individual':
             scenarios = list(itertools.chain.from_iterable(scenarios))
             # Turn the corresponding plot_colors to list of lists with enough rows to match, then unpack them.
             plot_colors = list(itertools.chain.from_iterable(plot_colors))
@@ -251,6 +258,7 @@ def plot_time_series(inputs):
             scenario = scenarios[scenario_index]
             df_this_scenario = df[df[scenario_label] == scenario]
             num_categories = len(categories)
+
             for category_index, category in enumerate(categories):
 
                 # One of three choices to consider: 1) all categories (no further winnowing down of the DataFrame), 2) a category that corresponds to
@@ -267,13 +275,13 @@ def plot_time_series(inputs):
                 marker = markers[category_index]
                 
                 if num_scenarios == 1 or (num_scenarios == 2 and plot_percent_difference):
-                    # If we have 2 scenarios but plotting a percent difference, 
-                    # the reference scenario is not included, so only one set of curves will appear on the plot.
+                    # If we have 2 scenarios but plotting a percent difference, the reference scenario is not included, 
+                    # so only one set of curves will appear on the plot. In this case, use the category index to set the line colors.
                     line_color = plot_colors[category_index]
                     if not legend_num_columns:
                         plot_options.update(zip(['legend_num_columns'], [1]))
                 else:
-                    # Base the line colors on the scenario index if there will be more than one set of curves on the plot.
+                    # Set the line colors based on the scenario if there is more than one scenario.
                     line_color = plot_colors[scenario_index]
                     if not legend_num_columns:
                         if plot_percent_difference:
@@ -283,32 +291,22 @@ def plot_time_series(inputs):
 
                 num_regions = len(inputs['regions'][category])
                 for region_index, region in enumerate(inputs['regions'][category]):
-                    
                     if region != 'Global':
-                        if (aggregation_type_in_each_year == 'area_weighted_mean') and (category in landtype_groups):
-                            landtypes = landtype_groups[category]
-                            df_this_region = df_this_scenario[df_this_scenario[category_label].isin(landtypes)]
-                            df_this_region = df_this_region[df_this_region[region_label] == region]
-                        else:
-                            df_this_region = df_this_category[df_this_category[region_label] == region]
+                        df_this_region = df_this_category[df_this_category[region_label] == region]
                     else:
-                        if (aggregation_type_in_each_year == 'area_weighted_mean') and (category in landtype_groups):
-                            landtypes = landtype_groups[category]
-                            df_this_region = df_this_scenario[df_this_scenario[category_label].isin(landtypes)]
-                        else:
-                            df_this_region = df_this_category
+                        df_this_region = df_this_category
 
                     # The linestyles (e.g., solid, dotted, dashed) on the plot will vary by region.
                     linestyle = linestyle_tuples[region_index][1]
+
+                    # Retrieve the years for the x-axis in the time series plots.
+                    x = df_this_region[year_label].unique()
                     
                     # For each year, take either a mean or sum over all rows that matches the current scenario, category, and region.
-                    x = df_this_region[year_label].unique()
                     if aggregation_type_in_each_year == 'mean':
                         y = df_this_region.groupby(year_label)[value_label].mean()*multiplier
                     elif aggregation_type_in_each_year == 'area_weighted_mean':
-                        y = df_this_region.groupby(year_label).apply(
-                             lambda g: (g[value_label] * g['area']).sum() / g['area'].sum()
-                             ) * multiplier 
+                        y = df_this_region.groupby(year_label).apply(lambda g: (g[value_label] * g['area']).sum() / g['area'].sum()) * multiplier 
                     elif aggregation_type_in_each_year == 'sum':
                         y = df_this_region.groupby(year_label)[value_label].sum()*multiplier
                         
@@ -335,12 +333,14 @@ def plot_time_series(inputs):
                     # Do not include the first scenario if plotting a percent difference. Include the data in the plot otherwise.
                     if not plot_percent_difference or scenario_index != 0:
                         ax.plot(x, y, label=label, color=line_color, linestyle=linestyle, linewidth=linewidth, marker=marker, markersize=marker_size)
-                    # Join the time series data from the current scenario into the larger DataFrame.
+                    # Join the time series data from the current scenario, category, and region into the larger DataFrame.
                     if have_not_stored_time_in_df:
                         x_series = pd.Series(x, name='Year')
                         df_all_time_series = pd.concat([df_all_time_series, x_series], axis=1)
                         have_not_stored_time_in_df = False
                     y_series = pd.Series(list(y), name=f'scen={scenario_index}_cat={category_index}_reg={region_index}')
+                    # The end result after all iterations of the nested loops is a DataFrame in which time (x) is stored in the first column,
+                    # and each subsequent column is a time series.
                     df_all_time_series = pd.concat([df_all_time_series, y_series], axis=1)
 
         # Calculate the overall mean and standard deviation (for error bars) across all time series.
@@ -379,24 +379,28 @@ def plot_time_series(inputs):
                     ttest = stats.ttest_ind(control_data, test_data)
                     label = f'scenario={scenario}, category={category}, region={region}'
                     print_p_values(ttest, label, p_value_threshold, p_value_file, plot_name, p_value_file_print_only_if_below_threshold)
-    
-    # Ensemble plots, in which the ensemble is further subdivided into groups of curves, where each group represents a set of scenarios.
+
+    # Option 2: ensemble plots, in which the outputs are subdivided into groups of curves, where each group (ensemble) represents a set of scenarios.
     elif check_is_list_of_lists(scenarios) and plot_type == 'ensemble_averages':
 
-        # Get the total number of scenario sets (groups) in the ensemble and the number of scenarios in each set.
+        # Get the total number of scenario sets (i.e., groups or ensembles) and the number of scenarios in each set.
         num_scenario_sets = len(scenarios[0])
-        num_scenario_in_each_set = len(scenarios)
-        # Unlike in the case of direct plots, the default for the number of columns in the legend are determined only by the number of scenario sets.
+        num_scenarios_in_each_set = len(scenarios)
+
+        # Unlike for individual plots, the default for the number of columns in the legend is determined only by the number of scenario sets.
         if not legend_num_columns:
             if plot_percent_difference:
                 plot_options.update(zip(['legend_num_columns'], [num_scenario_sets-1]))
             else:
                 plot_options.update(zip(['legend_num_columns'], [num_scenario_sets]))
+
         for scenario_set_index in range(num_scenario_sets):
-            scenarios_in_set = [scenarios[i][scenario_set_index] for i in range(num_scenario_in_each_set)]
+            scenarios_in_set = [scenarios[i][scenario_set_index] for i in range(num_scenarios_in_each_set)]
+
             for scenario_index, scenario in enumerate(scenarios_in_set):
                 scenario = scenarios_in_set[scenario_index]
                 df_this_scenario = df[df[scenario_label] == scenario]
+
                 for category_index, category in enumerate(categories):
                     # One of three choices to consider: 1) all categories (no further winnowing down of the DataFrame), 2) a category that 
                     # corresponds to a group of landtypes (e.g., forest, crop, grass, shrub, pasture), and 3) a specific category.
@@ -407,68 +411,64 @@ def plot_time_series(inputs):
                                 value_label, landtype_groups, mean_or_sum_if_more_than_one_row_in_same_landtype_group, key_columns)
                     else:
                         df_this_category = df_this_scenario[df_this_scenario[category_label] == category]
+
                     for region_index, region in enumerate(inputs['regions'][category]):
-
-                        if region != 'Global':   
-                            if (aggregation_type_in_each_year == 'area_weighted_mean') and (category in landtype_groups):
-                                landtypes = landtype_groups[category]
-                                df_this_region = df_this_scenario[df_this_scenario[category_label].isin(landtypes)]
-                                df_this_region = df_this_region[df_this_region[region_label] == region]
-                            else:
-                                df_this_region = df_this_category[df_this_category[region_label] == region]
+                        if region != 'Global':
+                            df_this_region = df_this_category[df_this_category[region_label] == region]
                         else:
-                            if (aggregation_type_in_each_year == 'area_weighted_mean') and (category in landtype_groups):
-                                landtypes = landtype_groups[category]
-                                df_this_region = df_this_scenario[df_this_scenario[category_label].isin(landtypes)]
-                            else:
-                                df_this_region = df_this_category
+                            df_this_region = df_this_category
 
-                        # For each year, take either a mean or sum over all rows that matches the current scenario, category, and region.
+                        # Retrieve the years for the x-axis in the time series plots.
                         x = df_this_region[year_label].unique()
+
+                        # For each year, take either a mean or sum over all rows that match the current scenario, category, and region.
                         if aggregation_type_in_each_year == 'mean':
                             y = df_this_region.groupby(year_label)[value_label].mean()*multiplier
                         elif aggregation_type_in_each_year == 'area_weighted_mean':
-                            y = df_this_region.groupby(year_label).apply(
-                             lambda g: (g[value_label] * g['area']).sum() / g['area'].sum()
-                             ) * multiplier 
+                            y = df_this_region.groupby(year_label).apply(lambda g: (g[value_label] * g['area']).sum() / g['area'].sum()) * multiplier
                         elif aggregation_type_in_each_year == 'sum':
                             y = df_this_region.groupby(year_label)[value_label].sum()*multiplier
 
-                        # Join the time series data for the current region and category in the current scenario set into the larger DataFrame.
+                        # Join time series data for the current scenario, category, and region in the current scenario set into the larger DataFrame.
                         if have_not_stored_time_in_df:
                             x_series = pd.Series(x, name='Year')
                             df_all_time_series = pd.concat([df_all_time_series, x_series], axis=1)
                             have_not_stored_time_in_df = False
                         y_series = pd.Series(list(y), name=f'set={scenario_set_index}_scen={scenario_index}_cat={category_index}_reg={region_index}')
+                        # The end result after all iterations of the nested loops is a DataFrame in which time (x) is stored in the first column,
+                        # and each subsequent column is a time series.
                         df_all_time_series = pd.concat([df_all_time_series, y_series], axis=1)
         
-        # Now that each individual time series has been stored, group them into scenario sets and perform analysis on the group/set means.
+        # Now that each individual time series has been stored, group them into scenario sets (ensembles) and perform analysis on the group/set means.
         x = x_series
         # Initialize DataFrame to store all of the set means.
         df_all_set_means = pd.DataFrame()
         have_not_stored_time_in_df = True
         num_categories = len(categories)
+
         for category_index, category in enumerate(categories):
-            # Like in the case of direct plots, markers are determined by the category.
+            # Like in the case of individual plots, markers are determined by the category.
             marker = markers[category_index]
             columns = [column for column in df_all_time_series.columns if f'cat={category_index}' in column]
             df_this_category = df_all_time_series[columns]
             num_regions = len(inputs['regions'][category])
+
             for region_index, region in enumerate(inputs['regions'][category]):
-                # Like in the case of direct plots, markers are determined by the region.
+                # Like in the case of individual plots, markers are determined by the region.
                 linestyle = linestyle_tuples[region_index][1]
                 columns = [column for column in  df_this_category.columns if f'reg={region_index}' in column]
                 df_this_region = df_this_category[columns]
-                for scenario_set_index in range(num_scenario_sets):
 
+                for scenario_set_index in range(num_scenario_sets):
                     if num_scenario_sets == 1 or (num_scenario_sets == 2 and plot_percent_difference):
                         # If we have 2 scenarios but plotting a percent difference, the reference scenario is not included, 
-                        # so only one set of curves will appear on the plot.
+                        # so only one set of curves will appear on the plot. In this case, use the category index to set the line colors.
                         line_color = plot_colors[category_index]
                     else:
-                        # Base the line colors on the scenario index if there will be more than one set of curves on the plot.
+                        # Set the line colors based on the scenario if there is more than one scenario.
                         line_color = plot_colors[scenario_set_index]
 
+                    # Get all columns in the DataFrame (of the current category and region) that belong to the current scenario set.
                     columns = [column for column in df_this_region.columns if f'set={scenario_set_index}' in column]
                     df_this_set = df_this_region[columns]
 
@@ -513,7 +513,7 @@ def plot_time_series(inputs):
                     df_all_set_means = pd.concat([df_all_set_means, y_series], axis=1)
 
                     # Plot the annual time series, including possibly the error bars. 
-                    # Do not include the first file set if plotting a percent difference. Include the data in the plot otherwise.
+                    # Do not include the first set if plotting a percent difference (since it is the reference). Include it otherwise.
                     if not plot_percent_difference or scenario_set_index != 0:
                         ax.plot(x, y, label=label, color=line_color, linestyle=linestyle, linewidth=linewidth, marker=marker, markersize=marker_size)
                         if std_multiplier:
@@ -543,11 +543,12 @@ def plot_time_series(inputs):
                                         (f'set={scenario_set_index}' in column and f'cat={category_index}_reg={region_index}' in column)]
                         p_values = df_all_time_series.apply(perform_ttest, columns_set_1=columns_control_set, \
                                                                columns_set_2=columns_this_set, axis=1).fillna(1)
+                        # If the p-value is below the threshold, add a marker to the plot at that time period (year).
                         mask = p_values <= p_value_threshold
                         ax.plot(df_all_time_series['Year'][mask], y_series[mask], color=line_color, linestyle='None', linewidth=linewidth, \
                                   marker=marker, markersize=p_value_marker_size)
 
-                # Calculate the overall mean across all scenario sets and a standard deviation for group/set means.
+                # Optionally include the overall mean across all scenario sets and error bars indicating the standard deviation for group/set means.
                 if include_mean_across_all_data:
                     if plot_percent_difference:
                     # If plotting a percent difference, do not include the first scenario set in calculating the overall mean.

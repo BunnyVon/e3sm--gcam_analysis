@@ -5,27 +5,27 @@ import pandas as pd
 forest_names = ['Forest', 'ProtectedUnmanagedForest', 'UnmanagedForest']
 pasture_names = ['Pasture', 'UnmanagedPasture', 'ProtectedUnmanagedPasture']
 grassland_names = ['Grassland', 'ProtectedGrassland']
-crop_names_nonstandard = ['Corn', 'CornC4', 'FiberCrop', 'FodderGrass', 'FodderHerb', 'FodderHerbC4', 'Fruits', 'FruitsTree', 'Legumes', 'MiscCrop', 
-	'MiscCropC4', 'MiscCropTree', 'NutsSeeds', 'NutsSeedsTree', 'OilCrop', 'OilCropTree', 'OilPalmTree', 'OtherGrain', 'OtherGrainC4', 'Rice', 
-    'RootTuber', 'Soybean', 'SugarCrop', 'SugarCropC4', 'Vegetables', 'Wheat', 'biomass', 'biomassGrass', 'biomassTree'] # Nonstandard crop names.
-crop_names = ['BioenergyCrop', 'Corn', 'FiberCrop', 'FodderGrass', 'FodderHerb', 'FodderHerb', 'Fruits', 'Legumes', 'MiscCrop', 'NutsSeeds',  
-    'OilCrop', 'OilPalm', 'OtherGrain', 'Rice', 'RootTuber', 'Soybean', 'SugarCrop', 'Vegetables', 'Wheat']   # Standardized set of crop names.
+crop_names_original = ['biomass', 'biomassGrass', 'biomassTree', 'Corn', 'CornC4', 'FiberCrop', 'FodderGrass', 'FodderHerb', 'FodderHerbC4', 'Fruits', 
+	'FruitsTree', 'Legumes', 'MiscCrop', 'MiscCropC4', 'MiscCropTree', 'NutsSeeds', 'NutsSeedsTree', 'OilCrop', 'OilCropTree', 'OilPalmTree', 
+    'OtherGrain', 'OtherGrainC4', 'Rice', 'RootTuber', 'Soybean', 'SugarCrop', 'SugarCropC4', 'Vegetables', 'Wheat'] # Original crop names.
+crop_names = ['BioenergyCrop', 'Corn', 'FiberCrop', 'FodderGrass', 'FodderHerb', 'Fruits', 'Legumes', 'MiscCrop', 'NutsSeeds',  
+    'OilCrop', 'OilPalm', 'OtherGrain', 'Rice', 'RootTuber', 'Soybean', 'SugarCrop', 'Vegetables', 'Wheat']   # Modified set of crop names.
 other_arable_names = ['OtherArableLand']		# This is considered a managed cropland type.
 shrubland_names = ['Shrubland', 'ProtectedShrubland']
 urban_names = ['UrbanLand']                     # These are constant.
 other_names = ['RockIceDesert', 'Tundra']       # These are constant.
 
-""" Dictionary of GCAM land type groups and aggregations with standard crop names. """
+""" Dictionary of GCAM land type groups and aggregations with modified/standardized crop names. """
 gcam_landtype_groups = {'forest': forest_names, 'pasture': pasture_names, 'grass': grassland_names, 'crop': crop_names,
         'other_arable': other_arable_names, 'shrub': shrubland_names, 'urban': urban_names, 'other': other_names}
 
-""" Dictionary of GCAM land type groups and aggregations with nonstandard crop names. """
-gcam_landtype_groups_nonstandard = gcam_landtype_groups
-gcam_landtype_groups_nonstandard['crop'] = crop_names_nonstandard
+""" Dictionary of GCAM land type groups and aggregations with original crop names. """
+gcam_landtype_groups_original = gcam_landtype_groups.copy()
+gcam_landtype_groups_original['crop'] = crop_names_original
 
 """ Dictionary of GCAM crop name mappings (keys = old names, values = new names) to create a standardized set of crop names across all files. """
 gcam_crop_mappings = {'biomass': 'BioenergyCrop', 'biomassGrass': 'BioenergyCrop', 'biomassTree': 'BioenergyCrop', 'CornC4': 'Corn', 
-        'FodderHerbC4': 'FodderHerb', 'FruitsTree': 'Fruits', 'MiscCropTree': 'MiscCrop', 'MiscCropC4': 'MiscCrop', 'NutsSeedsTree': 'NutsSeeds',
+        'FodderHerbC4': 'FodderHerb', 'FruitsTree': 'Fruits', 'MiscCropC4': 'MiscCrop', 'MiscCropTree': 'MiscCrop', 'NutsSeedsTree': 'NutsSeeds',
         'OilCropTree': 'OilCrop', 'OilPalmTree': 'OilPalm', 'OtherGrainC4': 'OtherGrain', 'SugarCropC4': 'SugarCrop'}
 
 """ Dictionary of GCAM basin names (keys) and their abbreviations (values). """
@@ -93,8 +93,8 @@ def produce_dataframe_for_landtype_group(df, category, category_label, value_lab
 
     Parameters:
         df: DataFrame containing the data of interest.
-        category: String specifying the name of the category of interest.
-        category_label: String specifying the label for the appropriate category (e.g., 'sector' or 'landtype').
+        category: String specifying the name of the landtype category of interest (e.g., 'forest', 'shrub', 'pasture').
+        category_label: String specifying the label for the landtype column in the DataFrame (most likely this will just be 'landtype').
         value_label: String specifying the label for the column containing the value of interest.
         landtype_groups: Dictionary where the keys are landtype group names and the values are all the landtypes that belong to each group.
         mean_or_sum_if_more_than_one_row_in_same_landtype_group: String that indicates the operation that should be performed on each group.
@@ -103,7 +103,7 @@ def produce_dataframe_for_landtype_group(df, category, category_label, value_lab
     Returns:
         DataFrame with aggregated rows and the value_label column modified to reflect a mean, sum, area-weighted mean, or area-weighted sum.
     """
-    # Get all landtypes for the group and parse the DataFrame to have only the rows that correspond to one of the landtypes in the group.
+    # Get all landtypes for the group and filter the DataFrame to keep only the rows that correspond to one of the landtypes in the group.
     landtypes = landtype_groups[category]
     df = df[df[category_label].isin(landtypes)]
 
@@ -111,7 +111,7 @@ def produce_dataframe_for_landtype_group(df, category, category_label, value_lab
         landtypes_in_df = [x for x in landtypes if x in df[category_label].unique()]
         num_landtypes_in_df = len(landtypes_in_df)
         df = df.groupby(key_columns).sum()
-        df.loc[:, df.columns != category_label] /= num_landtypes_in_df
+        df.loc[:, value_label] /= num_landtypes_in_df
         df = df.reset_index()
     elif mean_or_sum_if_more_than_one_row_in_same_landtype_group == 'sum':
         df = df.groupby(key_columns).sum().reset_index()
@@ -119,17 +119,17 @@ def produce_dataframe_for_landtype_group(df, category, category_label, value_lab
         df.loc[:, value_label] = df['area']*df[value_label]
         df = df.groupby(key_columns).sum()
         total_area = df['area']
-        df.loc[:, df.columns != category_label] = df.loc[:, df.columns != category_label].div(total_area, axis=0)
+        df.loc[:, value_label] = df.loc[:, value_label].div(total_area, axis=0)
         df = df.reset_index()
     elif mean_or_sum_if_more_than_one_row_in_same_landtype_group == 'area_weighted_sum':
-        df[value_label] = df['area']*df[value_label]
+        df[:, value_label] = df['area']*df[value_label]
         df = df.groupby(key_columns).sum().reset_index()
     df[category_label] = category
     return df
 
-def standardize_crop_names(df, columns, mean_or_sum_if_more_than_one_row_for_crop_name='mean'):
+def modify_crop_names(df, columns, mean_or_sum_if_more_than_one_row_for_crop_name='mean'):
     """
-    Applies the mappings in gcam_crop_mappings dictionary to produce a common set of crop names in the given Pandas DataFrame.
+    Applies the mappings in gcam_crop_mappings dictionary to produce a modified set of crop names in the given Pandas DataFrame.
     An aggregation followed by a mean or sum is performed if there happens to be more than one row that matches a value for the given set of columns.
 
     Parameters:
@@ -138,33 +138,35 @@ def standardize_crop_names(df, columns, mean_or_sum_if_more_than_one_row_for_cro
         mean_or_sum_if_more_than_one_row_for_crop_name: Specifies whether to calculate a mean or a sum after performing the aggregation.
 
     Returns:
-        DataFrame with the crop names modified so that they belong to the standard common set.
+        DataFrame with the crop names modified so that they belong to the modified common set.
     """
     df = df.replace(gcam_crop_mappings)
     if mean_or_sum_if_more_than_one_row_for_crop_name == 'mean':
         mean_df = df.groupby(columns).mean().reset_index()
+        # Areas should be summed, not averaged, even in the 'mean' case.
         if 'area' in df.columns:
-            # sum of area
             area_sum = df.groupby(columns)['area'].sum().reset_index()
-            # replace/merge the area column in mean_df
+            # Replace/merge the area column in mean_df.
             mean_df = mean_df.drop(columns='area', errors='ignore').merge(area_sum, on=columns)
         return mean_df
     elif mean_or_sum_if_more_than_one_row_for_crop_name == 'sum':
         return df.groupby(columns).sum().reset_index()
     elif mean_or_sum_if_more_than_one_row_for_crop_name == 'area_weighted_mean':
+        # Identify columns to be averaged (these are numeric, non-area columns that are not part of the aggregation operation).
         numeric_cols = df.select_dtypes('number').columns.tolist()
         numeric_cols = [col for col in numeric_cols if col not in columns + ['area']]
 
+        # Define a function to compute area-weighted mean for each group.
         def weighted_mean(g):
             result = {}
             total_area = g['area'].sum()
-    
             for col in numeric_cols:
                 if total_area != 0:
                     result[col] = (g[col] * g['area']).sum() / total_area
                 else:
-                    result[col] = float('nan')  # avoid division by zero
+                    result[col] = float('nan')  # Avoid division by zero.
             result['area'] = total_area
             return pd.Series(result)
 
+        # Apply the weighted mean function to each group.
         return df.groupby(columns).apply(weighted_mean).reset_index()

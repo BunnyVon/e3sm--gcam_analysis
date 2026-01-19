@@ -81,7 +81,7 @@ def clean_up_dataframe(df, print_to_console=False):
 
 def get_columns_without_units_in_dataframe(df):
     """
-    Returns all column names in a Pandas DataFrame without the units. For example, return 'Mass' if the colum name is 'Mass (kg)'.
+    Returns all column names in a Pandas DataFrame without the units. For example, return 'Mass' if the column name is 'Mass (kg)'.
 
     Parameters:
         df: The input DataFrame.
@@ -234,6 +234,22 @@ def write_data_and_labels_to_fwf(file_name, data, column_labels, transpose_data=
     if print_to_console:
         print(df)
     write_dataframe_to_fwf(file_name, df, keep_index_column)
+
+def write_dataframe_to_file(df, file_name):
+    """ 
+    Writes a Pandas DataFrame to either a csv or fixed-width-format file.
+
+    Parameters:
+        df: The DataFrame to write.
+        file_name: Complete path and name of the output file.
+
+    Returns:
+        N/A.
+    """
+    if file_name.endswith('.csv'):
+        df.to_csv(file_name, index=False)
+    else:
+        write_dataframe_to_fwf(file_name, df)
 
 def write_dataframe_to_fwf(file_name, df, keep_index_column=False, width_index_column=None):
     """ 
