@@ -24,11 +24,11 @@ default_inputs = {
     'hue': None,
     'key_columns': None,
     'landtype_groups': 'modified',
-    'legend_x_offset': None,
     'legend_label_size': legend_label_size_default,
     'legend_num_columns': 1,
     'legend_on': legend_on_default,
     'legend_place_outside': False, 
+    'legend_x_offset': None,
     'linewidth': 1,
     'marker_size': 6,
     'multiplier': 1,
@@ -154,11 +154,11 @@ def plot_box_and_whiskers(inputs):
     hue = inputs['hue']
     key_columns = inputs['key_columns']
     landtype_groups = inputs['landtype_groups']
-    legend_x_offset = inputs['legend_x_offset']
     legend_label_size = inputs['legend_label_size']
     legend_num_columns = inputs['legend_num_columns']
     legend_on = inputs['legend_on']
     legend_place_outside = inputs['legend_place_outside']
+    legend_x_offset = inputs['legend_x_offset']
     linewidth = inputs['linewidth']
     marker_size = inputs['marker_size']
     multiplier = inputs['multiplier']

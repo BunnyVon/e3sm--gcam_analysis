@@ -23,11 +23,11 @@ default_inputs = {
     'include_mean_across_all_data': False,
     'key_columns': None,
     'landtype_groups': 'modified',
-    'legend_x_offset': None,
     'legend_label_size': legend_label_size_default,
     'legend_num_columns': None,
     'legend_on': legend_on_default,
     'legend_place_outside': True, 
+    'legend_x_offset': None,
     'linestyle_tuples': linestyle_tuples_default,
     'linewidth': linewidth_default,
     'marker_size': 6,
@@ -47,6 +47,7 @@ default_inputs = {
     'regions': ['Global'],
     'scenario_label': 'scenario', 
     'scenario_sets': None,
+    'set_nan_to_zero': False,
     'start_year': 2015,
     'std_mean_across_all_data_multiplier': 1,
     'std_multiplier': 1, 
@@ -166,11 +167,11 @@ def plot_time_series(inputs):
     include_mean_across_all_data = inputs['include_mean_across_all_data']
     key_columns = inputs['key_columns']
     landtype_groups = inputs['landtype_groups']
-    legend_x_offset = inputs['legend_x_offset']
     legend_label_size = inputs['legend_label_size']
     legend_num_columns = inputs['legend_num_columns']
     legend_on = inputs['legend_on']
     legend_place_outside = inputs['legend_place_outside']
+    legend_x_offset = inputs['legend_x_offset']
     linestyle_tuples = inputs['linestyle_tuples']
     linewidth = inputs['linewidth']
     marker_size = inputs['marker_size']
@@ -190,6 +191,7 @@ def plot_time_series(inputs):
     scenario_label = inputs['scenario_label']
     scenario_sets = inputs['scenario_sets']
     scenarios = inputs['scenarios']
+    set_nan_to_zero = inputs['set_nan_to_zero']
     start_year = inputs['start_year']
     std_mean_across_all_data_multiplier = inputs['std_mean_across_all_data_multiplier']
     std_multiplier = inputs['std_multiplier']
@@ -307,6 +309,14 @@ def plot_time_series(inputs):
                         y = df_this_region.groupby(year_label)[value_label].mean()*multiplier
                     elif aggregation_type_in_each_year == 'area_weighted_mean':
                         y = df_this_region.groupby(year_label).apply(lambda g: (g[value_label] * g['area']).sum() / g['area'].sum()) * multiplier 
+                        if any(df_this_region.groupby(year_label)['area'].sum() == 0):
+                            if set_nan_to_zero:
+                                print('Fixing area-weighted mean calculation where total area is zero by setting value to zero instead of NaN.')
+                                y = y.fillna(0)
+                            else:
+                                statement = 'Area-weighted mean resulted in NaN because total area is zero for some years. ' + \
+                                      'No fix applied as set_nan_to_zero is False. Years with NaN values will not appear on the plot.'
+                                print(statement)
                     elif aggregation_type_in_each_year == 'sum':
                         y = df_this_region.groupby(year_label)[value_label].sum()*multiplier
                         

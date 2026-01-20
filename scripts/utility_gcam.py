@@ -164,7 +164,8 @@ def modify_crop_names(df, columns, mean_or_sum_if_more_than_one_row_for_crop_nam
                 if total_area != 0:
                     result[col] = (g[col] * g['area']).sum() / total_area
                 else:
-                    result[col] = float('nan')  # Avoid division by zero.
+                    result[col] = 0
+                    # result[col] = float('nan')  # Avoid division by zero.
             result['area'] = total_area
             return pd.Series(result)
 
