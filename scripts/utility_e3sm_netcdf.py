@@ -103,7 +103,7 @@ def get_netcdf_files_between_start_and_end_years(files, start_year, end_year):
 def get_regional_bounds(region):
     """
     Finds and returns a NumPy array that indicates the bounds on the longitude and latitude for given a geographical region.
-    Adapted from a script by Daniel Ricciuto: /home/ac.eva.sinha/Sinha-etal-2025/workflow/e3sm_diags/diags_lineplots_hist_ZATM.py.
+    Adapted from a script by Daniel Ricciuto, see /home/ac.eva.sinha/Sinha-etal-2025/workflow/e3sm_diags/diags_lineplots_hist_ZATM.py on Chryalis.
 
     Parameters:
         region: String for the geographical region.
@@ -111,47 +111,47 @@ def get_regional_bounds(region):
     Returns:
         NumPy array with four numbers, [-min_lon, max_lon, min_lat, max_lat]. If the selected region is not recognized, returns [0, 360, -90, 90].
     """
-    if region == 'noam':  # North America
+    if region == 'noam':        # North America
         bounds = [-170.25, -45.25, 9.75, 79.75]
-    elif region == 'bona':  # Boreal North America
+    elif region == 'bona':      # Boreal North America
         bounds = [-170.25, -60.25, 49.75, 79.75]
-    elif region == 'tena':  # Temperate North America
+    elif region == 'tena':      # Temperate North America
         bounds = [-125.25, -66.25, 30.25, 49.75]
-    elif region == 'conus':  # Continental US (CONUS)
+    elif region == 'conus':     # Continental US (CONUS)
         bounds = [-125.25, -66.25, 23.25, 54.75]
-    elif region == 'columbia':   # Columbia River watershed
+    elif region == 'columbia':  # Columbia River watershed
         bounds = [-126, -108, 40.0, 55.0]
-    elif region == 'ceam':  # Central America
+    elif region == 'ceam':      # Central America
         bounds = [-115.25, -80.25, 9.75, 30.25]
-    elif region == 'soam':    # South America
+    elif region == 'soam':      # South America
         bounds = [-80.25, -40.25, -59.75, 12.75]
-    elif region == 'nhsa':  # Northern hemisphere South America
+    elif region == 'nhsa':      # Northern hemisphere South America
         bounds = [-80.25, -50.25, 0.25, 12.75]
-    elif region == 'shsa':  # Southern hemisphere South America
+    elif region == 'shsa':      # Southern hemisphere South America
         bounds = [-80.25, -40.25, -59.75, 0.25]
-    elif region == 'amazon':  # Amazon
+    elif region == 'amazon':    # Amazon
         bounds = [-85., -35., -25., 15.]
-    elif region == 'euro':  # Europe
+    elif region == 'euro':      # Europe
         bounds = [-10.25, 30.25, 35.25, 70.25]
-    elif region == 'mide':  # Middle East
+    elif region == 'mide':      # Middle East
         bounds = [-10.25, 60.25, 20.24, 40.25]
-    elif region == 'afrc':    # Africa, note can't span the Prime Meridian
-     	bounds = [0.25, 45.25, -34.75, 20.25] 
-    elif region == 'nhaf':  # Northern hemisphere Africa
+    elif region == 'afrc':      # Africa, note can't span the Prime Meridian
+        bounds = [0.25, 45.25, -34.75, 20.25]
+    elif region == 'nhaf':      # Northern hemisphere Africa
         bounds = [-20.25, 45.25, 0.25, 20.25]
-    elif region == 'shaf':  # Southern hemisphere Africa
-        bounds = [10.25, 45.25, -34.75 ,0.25]
-    elif region == 'asia':  # Asia
+    elif region == 'shaf':      # Southern hemisphere Africa
+        bounds = [10.25, 45.25, -34.75, 0.25]   
+    elif region == 'asia':      # Asia
         bounds = [30.25, 179.75, -10.25, 70.25]
-    elif region == 'boas':  # Boreal Asia
+    elif region == 'boas':      # Boreal Asia
         bounds = [30.25, 179.75, 54.75, 70.25]
-    elif region == 'ceas':  # Central Asia
+    elif region == 'ceas':      # Central Asia
         bounds = [30.25, 142.58, 30.25, 54.75]
-    elif region == 'seas':  # Southeast Asia
+    elif region == 'seas':      # Southeast Asia
         bounds = [65.25, 120.25, 5.25, 30.25]
-    elif region == 'eqas':  # Equatorial Asia
+    elif region == 'eqas':      # Equatorial Asia
         bounds = [99.75, 150.25, -10.25, 10.25]
-    elif region == 'aust':  # Australia
+    elif region == 'aust':      # Australia
         bounds = [112.00, 154.00, -41.25, -10.50]
     else:
         print(f'Did not recognize the selected region {region}! Setting bounds to global.\n')
