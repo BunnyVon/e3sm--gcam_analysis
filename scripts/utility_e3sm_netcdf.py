@@ -19,6 +19,21 @@ def extract_year_and_month_from_name_of_netcdf_file(file):
     month = int(file[index+len('YYYY-'):index+len('YYYY-MM')])
     return year, month
 
+def extract_year_and_month_from_netcdf_file(file):
+    """ 
+    Finds the year and month from reading the contents of a given E3SM-generated NetCDF file.
+
+    Parameters:
+        file: NetCDF file containing data for one month in a particular year.
+
+    Returns:
+        The year and month indicated in the name of the NetCDF file.
+    """
+    ds = xr.open_dataset(file)
+    year = ds['time'].dt.year.values[0]
+    month = ds['time'].dt.month.values[0]
+    return year, month
+
 def find_gridcell_areas_in_netcdf_file(file, region=None):
     """ 
     Obtains the grid cell areas of all latitude/longitude coordinates in an E3SM-generated (EAM or ELM or EHC) NetCDF file for the given region.

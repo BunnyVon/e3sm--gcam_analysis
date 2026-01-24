@@ -111,7 +111,7 @@ def extract_netcdf_file_into_dataframe(file, variables, lat_lon_aggregation_type
         df.columns = add_lists_elementwise(df.columns, units, list2_are_units=True)
     if variables_landunits_and_pfts:
         df_landunits_and_pfts = ds[variables_landunits_and_pfts].to_dataframe()
-    
+
     # 9 land units: vegetation, crop, ice, multiple ice, lake, wetland, urban tbd, urban hd, urban md. Currently, we want only vegetation (index = 0).
     if 'PCT_LANDUNIT' in variables:
         df_landunits_and_pfts = df_landunits_and_pfts.reset_index(level='ltype')
@@ -139,7 +139,7 @@ def extract_netcdf_file_into_dataframe(file, variables, lat_lon_aggregation_type
         pft_labels.extend(['BARE_AREA (km^2)', 'FOREST_AREA (km^2)', 'SHRUB_AREA (km^2)', 'GRASS_AREA (km^2)', 'CROP_AREA (km^2)'])
         pft_min_max_indices = [(i, i) for i in range(16)]
         pft_min_max_indices.extend([(0, 0), (1, 8), (9, 11), (12, 14), (15, 15)])
-        # Select only the rows that pertain to this particular PFT category and for each lat/lon coordinate, sum over all PFTS if a subgroup.
+        # Select only the rows that pertain to this particular PFT category and for each lat/lon coordinate, sum over all PFTs if a subgroup.
         for index, pft_label in enumerate(pft_labels):
             pft_min_index, pft_max_index = pft_min_max_indices[index][0], pft_min_max_indices[index][1]
             df_this_pft = df_landunits_and_pfts[(df_landunits_and_pfts['natpft'] >= pft_min_index) & 
@@ -165,19 +165,20 @@ def extract_netcdf_file_into_dataframe(file, variables, lat_lon_aggregation_type
 
         # Variables that are not fluxes and stocks (so that they are not per-area quantities), should be global area-weighted means
         # rather than area-weighted sums, and therefore we need to divide these sums (which were computed a few lines above) by the total area.
+        # Temperature variables are examples of such non-flux/stock variables.
         columns_for_means = [label for label in columns_to_multipy_by_areas 
                              if not check_substrings_in_string(['/m^2', '/m2'], label, all_or_any='any')]
         # LND and OCN refer to certain types of EAM output for which we need to multiply the total grid cell areas by the land or non-land fractions.
         columns_for_means_LND = [label for label in columns_for_means if '_LND' in label]
         total_area = np.sum(areas*landfrac)
-        df[columns_for_means_LND]/= total_area
+        df[columns_for_means_LND] /= total_area
         columns_for_means_OCN = [label for label in columns_for_means if '_OCN' in label]
         total_area = np.sum(areas*non_landfrac)
-        df[columns_for_means_OCN]/= total_area
+        df[columns_for_means_OCN] /= total_area
         # Variables that are not LND or OCN refer to outputs where we need to work with the full area of each grid cell.
         columns_for_means = [label for label in columns_for_means if (label not in columns_for_means_LND and label not in columns_for_means_OCN)]
         total_area = np.sum(areas)
-        df[columns_for_means]/= total_area
+        df[columns_for_means] /= total_area
 
         # Fluxes and stocks are global area-weighted sums and have been multiplied by areas, so we must update the labels to remove the '/m^2' part.
         for old_label in ['/m^2', '/m2']:
@@ -286,7 +287,7 @@ if __name__ == '__main__':
         input_file = sys.argv[index]
         with open(input_file) as f:
             list_of_inputs.extend(json.load(f))
-
+            
     # Produce the output files one at a time.
     for inputs in list_of_inputs:
         start_time = time.time()
