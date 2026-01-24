@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E3SM Spatial Data Extraction Documentation</title>
+    <style>/* 
+ * Documentation Stylesheet for GCAM Synthetic Data Generation Script
+ * A modern, colorful design with good readability
+ */
+
+/* ===== ROOT VARIABLES ===== */
+:root {
+    /* Color Palette */
+    --primary-blue: #2563eb;
+    --primary-blue-light: #3b82f6;
+    --primary-blue-dark: #1e40af;
+    --accent-green: #10b981;
+    --accent-orange: #f59e0b;
+    --accent-purple: #8b5cf6;
+    --accent-red: #ef4444;
+    
+    /* Background Colors */
+    --bg-main: #f8fafc;
+    --bg-code: #1e293b;
+    --bg-code-inline: #e2e8f0;
+    --bg-table-header: #1e40af;
+    --bg-table-row-even: #f1f5f9;
+    --bg-table-row-odd: #ffffff;
+    --bg-note: #fef3c7;
+    --bg-warning: #fee2e2;
+    --bg-info: #dbeafe;
+    --bg-success: #d1fae5;
+    
+    /* Text Colors */
+    --text-main: #1e293b;
+    --text-secondary: #64748b;
+    --text-code: #e2e8f0;
+    --text-link: #2563eb;
+    --text-link-hover: #1e40af;
+    
+    /* Border Colors */
+    --border-light: #e2e8f0;
+    --border-medium: #cbd5e1;
+    --border-dark: #94a3b8;
+    
+    /* Spacing */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-2xl: 3rem;
+}
+
+/* ===== BASE STYLES ===== */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.7;
+    color: var(--text-main);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: var(--spacing-xl) var(--spacing-md);
+    font-size: 16px;
+}
+
+/* Main Container */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: var(--bg-main);
+    padding: var(--spacing-2xl);
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+/* ===== TYPOGRAPHY ===== */
+h1 {
+    font-size: 2.5rem;
+    color: var(--primary-blue-dark);
+    margin-bottom: var(--spacing-xl);
+    padding-bottom: var(--spacing-md);
+    border-bottom: 4px solid var(--primary-blue);
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--accent-purple) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+h2 {
+    font-size: 2rem;
+    color: var(--primary-blue);
+    margin-top: var(--spacing-2xl);
+    margin-bottom: var(--spacing-lg);
+    padding-left: var(--spacing-md);
+    border-left: 5px solid var(--accent-green);
+    font-weight: 600;
+}
+
+h3 {
+    font-size: 1.5rem;
+    color: var(--primary-blue-dark);
+    margin-top: var(--spacing-xl);
+    margin-bottom: var(--spacing-md);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+}
+
+h3::before {
+    content: "▸";
+    color: var(--accent-orange);
+    margin-right: var(--spacing-sm);
+    font-size: 1.2rem;
+}
+
+h4 {
+    font-size: 1.25rem;
+    color: var(--accent-purple);
+    margin-top: var(--spacing-lg);
+    margin-bottom: var(--spacing-sm);
+    font-weight: 600;
+}
+
+p {
+    margin-bottom: var(--spacing-md);
+    color: var(--text-main);
+}
+
+/* ===== LINKS ===== */
+a {
+    color: var(--text-link);
+    text-decoration: none;
+    font-weight: 500;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+a:hover {
+    color: var(--text-link-hover);
+    border-bottom-color: var(--text-link-hover);
+}
+
+/* ===== LISTS ===== */
+ul, ol {
+    margin-left: var(--spacing-xl);
+    margin-bottom: var(--spacing-md);
+}
+
+li {
+    margin-bottom: var(--spacing-sm);
+    padding-left: var(--spacing-sm);
+}
+
+ul li::marker {
+    color: var(--accent-green);
+    font-size: 1.2em;
+}
+
+ol li::marker {
+    color: var(--primary-blue);
+    font-weight: 600;
+}
+
+/* ===== CODE BLOCKS ===== */
+code {
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 0.9em;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background: var(--bg-code-inline);
+    color: var(--accent-red);
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+pre {
+    background: var(--bg-code);
+    color: var(--text-code);
+    padding: var(--spacing-lg);
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: var(--spacing-lg) 0;
+    border-left: 4px solid var(--accent-green);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+pre code {
+    background: transparent;
+    color: var(--text-code);
+    padding: 0;
+    font-size: 0.95em;
+    line-height: 1.5;
+}
+
+/* ===== TABLES ===== */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: var(--spacing-xl) 0;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+thead {
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-dark) 100%);
+    color: white;
+}
+
+th {
+    padding: var(--spacing-md);
+    text-align: left;
+    font-weight: 600;
+    font-size: 1.05em;
+    border-bottom: 3px solid var(--accent-orange);
+}
+
+td {
+    padding: var(--spacing-md);
+    border-bottom: 1px solid var(--border-light);
+}
+
+tbody tr:nth-child(even) {
+    background: var(--bg-table-row-even);
+}
+
+tbody tr:nth-child(odd) {
+    background: var(--bg-table-row-odd);
+}
+
+tbody tr:hover {
+    background: #e0f2fe;
+    transform: scale(1.01);
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* ===== BLOCKQUOTES ===== */
+blockquote {
+    margin: var(--spacing-lg) 0;
+    padding: var(--spacing-md) var(--spacing-lg);
+    background: var(--bg-info);
+    border-left: 5px solid var(--primary-blue);
+    border-radius: 0 8px 8px 0;
+    font-style: italic;
+    color: var(--primary-blue-dark);
+}
+
+/* ===== HORIZONTAL RULES ===== */
+hr {
+    border: none;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent-green) 0%, var(--primary-blue) 50%, var(--accent-purple) 100%);
+    margin: var(--spacing-2xl) 0;
+    border-radius: 2px;
+}
+
+/* ===== SPECIAL BOXES ===== */
+.note {
+    background: var(--bg-note);
+    border-left: 5px solid var(--accent-orange);
+    padding: var(--spacing-md) var(--spacing-lg);
+    margin: var(--spacing-lg) 0;
+    border-radius: 0 8px 8px 0;
+}
+
+.warning {
+    background: var(--bg-warning);
+    border-left: 5px solid var(--accent-red);
+    padding: var(--spacing-md) var(--spacing-lg);
+    margin: var(--spacing-lg) 0;
+    border-radius: 0 8px 8px 0;
+}
+
+.info {
+    background: var(--bg-info);
+    border-left: 5px solid var(--primary-blue);
+    padding: var(--spacing-md) var(--spacing-lg);
+    margin: var(--spacing-lg) 0;
+    border-radius: 0 8px 8px 0;
+}
+
+.success {
+    background: var(--bg-success);
+    border-left: 5px solid var(--accent-green);
+    padding: var(--spacing-md) var(--spacing-lg);
+    margin: var(--spacing-lg) 0;
+    border-radius: 0 8px 8px 0;
+}
+
+/* ===== BADGES ===== */
+.badge {
+    display: inline-block;
+    padding: var(--spacing-xs) var(--spacing-md);
+    border-radius: 20px;
+    font-size: 0.85em;
+    font-weight: 600;
+    margin: 0 var(--spacing-xs);
+}
+
+.badge-required {
+    background: var(--accent-red);
+    color: white;
+}
+
+.badge-optional {
+    background: var(--accent-green);
+    color: white;
+}
+
+.badge-default {
+    background: var(--primary-blue);
+    color: white;
+}
+
+/* ===== STRONG & EM ===== */
+strong {
+    color: var(--primary-blue-dark);
+    font-weight: 700;
+}
+
+em {
+    color: var(--accent-purple);
+    font-style: italic;
+}
+
+/* ===== IMAGES ===== */
+img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin: var(--spacing-lg) 0;
+}
+
+/* ===== SCROLLBAR STYLING ===== */
+::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-table-row-even);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--accent-purple) 100%);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, var(--primary-blue-dark) 0%, var(--accent-purple) 100%);
+}
+
+/* ===== PRINT STYLES ===== */
+@media print {
+    body {
+        background: white;
+        padding: 0;
+    }
+    
+    .container {
+        box-shadow: none;
+        max-width: 100%;
+    }
+    
+    h1, h2, h3 {
+        page-break-after: avoid;
+    }
+    
+    pre, table {
+        page-break-inside: avoid;
+    }
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+@media (max-width: 768px) {
+    body {
+        padding: var(--spacing-md) var(--spacing-sm);
+        font-size: 14px;
+    }
+    
+    .container {
+        padding: var(--spacing-lg);
+    }
+    
+    h1 {
+        font-size: 2rem;
+    }
+    
+    h2 {
+        font-size: 1.5rem;
+    }
+    
+    h3 {
+        font-size: 1.25rem;
+    }
+    
+    table {
+        font-size: 0.9em;
+    }
+    
+    th, td {
+        padding: var(--spacing-sm);
+    }
+}
+
+/* ===== ADDITIONAL UTILITY CLASSES ===== */
+.text-center {
+    text-align: center;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.margin-top-lg {
+    margin-top: var(--spacing-2xl);
+}
+
+.margin-bottom-lg {
+    margin-bottom: var(--spacing-2xl);
+}
+
+.highlight {
+    background: linear-gradient(120deg, #fef3c7 0%, #fde68a 100%);
+    padding: 0 var(--spacing-xs);
+    border-radius: 3px;
+}
+
+/* ===== SECTION DIVIDERS ===== */
+.section-divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: var(--spacing-2xl) 0;
+}
+
+.section-divider::before,
+.section-divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 2px solid var(--border-medium);
+}
+
+.section-divider::before {
+    margin-right: var(--spacing-md);
+}
+
+.section-divider::after {
+    margin-left: var(--spacing-md);
+}
+
+/* ===== FOOTER ===== */
+footer {
+    margin-top: var(--spacing-2xl);
+    padding-top: var(--spacing-lg);
+    border-top: 2px solid var(--border-light);
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.9em;
+}
+</style>
+</head>
+<body>
+    <div class="container"><h1>E3SM Spatial Data Extraction Script Documentation</h1>
+<h2>Overview</h2>
+<p><strong>Script Name:</strong> <code>e3sm_extract_spatial_data_h0.py</code></p>
+<p><strong>Purpose:</strong> Extracts spatially-gridded annual-mean data from E3SM monthly NetCDF h0 output files (ELM and/or EAM) and creates smaller, focused NetCDF files containing only user-specified variables for a specific time period. Unlike time series extraction which aggregates spatially, this script preserves full latitude/longitude resolution while aggregating temporally (annual means from monthly data).</p>
+<p><strong>Key Use Case:</strong> Creating manageable NetCDF files for spatial analysis, mapping, and visualization of E3SM output variables over specific time periods without the overhead of processing entire simulation archives.</p>
+<p><strong>Author:</strong> Philip Myint (myint1@llnl.gov) and Dalei Hao (dalei.hao@pnnl.gov)</p>
+<p><strong>Repository:</strong> <a href="https://github.com/philipmyint/e3sm--gcam_analysis">E3SM-GCAM Analysis Scripts</a></p>
+<hr />
+<h2>Table of Contents</h2>
+<ol>
+<li><a href="#overview">Overview</a></li>
+<li><a href="#installation--requirements">Installation &amp; Requirements</a></li>
+<li><a href="#basic-usage">Basic Usage</a></li>
+<li><a href="#key-concepts">Key Concepts</a></li>
+<li><a href="#complete-parameter-reference-table">Complete Parameter Reference Table</a></li>
+<li><a href="#detailed-parameter-descriptions">Detailed Parameter Descriptions</a></li>
+<li><a href="#variable-processing">Variable Processing</a></li>
+<li><a href="#json-configuration-examples">JSON Configuration Examples</a></li>
+<li><a href="#output-files">Output Files</a></li>
+<li><a href="#troubleshooting">Troubleshooting</a></li>
+<li><a href="#best-practices">Best Practices</a></li>
+<li><a href="#comparison-with-time-series-extraction">Comparison with Time Series Extraction</a></li>
+</ol>
+<hr />
+<h2>Installation &amp; Requirements</h2>
+<h3>Required Python Libraries</h3>
+<div class="codehilite"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>pandas<span class="w"> </span>numpy<span class="w"> </span>xarray<span class="w"> </span>netCDF4<span class="w"> </span>dask<span class="w"> </span>multiprocessing
+</code></pre></div>
+
+<h3>Required Utility Modules</h3>
+<p>The script imports several utility modules that must be in the same directory or Python path:<br />
+- <code>utility_constants</code> - Physical constants (conversion factors)<br />
+- <code>utility_functions</code> - General utility functions<br />
+- <code>utility_e3sm_netcdf</code> - E3SM-specific NetCDF handling functions</p>
+<h3>System Requirements</h3>
+<ul>
+<li>Python 3.7+</li>
+<li>Multi-core processor (script uses parallel processing)</li>
+<li>Sufficient RAM (8+ GB recommended for large datasets)</li>
+<li>Sufficient disk space for output NetCDF files</li>
+<li>Access to E3SM simulation output directories</li>
+</ul>
+<hr />
+<h2>Basic Usage</h2>
+<h3>Command Line Execution</h3>
+<div class="codehilite"><pre><span></span><code>python<span class="w"> </span>e3sm_extract_spatial_data_h0.py<span class="w"> </span>path/to/config.json
+</code></pre></div>
+
+<p><strong>Multiple Configuration Files:</strong></p>
+<div class="codehilite"><pre><span></span><code>python<span class="w"> </span>e3sm_extract_spatial_data_h0.py<span class="w"> </span>config1.json<span class="w"> </span>config2.json<span class="w"> </span>config3.json
+</code></pre></div>
+
+<h3>What the Script Does</h3>
+<p>For each configuration block in the JSON file, the script:<br />
+1. <strong>Locates</strong> monthly E3SM NetCDF h0 files (elm.h0.<em>, eam.h0.</em>)<br />
+2. <strong>Filters</strong> files by year range (start_years to end_years)<br />
+3. <strong>Opens</strong> multiple NetCDF files efficiently using xarray's parallel processing<br />
+4. <strong>Extracts</strong> only user-specified variables<br />
+5. <strong>Computes</strong> annual means from monthly data (temporal aggregation)<br />
+6. <strong>Processes</strong> variables (adds total precipitation, CO₂ mole fraction)<br />
+7. <strong>Writes</strong> compact NetCDF file with spatial data<br />
+8. <strong>Uses</strong> parallel processing for multiple output files</p>
+<hr />
+<h2>Key Concepts</h2>
+<h3>Spatial vs Time Series Extraction</h3>
+<p><strong>This Script (Spatial Extraction):</strong><br />
+- <strong>Preserves:</strong> Full latitude/longitude resolution<br />
+- <strong>Aggregates:</strong> Temporal (monthly → annual mean)<br />
+- <strong>Output:</strong> NetCDF file with gridded data<br />
+- <strong>Use:</strong> Mapping, spatial analysis, visualization</p>
+<p><strong>Time Series Extraction Script:</strong><br />
+- <strong>Preserves:</strong> Temporal resolution (monthly or annual)<br />
+- <strong>Aggregates:</strong> Spatial (lat/lon → global or regional mean/sum)<br />
+- <strong>Output:</strong> Text file with time series<br />
+- <strong>Use:</strong> Trend analysis, statistical analysis</p>
+<h3>Annual Mean Calculation</h3>
+<p>The script converts monthly E3SM output to annual means:</p>
+<div class="codehilite"><pre><span></span><code><span class="nv">Monthly</span><span class="w"> </span><span class="nv">files</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="mi">2085</span>:
+<span class="nv">elm</span>.<span class="nv">h0</span>.<span class="mi">2085</span><span class="o">-</span><span class="mi">01</span>.<span class="nv">nc</span>,<span class="w"> </span><span class="nv">elm</span>.<span class="nv">h0</span>.<span class="mi">2085</span><span class="o">-</span><span class="mi">02</span>.<span class="nv">nc</span>,<span class="w"> </span>...,<span class="w"> </span><span class="nv">elm</span>.<span class="nv">h0</span>.<span class="mi">2085</span><span class="o">-</span><span class="mi">12</span>.<span class="nv">nc</span>
+
+↓<span class="w"> </span>[<span class="nv">Annual</span><span class="w"> </span><span class="nv">mean</span><span class="w"> </span><span class="nv">calculated</span>]
+
+<span class="nv">Annual</span><span class="w"> </span><span class="nv">mean</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="mi">2085</span><span class="w"> </span><span class="nv">at</span><span class="w"> </span><span class="nv">each</span><span class="w"> </span><span class="nv">lat</span><span class="o">/</span><span class="nv">lon</span><span class="w"> </span><span class="nv">gridcell</span>
+</code></pre></div>
+
+<p><strong>Formula:</strong></p>
+<div class="codehilite"><pre><span></span><code>Annual_mean(lat, lon) = mean(Jan, Feb, Mar, ..., Dec)
+</code></pre></div>
+
+<h3>Multi-File Processing</h3>
+<p>The script efficiently handles multiple monthly files using xarray's <code>open_mfdataset</code>:</p>
+<div class="codehilite"><pre><span></span><code><span class="c1"># Opens all monthly files in parallel</span>
+<span class="n">ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_mfdataset</span><span class="p">(</span>
+    <span class="n">netcdf_files</span><span class="p">,</span>              <span class="c1"># List of monthly files</span>
+    <span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>             <span class="c1"># Parallel I/O</span>
+    <span class="n">combine</span><span class="o">=</span><span class="s1">&#39;nested&#39;</span><span class="p">,</span>          <span class="c1"># Combine along time</span>
+    <span class="n">concat_dim</span><span class="o">=</span><span class="s1">&#39;time&#39;</span>          <span class="c1"># Concatenate on time dimension</span>
+<span class="p">)</span>
+</code></pre></div>
+
+<hr />
+<h2>Complete Parameter Reference Table</h2>
+<h3>Required Parameters</h3>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>simulation_path</code></td>
+<td>string</td>
+<td><strong>Yes</strong></td>
+<td>Path to E3SM simulation directory</td>
+</tr>
+<tr>
+<td><code>output_files</code></td>
+<td>string or list</td>
+<td><strong>Yes</strong></td>
+<td>Path(s) to output NetCDF file(s)</td>
+</tr>
+<tr>
+<td><code>netcdf_substrings</code></td>
+<td>nested list</td>
+<td><strong>Yes</strong></td>
+<td>File type identifiers for NetCDF files</td>
+</tr>
+<tr>
+<td><code>variables</code></td>
+<td>nested list</td>
+<td><strong>Yes</strong></td>
+<td>Variables to extract from each file type</td>
+</tr>
+<tr>
+<td><code>start_years</code></td>
+<td>integer or list</td>
+<td><strong>Yes</strong></td>
+<td>First year(s) to extract</td>
+</tr>
+<tr>
+<td><code>end_years</code></td>
+<td>integer or list</td>
+<td><strong>Yes</strong></td>
+<td>Last year(s) to extract</td>
+</tr>
+</tbody>
+</table>
+<h3>No Optional Parameters</h3>
+<p>This script requires all parameters to be specified. Unlike other scripts in the suite, there are no default values for optional parameters.</p>
+<hr />
+<h2>Detailed Parameter Descriptions</h2>
+<h3>Core Required Parameters</h3>
+<h4><code>simulation_path</code></h4>
+<p><strong>Type:</strong> String (directory path)<br />
+<strong>Required:</strong> Yes<br />
+<strong>Description:</strong> Complete path to directory containing E3SM NetCDF h0 output files.</p>
+<p><strong>Examples:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="nt">&quot;simulation_path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/lcrc/group/e3sm/ac.eva.sinha/20240730_SSP245_ZATM_BGC_ne30pg2_f09_oEC60to30v3_without_feedbacks/run&quot;</span>
+</code></pre></div>
+
+<p><strong>Requirements:</strong><br />
+- Must be valid directory path<br />
+- Must contain monthly NetCDF (.nc) files<br />
+- Files must follow E3SM naming convention</p>
+<p><strong>Typical Structure:</strong></p>
+<div class="codehilite"><pre><span></span><code>simulation_path/
+├── elm.h0.2015-01.nc
+├── elm.h0.2015-02.nc
+├── ...
+├── eam.h0.2015-01.nc
+├── eam.h0.2015-02.nc
+└── ...
+</code></pre></div>
+
+<hr />
+<h4><code>output_files</code></h4>
+<p><strong>Type:</strong> String OR List of strings<br />
+<strong>Required:</strong> Yes<br />
+<strong>Description:</strong> Path(s) to output NetCDF file(s). Can be a single file or list of files.</p>
+<p><strong>Format 1 - Single Output File:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="nt">&quot;output_files&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;./output/spatial_data.nc&quot;</span>
+</code></pre></div>
+
+<p><strong>Format 2 - Multiple Output Files:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="nt">&quot;output_files&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="s2">&quot;./output/spatial_elm.nc&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;./output/spatial_eam.nc&quot;</span>
+<span class="p">]</span>
+</code></pre></div>
+
+<p><strong>Automatic Conversion:</strong><br />
+If you provide a single string, the script converts it to a list:</p>
+<div class="codehilite"><pre><span></span><code><span class="c1">// You write:</span>
+<span class="nt">&quot;output_files&quot;</span><span class="p">:</span><span class="w"> </span><span class="nt">&quot;file.nc&quot;</span>
+
+<span class="c1">// Script converts to:</span>
+<span class="nt">&quot;output_files&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;file.nc&quot;</span><span class="p">]</span>
+</code></pre></div>
+
+<p><strong>File Format:</strong><br />
+- Must be NetCDF format (.nc extension)<br />
+- Creates standard NetCDF4 file<br />
+- Contains spatial gridded data</p>
+<hr />
+<h4><code>netcdf_substrings</code></h4>
+<p><strong>Type:</strong> Nested list of strings OR list of strings<br />
+<strong>Required:</strong> Yes<br />
+<strong>Description:</strong> Identifies different types of NetCDF files by substrings in filenames.</p>
+<p><strong>Format:</strong> List of lists, where each inner list contains substrings for one file type.</p>
+<p><strong>Examples:</strong></p>
+<p><strong>Single file type (ELM only):</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="nt">&quot;netcdf_substrings&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[[</span><span class="s2">&quot;elm.h0&quot;</span><span class="p">]]</span>
+</code></pre></div>
+
+<p><strong>Two file types (ELM and EAM):</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="nt">&quot;netcdf_substrings&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[[</span><span class="s2">&quot;elm.h0&quot;</span><span class="p">],</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;eam.h0&quot;</span><span class="p">]]</span>
+</code></pre></div>
+
+<p><strong>Automatic List Conversion:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="c1">// If you write:</span>
+<span class="nt">&quot;netcdf_substrings&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;elm.h0&quot;</span><span class="p">]</span>
+
+<span class="c1">// Script converts to:</span>
+<span class="nt">&quot;netcdf_substrings&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[[</span><span class="s2">&quot;elm.h0&quot;</span><span class="p">]]</span>
+</code></pre></div>
+
+<p><strong>How It Works:</strong><br />
+- Script searches <code>simulation_path</code> for .nc files<br />
+- Files must contain ALL substrings in their corresponding list<br />
+- Each file type creates separate output file</p>
+<hr />
+<h4><code>variables</code></h4>
+<p><strong>Type:</strong> Nested list of strings OR list of strings<br />
+<strong>Required:</strong> Yes<br />
+<strong>Description:</strong> Variables to extract from each NetCDF file type.</p>
+<p><strong>Format:</strong> List of lists, where each inner list corresponds to one file type.</p>
+<p><strong>Structure:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="n">variables</span><span class="o">[</span><span class="n">i</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">variables</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="k">extract</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">netcdf_substrings</span><span class="o">[</span><span class="n">i</span><span class="o">]</span><span class="w"> </span><span class="n">files</span>
+</code></pre></div>
+
+<p><strong>Example:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;output_files&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;elm_spatial.nc&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;eam_spatial.nc&quot;</span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;netcdf_substrings&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[[</span><span class="s2">&quot;elm.h0&quot;</span><span class="p">],</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;eam.h0&quot;</span><span class="p">]],</span>
+<span class="w">    </span><span class="nt">&quot;variables&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="p">[</span><span class="s2">&quot;GPP&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;NPP&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;NBP&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;TOTECOSYSC&quot;</span><span class="p">],</span>
+<span class="w">        </span><span class="p">[</span><span class="s2">&quot;PRECC&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;PRECL&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;TREFHT&quot;</span><span class="p">]</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p><strong>Breakdown:</strong><br />
+- <code>["GPP", "NPP", "NBP", "TOTECOSYSC"]</code> → elm_spatial.nc (from elm.h0 files)<br />
+- <code>["PRECC", "PRECL", "TREFHT"]</code> → eam_spatial.nc (from eam.h0 files)</p>
+<p><strong>Automatic List Conversion:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="c1">// If you write:</span>
+<span class="nt">&quot;variables&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;GPP&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;NPP&quot;</span><span class="p">]</span>
+
+<span class="c1">// And output_files has length 1:</span>
+<span class="c1">// Script keeps as:</span>
+<span class="nt">&quot;variables&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[[</span><span class="s2">&quot;GPP&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;NPP&quot;</span><span class="p">]]</span>
+</code></pre></div>
+
+<p><strong>Common ELM Variables:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="nt">&quot;variables&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">[</span><span class="s2">&quot;GPP&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;NPP&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;NBP&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;ER&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;HR&quot;</span><span class="p">,</span>
+<span class="w">     </span><span class="s2">&quot;TOTECOSYSC&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;TOTVEGC&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;TOTSOMC&quot;</span><span class="p">,</span>
+<span class="w">     </span><span class="s2">&quot;LAND_UPTAKE&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;LAND_USE_FLUX&quot;</span><span class="p">]</span>
+<span class="p">]</span>
+</code></pre></div>
+
+<p><strong>Common EAM Variables:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="nt">&quot;variables&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">[</span><span class="s2">&quot;PRECC&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;PRECL&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;TREFHT&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;PBOT&quot;</span><span class="p">,</span>
+<span class="w">     </span><span class="s2">&quot;SFCO2&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;SFCO2_LND&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;SFCO2_OCN&quot;</span><span class="p">]</span>
+<span class="p">]</span>
+</code></pre></div>
+
+<hr />
+<h4><code>start_years</code></h4>
+<p><strong>Type:</strong> Integer OR List of integers<br />
+<strong>Required:</strong> Yes<br />
+<strong>Description:</strong> First year(s) for time period to extract.</p>
+<p><strong>Format 1 - Single Value (Applied to All):</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="nt">&quot;start_years&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2085</span>
+</code></pre></div>
+
+<p><strong>Format 2 - Multiple Values (One Per Output File):</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="nt">&quot;start_years&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">2085</span><span class="p">,</span><span class="w"> </span><span class="mi">2085</span><span class="p">]</span>
+</code></pre></div>
+
+<p><strong>Automatic Value Replication:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="c1">// If you write:</span>
+<span class="nt">&quot;start_years&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2085</span>
+
+<span class="c1">// And output_files has length 2:</span>
+<span class="c1">// Script converts to:</span>
+<span class="nt">&quot;start_years&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">2085</span><span class="p">,</span><span class="w"> </span><span class="mi">2085</span><span class="p">]</span>
+</code></pre></div>
+
+<p><strong>Usage:</strong><br />
+- Defines start of time window<br />
+- Script extracts monthly files from start_years to end_years<br />
+- Computes annual means for each year in range</p>
+<hr />
+<h4><code>end_years</code></h4>
+<p><strong>Type:</strong> Integer OR List of integers<br />
+<strong>Required:</strong> Yes<br />
+<strong>Description:</strong> Last year(s) for time period to extract.</p>
+<p><strong>Format 1 - Single Value (Applied to All):</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="nt">&quot;end_years&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2090</span>
+</code></pre></div>
+
+<p><strong>Format 2 - Multiple Values (One Per Output File):</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="nt">&quot;end_years&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">2090</span><span class="p">,</span><span class="w"> </span><span class="mi">2090</span><span class="p">]</span>
+</code></pre></div>
+
+<p><strong>Automatic Value Replication:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="c1">// If you write:</span>
+<span class="nt">&quot;end_years&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2090</span>
+
+<span class="c1">// And output_files has length 2:</span>
+<span class="c1">// Script converts to:</span>
+<span class="nt">&quot;end_years&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">2090</span><span class="p">,</span><span class="w"> </span><span class="mi">2090</span><span class="p">]</span>
+</code></pre></div>
+
+<p><strong>Time Period:</strong></p>
+<div class="codehilite"><pre><span></span><code>start_years = 2085, end_years = 2090
+
+→ Extracts: 2085, 2086, 2087, 2088, 2089, 2090 (6 years)
+→ Processes: 72 monthly files (6 years × 12 months)
+→ Output: 6 annual means at each gridcell
+</code></pre></div>
+
+<hr />
+<h2>Variable Processing</h2>
+<p>The script automatically processes certain variables when they are present:</p>
+<h3>1. Total Precipitation Calculation</h3>
+<p><strong>Requires:</strong> <code>PRECC</code>, <code>PRECL</code>, <code>PRECSC</code>, <code>PRECSL</code> (all must be present)</p>
+<p><strong>Processing:</strong><br />
+1. Convert units: m/s → mm/year<br />
+2. Create new variable: <code>PRECIP</code> = sum of all precipitation components</p>
+<p><strong>Formula:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="c1"># Convert each component</span>
+<span class="n">PRECC</span> <span class="p">(</span><span class="n">mm</span><span class="o">/</span><span class="n">year</span><span class="p">)</span> <span class="o">=</span> <span class="n">PRECC</span> <span class="p">(</span><span class="n">m</span><span class="o">/</span><span class="n">s</span><span class="p">)</span> <span class="err">×</span> <span class="n">seconds_per_year</span> <span class="err">×</span> <span class="mi">1000</span> <span class="n">mm</span><span class="o">/</span><span class="n">m</span>
+<span class="n">PRECL</span> <span class="p">(</span><span class="n">mm</span><span class="o">/</span><span class="n">year</span><span class="p">)</span> <span class="o">=</span> <span class="n">PRECL</span> <span class="p">(</span><span class="n">m</span><span class="o">/</span><span class="n">s</span><span class="p">)</span> <span class="err">×</span> <span class="n">seconds_per_year</span> <span class="err">×</span> <span class="mi">1000</span> <span class="n">mm</span><span class="o">/</span><span class="n">m</span>
+<span class="n">PRECSC</span> <span class="p">(</span><span class="n">mm</span><span class="o">/</span><span class="n">year</span><span class="p">)</span> <span class="o">=</span> <span class="n">PRECSC</span> <span class="p">(</span><span class="n">m</span><span class="o">/</span><span class="n">s</span><span class="p">)</span> <span class="err">×</span> <span class="n">seconds_per_year</span> <span class="err">×</span> <span class="mi">1000</span> <span class="n">mm</span><span class="o">/</span><span class="n">m</span>
+<span class="n">PRECSL</span> <span class="p">(</span><span class="n">mm</span><span class="o">/</span><span class="n">year</span><span class="p">)</span> <span class="o">=</span> <span class="n">PRECSL</span> <span class="p">(</span><span class="n">m</span><span class="o">/</span><span class="n">s</span><span class="p">)</span> <span class="err">×</span> <span class="n">seconds_per_year</span> <span class="err">×</span> <span class="mi">1000</span> <span class="n">mm</span><span class="o">/</span><span class="n">m</span>
+
+<span class="c1"># Calculate total</span>
+<span class="n">PRECIP</span> <span class="p">(</span><span class="n">mm</span><span class="o">/</span><span class="n">year</span><span class="p">)</span> <span class="o">=</span> <span class="n">PRECC</span> <span class="o">+</span> <span class="n">PRECL</span> <span class="o">+</span> <span class="n">PRECSC</span> <span class="o">+</span> <span class="n">PRECSL</span>
+</code></pre></div>
+
+<p><strong>Output Variables:</strong><br />
+- <code>PRECC</code> - Convective precipitation (mm/year)<br />
+- <code>PRECL</code> - Large-scale precipitation (mm/year)<br />
+- <code>PRECSC</code> - Convective snow (mm/year)<br />
+- <code>PRECSL</code> - Large-scale snow (mm/year)<br />
+- <code>PRECIP</code> - <strong>New:</strong> Total precipitation (mm/year)</p>
+<p><strong>Attributes:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="n">PRECIP</span><span class="o">:</span>
+<span class="w">  </span><span class="n">units</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;mm/year&quot;</span>
+<span class="w">  </span><span class="n">description</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;Total precipitation rate&quot;</span>
+</code></pre></div>
+
+<hr />
+<h3>2. CO₂ Mole Fraction Calculation</h3>
+<p><strong>Requires:</strong> <code>PBOT</code>, <code>PCO2</code>, <code>QBOT</code> (all must be present)</p>
+<p><strong>Processing:</strong><br />
+Calculate atmospheric CO₂ mole fraction in dry air (ppm)</p>
+<p><strong>Formula:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="c1"># Partial pressure of water vapor (Pa)</span>
+<span class="c1"># See: https://cran.r-project.org/web/packages/humidity/vignettes/humidity-measures.html</span>
+<span class="n">pH2O</span> <span class="o">=</span> <span class="n">PBOT</span> <span class="err">×</span> <span class="n">QBOT</span> <span class="o">/</span> <span class="p">(</span><span class="mf">0.622</span> <span class="o">+</span> <span class="mf">0.378</span> <span class="err">×</span> <span class="n">QBOT</span><span class="p">)</span>
+
+<span class="c1"># CO₂ mole fraction in dry air (ppm)</span>
+<span class="n">ZCO2</span> <span class="p">(</span><span class="n">ppm</span><span class="p">)</span> <span class="o">=</span> <span class="mf">1e6</span> <span class="err">×</span> <span class="n">PCO2</span> <span class="o">/</span> <span class="p">(</span><span class="n">PBOT</span> <span class="o">-</span> <span class="n">pH2O</span><span class="p">)</span>
+</code></pre></div>
+
+<p><strong>Output Variable:</strong><br />
+- <code>ZCO2</code> - <strong>New:</strong> CO₂ mole fraction in dry air (ppm)</p>
+<p><strong>Attributes:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="n">ZCO2</span><span class="o">:</span>
+<span class="w">  </span><span class="n">units</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;ppm&quot;</span>
+<span class="w">  </span><span class="n">description</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;CO2 mole fraction in dry air&quot;</span>
+</code></pre></div>
+
+<p><strong>Scientific Background:</strong><br />
+- CO₂ concentrations reported as mole fraction in <em>dry</em> air<br />
+- Must remove water vapor contribution<br />
+- Uses standard psychrometric formula</p>
+<hr />
+<h2>JSON Configuration Examples</h2>
+<h3>Example 1: Basic Configuration (ELM + EAM)</h3>
+<p><strong>Purpose:</strong> Extract land and atmosphere variables for 2085-2090</p>
+<div class="codehilite"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;simulation_path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/lcrc/group/e3sm/ac.eva.sinha/20240730_SSP245_ZATM_BGC_ne30pg2_f09_oEC60to30v3_without_feedbacks/run&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;output_files&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="s2">&quot;./../2025_DiVittorio_et_al_e3sm/control_spatial_data_elm.nc&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="s2">&quot;./../2025_DiVittorio_et_al_e3sm/control_spatial_data_eam.nc&quot;</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;netcdf_substrings&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[[</span><span class="s2">&quot;elm.h0&quot;</span><span class="p">],</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;eam.h0&quot;</span><span class="p">]],</span>
+<span class="w">    </span><span class="nt">&quot;variables&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="p">[</span><span class="s2">&quot;DWT_CONV_CFLUX_GRC&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;ER&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;GPP&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;HR&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;LAND_UPTAKE&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;LAND_USE_FLUX&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="s2">&quot;NBP&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;NEE&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;NEP&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;NPP&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;PFT_FIRE_CLOSS&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;WOOD_HARVESTC&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="s2">&quot;WOODC_ALLOC&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;WOODC_LOSS&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;PBOT&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;PCO2&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;QBOT&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;TBOT&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="s2">&quot;TOTECOSYSC&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;TOTSOMC&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;TOTLITC&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;TOTVEGC&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;TOTVEGC_ABG&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;WOODC&quot;</span><span class="p">],</span>
+<span class="w">        </span><span class="p">[</span><span class="s2">&quot;PRECC&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;PRECL&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;PRECSC&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;PRECSL&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;SFCO2&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;SFCO2_FFF&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="s2">&quot;SFCO2_LND&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;SFCO2_OCN&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;TMCO2&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;TMCO2_FFF&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;TMCO2_LND&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="s2">&quot;TMCO2_OCN&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;TREFHT&quot;</span><span class="p">]</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;start_years&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2085</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;end_years&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2090</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p><strong>What it does:</strong><br />
+- Creates 2 output files (ELM and EAM)<br />
+- ELM file: 24 land variables<br />
+- EAM file: 13 atmospheric variables + PRECIP (added automatically)<br />
+- Time period: 2085-2090 (6 years)<br />
+- Output includes ZCO2 (derived from PBOT, PCO2, QBOT)</p>
+<hr />
+<h3>Example 2: Single File Type</h3>
+<p><strong>Purpose:</strong> Extract only land model outputs</p>
+<div class="codehilite"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;simulation_path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/lcrc/group/e3sm/simulation/run&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;output_files&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;./output/elm_spatial_data.nc&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;netcdf_substrings&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[[</span><span class="s2">&quot;elm.h0&quot;</span><span class="p">]],</span>
+<span class="w">    </span><span class="nt">&quot;variables&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[[</span><span class="s2">&quot;GPP&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;NPP&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;NBP&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;TOTECOSYSC&quot;</span><span class="p">]],</span>
+<span class="w">    </span><span class="nt">&quot;start_years&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2085</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;end_years&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2090</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<hr />
+<h3>Example 3: Multiple Simulations</h3>
+<p><strong>Purpose:</strong> Process multiple simulations in batch</p>
+<div class="codehilite"><pre><span></span><code><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;simulation_path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/lcrc/group/e3sm/control/run&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;output_files&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;./control_elm.nc&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;./control_eam.nc&quot;</span><span class="p">],</span>
+<span class="w">        </span><span class="nt">&quot;netcdf_substrings&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[[</span><span class="s2">&quot;elm.h0&quot;</span><span class="p">],</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;eam.h0&quot;</span><span class="p">]],</span>
+<span class="w">        </span><span class="nt">&quot;variables&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[[</span><span class="s2">&quot;GPP&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;NPP&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;NBP&quot;</span><span class="p">],</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;PRECC&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;PRECL&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;TREFHT&quot;</span><span class="p">]],</span>
+<span class="w">        </span><span class="nt">&quot;start_years&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2085</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;end_years&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2090</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;simulation_path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/lcrc/group/e3sm/full_feedback/run&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;output_files&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;./full_feedback_elm.nc&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;./full_feedback_eam.nc&quot;</span><span class="p">],</span>
+<span class="w">        </span><span class="nt">&quot;netcdf_substrings&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[[</span><span class="s2">&quot;elm.h0&quot;</span><span class="p">],</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;eam.h0&quot;</span><span class="p">]],</span>
+<span class="w">        </span><span class="nt">&quot;variables&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[[</span><span class="s2">&quot;GPP&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;NPP&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;NBP&quot;</span><span class="p">],</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;PRECC&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;PRECL&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;TREFHT&quot;</span><span class="p">]],</span>
+<span class="w">        </span><span class="nt">&quot;start_years&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2085</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;end_years&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2090</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">]</span>
+</code></pre></div>
+
+<hr />
+<h2>Output Files</h2>
+<h3>NetCDF File Structure</h3>
+<p><strong>Format:</strong> NetCDF4</p>
+<p><strong>Typical Dimensions:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="n">Dimensions</span><span class="o">:</span>
+<span class="w">  </span><span class="n">lat</span><span class="o">:</span><span class="w"> </span><span class="mi">192</span><span class="w"> </span><span class="o">(</span><span class="n">grid</span><span class="o">-</span><span class="n">dependent</span><span class="o">)</span>
+<span class="w">  </span><span class="n">lon</span><span class="o">:</span><span class="w"> </span><span class="mi">288</span><span class="w"> </span><span class="o">(</span><span class="n">grid</span><span class="o">-</span><span class="n">dependent</span><span class="o">)</span>
+<span class="w">  </span><span class="n">year</span><span class="o">:</span><span class="w"> </span><span class="mi">6</span><span class="w"> </span><span class="o">(</span><span class="mi">2085</span><span class="o">-</span><span class="mi">2090</span><span class="o">)</span>
+</code></pre></div>
+
+<p><strong>Variables:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="n">lat</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span><span class="o">:</span><span class="w"> </span><span class="n">Latitude</span><span class="w"> </span><span class="n">coordinates</span>
+<span class="n">lon</span><span class="p">(</span><span class="n">lon</span><span class="p">)</span><span class="o">:</span><span class="w"> </span><span class="n">Longitude</span><span class="w"> </span><span class="n">coordinates</span>
+<span class="n">year</span><span class="p">(</span><span class="n">year</span><span class="p">)</span><span class="o">:</span><span class="w"> </span><span class="n">Year</span><span class="w"> </span><span class="n">values</span>
+<span class="p">[</span><span class="n">User</span><span class="w"> </span><span class="n">variables</span><span class="p">](</span><span class="n">year</span><span class="p">,</span><span class="w"> </span><span class="n">lat</span><span class="p">,</span><span class="w"> </span><span class="n">lon</span><span class="p">)</span><span class="o">:</span><span class="w"> </span><span class="n">Data</span><span class="w"> </span><span class="n">arrays</span>
+</code></pre></div>
+
+<h3>Using Output Files</h3>
+<p><strong>Load in Python:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
+<span class="n">ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="s1">&#39;spatial_elm.nc&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+
+<span class="c1"># Plot</span>
+<span class="n">ds</span><span class="p">[</span><span class="s1">&#39;GPP&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="mi">2085</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</code></pre></div>
+
+<hr />
+<h2>Troubleshooting</h2>
+<h3>Issue 1: Memory Error</h3>
+<p><strong>Solutions:</strong><br />
+- Reduce variables<br />
+- Shorten time period<br />
+- Process in batches<br />
+- Use HPC with more RAM</p>
+<h3>Issue 2: File Not Found</h3>
+<p><strong>Solutions:</strong><br />
+- Verify simulation_path<br />
+- Check netcdf_substrings match files<br />
+- Verify year range has files</p>
+<h3>Issue 3: Variable Not Found</h3>
+<p><strong>Solutions:</strong><br />
+- Check variable exists in files<br />
+- Verify correct file type (ELM vs EAM)<br />
+- Check for typos (case-sensitive)</p>
+<hr />
+<h2>Best Practices</h2>
+<ol>
+<li><strong>Test first</strong> with short periods and few variables</li>
+<li><strong>Name files descriptively</strong> (include simulation, years, component)</li>
+<li><strong>Process in parallel</strong> by using multiple output_files</li>
+<li><strong>Document</strong> your configurations</li>
+<li><strong>Verify outputs</strong> after extraction</li>
+</ol>
+<hr />
+<h2>Comparison with Time Series Extraction</h2>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Spatial Script</th>
+<th>Time Series Script</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Output</td>
+<td>NetCDF (gridded)</td>
+<td>Text (time series)</td>
+</tr>
+<tr>
+<td>Spatial</td>
+<td>Full resolution</td>
+<td>Aggregated</td>
+</tr>
+<tr>
+<td>Temporal</td>
+<td>Annual means</td>
+<td>Monthly/annual</td>
+</tr>
+<tr>
+<td>Use</td>
+<td>Mapping</td>
+<td>Trend analysis</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>References</h2>
+<ul>
+<li>E3SM Documentation: <a href="https://e3sm.org/">https://e3sm.org/</a></li>
+<li>xarray Documentation: <a href="https://xarray.pydata.org/">https://xarray.pydata.org/</a></li>
+<li>DiVittorio et al. (2025). <a href="https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2024MS004806">DOI: 10.1029/2024MS004806</a></li>
+<li>GitHub Repository: <a href="https://github.com/philipmyint/e3sm--gcam_analysis">https://github.com/philipmyint/e3sm--gcam_analysis</a></li>
+</ul>
+<hr />
+<h2>Contact</h2>
+<ul>
+<li><strong>Philip Myint</strong>: myint1@llnl.gov</li>
+<li><strong>Dalei Hao</strong>: dalei.hao@pnnl.gov</li>
+</ul>
+<hr />
+<p><em>Documentation for <code>e3sm_extract_spatial_data_h0.py</code> - Last Updated: January 2026</em></p>
+        <footer>
+            <p>E3SM Spatial Data Extraction Script Documentation<br>
+            <strong>Script:</strong> e3sm_extract_spatial_data_h0.py<br>
+            <strong>Authors:</strong> Philip Myint, Dalei Hao<br>
+            <strong>Version:</strong> 1.0 | January 2026</p>
+        </footer>
+    </div>
+</body>
+</html>

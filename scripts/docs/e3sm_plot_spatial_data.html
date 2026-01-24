@@ -1,0 +1,1413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E3SM Spatial Data Plotting Documentation</title>
+    <style>/* 
+ * Documentation Stylesheet for GCAM Synthetic Data Generation Script
+ * A modern, colorful design with good readability
+ */
+
+/* ===== ROOT VARIABLES ===== */
+:root {
+    /* Color Palette */
+    --primary-blue: #2563eb;
+    --primary-blue-light: #3b82f6;
+    --primary-blue-dark: #1e40af;
+    --accent-green: #10b981;
+    --accent-orange: #f59e0b;
+    --accent-purple: #8b5cf6;
+    --accent-red: #ef4444;
+    
+    /* Background Colors */
+    --bg-main: #f8fafc;
+    --bg-code: #1e293b;
+    --bg-code-inline: #e2e8f0;
+    --bg-table-header: #1e40af;
+    --bg-table-row-even: #f1f5f9;
+    --bg-table-row-odd: #ffffff;
+    --bg-note: #fef3c7;
+    --bg-warning: #fee2e2;
+    --bg-info: #dbeafe;
+    --bg-success: #d1fae5;
+    
+    /* Text Colors */
+    --text-main: #1e293b;
+    --text-secondary: #64748b;
+    --text-code: #e2e8f0;
+    --text-link: #2563eb;
+    --text-link-hover: #1e40af;
+    
+    /* Border Colors */
+    --border-light: #e2e8f0;
+    --border-medium: #cbd5e1;
+    --border-dark: #94a3b8;
+    
+    /* Spacing */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-2xl: 3rem;
+}
+
+/* ===== BASE STYLES ===== */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.7;
+    color: var(--text-main);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: var(--spacing-xl) var(--spacing-md);
+    font-size: 16px;
+}
+
+/* Main Container */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: var(--bg-main);
+    padding: var(--spacing-2xl);
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+/* ===== TYPOGRAPHY ===== */
+h1 {
+    font-size: 2.5rem;
+    color: var(--primary-blue-dark);
+    margin-bottom: var(--spacing-xl);
+    padding-bottom: var(--spacing-md);
+    border-bottom: 4px solid var(--primary-blue);
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--accent-purple) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+h2 {
+    font-size: 2rem;
+    color: var(--primary-blue);
+    margin-top: var(--spacing-2xl);
+    margin-bottom: var(--spacing-lg);
+    padding-left: var(--spacing-md);
+    border-left: 5px solid var(--accent-green);
+    font-weight: 600;
+}
+
+h3 {
+    font-size: 1.5rem;
+    color: var(--primary-blue-dark);
+    margin-top: var(--spacing-xl);
+    margin-bottom: var(--spacing-md);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+}
+
+h3::before {
+    content: "▸";
+    color: var(--accent-orange);
+    margin-right: var(--spacing-sm);
+    font-size: 1.2rem;
+}
+
+h4 {
+    font-size: 1.25rem;
+    color: var(--accent-purple);
+    margin-top: var(--spacing-lg);
+    margin-bottom: var(--spacing-sm);
+    font-weight: 600;
+}
+
+p {
+    margin-bottom: var(--spacing-md);
+    color: var(--text-main);
+}
+
+/* ===== LINKS ===== */
+a {
+    color: var(--text-link);
+    text-decoration: none;
+    font-weight: 500;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+a:hover {
+    color: var(--text-link-hover);
+    border-bottom-color: var(--text-link-hover);
+}
+
+/* ===== LISTS ===== */
+ul, ol {
+    margin-left: var(--spacing-xl);
+    margin-bottom: var(--spacing-md);
+}
+
+li {
+    margin-bottom: var(--spacing-sm);
+    padding-left: var(--spacing-sm);
+}
+
+ul li::marker {
+    color: var(--accent-green);
+    font-size: 1.2em;
+}
+
+ol li::marker {
+    color: var(--primary-blue);
+    font-weight: 600;
+}
+
+/* ===== CODE BLOCKS ===== */
+code {
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 0.9em;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background: var(--bg-code-inline);
+    color: var(--accent-red);
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+pre {
+    background: var(--bg-code);
+    color: var(--text-code);
+    padding: var(--spacing-lg);
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: var(--spacing-lg) 0;
+    border-left: 4px solid var(--accent-green);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+pre code {
+    background: transparent;
+    color: var(--text-code);
+    padding: 0;
+    font-size: 0.95em;
+    line-height: 1.5;
+}
+
+/* ===== TABLES ===== */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: var(--spacing-xl) 0;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+thead {
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-dark) 100%);
+    color: white;
+}
+
+th {
+    padding: var(--spacing-md);
+    text-align: left;
+    font-weight: 600;
+    font-size: 1.05em;
+    border-bottom: 3px solid var(--accent-orange);
+}
+
+td {
+    padding: var(--spacing-md);
+    border-bottom: 1px solid var(--border-light);
+}
+
+tbody tr:nth-child(even) {
+    background: var(--bg-table-row-even);
+}
+
+tbody tr:nth-child(odd) {
+    background: var(--bg-table-row-odd);
+}
+
+tbody tr:hover {
+    background: #e0f2fe;
+    transform: scale(1.01);
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* ===== BLOCKQUOTES ===== */
+blockquote {
+    margin: var(--spacing-lg) 0;
+    padding: var(--spacing-md) var(--spacing-lg);
+    background: var(--bg-info);
+    border-left: 5px solid var(--primary-blue);
+    border-radius: 0 8px 8px 0;
+    font-style: italic;
+    color: var(--primary-blue-dark);
+}
+
+/* ===== HORIZONTAL RULES ===== */
+hr {
+    border: none;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent-green) 0%, var(--primary-blue) 50%, var(--accent-purple) 100%);
+    margin: var(--spacing-2xl) 0;
+    border-radius: 2px;
+}
+
+/* ===== SPECIAL BOXES ===== */
+.note {
+    background: var(--bg-note);
+    border-left: 5px solid var(--accent-orange);
+    padding: var(--spacing-md) var(--spacing-lg);
+    margin: var(--spacing-lg) 0;
+    border-radius: 0 8px 8px 0;
+}
+
+.warning {
+    background: var(--bg-warning);
+    border-left: 5px solid var(--accent-red);
+    padding: var(--spacing-md) var(--spacing-lg);
+    margin: var(--spacing-lg) 0;
+    border-radius: 0 8px 8px 0;
+}
+
+.info {
+    background: var(--bg-info);
+    border-left: 5px solid var(--primary-blue);
+    padding: var(--spacing-md) var(--spacing-lg);
+    margin: var(--spacing-lg) 0;
+    border-radius: 0 8px 8px 0;
+}
+
+.success {
+    background: var(--bg-success);
+    border-left: 5px solid var(--accent-green);
+    padding: var(--spacing-md) var(--spacing-lg);
+    margin: var(--spacing-lg) 0;
+    border-radius: 0 8px 8px 0;
+}
+
+/* ===== BADGES ===== */
+.badge {
+    display: inline-block;
+    padding: var(--spacing-xs) var(--spacing-md);
+    border-radius: 20px;
+    font-size: 0.85em;
+    font-weight: 600;
+    margin: 0 var(--spacing-xs);
+}
+
+.badge-required {
+    background: var(--accent-red);
+    color: white;
+}
+
+.badge-optional {
+    background: var(--accent-green);
+    color: white;
+}
+
+.badge-default {
+    background: var(--primary-blue);
+    color: white;
+}
+
+/* ===== STRONG & EM ===== */
+strong {
+    color: var(--primary-blue-dark);
+    font-weight: 700;
+}
+
+em {
+    color: var(--accent-purple);
+    font-style: italic;
+}
+
+/* ===== IMAGES ===== */
+img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin: var(--spacing-lg) 0;
+}
+
+/* ===== SCROLLBAR STYLING ===== */
+::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-table-row-even);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--accent-purple) 100%);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, var(--primary-blue-dark) 0%, var(--accent-purple) 100%);
+}
+
+/* ===== PRINT STYLES ===== */
+@media print {
+    body {
+        background: white;
+        padding: 0;
+    }
+    
+    .container {
+        box-shadow: none;
+        max-width: 100%;
+    }
+    
+    h1, h2, h3 {
+        page-break-after: avoid;
+    }
+    
+    pre, table {
+        page-break-inside: avoid;
+    }
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+@media (max-width: 768px) {
+    body {
+        padding: var(--spacing-md) var(--spacing-sm);
+        font-size: 14px;
+    }
+    
+    .container {
+        padding: var(--spacing-lg);
+    }
+    
+    h1 {
+        font-size: 2rem;
+    }
+    
+    h2 {
+        font-size: 1.5rem;
+    }
+    
+    h3 {
+        font-size: 1.25rem;
+    }
+    
+    table {
+        font-size: 0.9em;
+    }
+    
+    th, td {
+        padding: var(--spacing-sm);
+    }
+}
+
+/* ===== ADDITIONAL UTILITY CLASSES ===== */
+.text-center {
+    text-align: center;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.margin-top-lg {
+    margin-top: var(--spacing-2xl);
+}
+
+.margin-bottom-lg {
+    margin-bottom: var(--spacing-2xl);
+}
+
+.highlight {
+    background: linear-gradient(120deg, #fef3c7 0%, #fde68a 100%);
+    padding: 0 var(--spacing-xs);
+    border-radius: 3px;
+}
+
+/* ===== SECTION DIVIDERS ===== */
+.section-divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: var(--spacing-2xl) 0;
+}
+
+.section-divider::before,
+.section-divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 2px solid var(--border-medium);
+}
+
+.section-divider::before {
+    margin-right: var(--spacing-md);
+}
+
+.section-divider::after {
+    margin-left: var(--spacing-md);
+}
+
+/* ===== FOOTER ===== */
+footer {
+    margin-top: var(--spacing-2xl);
+    padding-top: var(--spacing-lg);
+    border-top: 2px solid var(--border-light);
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.9em;
+}
+</style>
+</head>
+<body>
+    <div class="container"><h1>E3SM Spatial Data Plotting Script Documentation</h1>
+<h2>Overview</h2>
+<p><strong>Script Name:</strong> <code>e3sm_plot_spatial_data.py</code></p>
+<p><strong>Purpose:</strong> Creates publication-quality spatial (map) plots from E3SM NetCDF data files with support for absolute differences, percent differences, ensemble analysis, statistical significance testing (stippling), and separate visualizations for control and scenario runs.</p>
+<p><strong>Key Capabilities:</strong><br />
+- Global and regional spatial maps<br />
+- Absolute and percent difference plots<br />
+- Ensemble mean with statistical significance stippling<br />
+- Separate plots for individual datasets<br />
+- Support for both ELM (structured grid) and EAM (unstructured grid)<br />
+- Customizable colormaps and projections<br />
+- Statistical significance testing (t-tests)<br />
+- Parallel processing for efficiency</p>
+<p><strong>Authors:</strong> Philip Myint (myint1@llnl.gov) and Dalei Hao (dalei.hao@pnnl.gov)</p>
+<p><strong>Repository:</strong> <a href="https://github.com/philipmyint/e3sm--gcam_analysis">E3SM-GCAM Analysis Scripts</a></p>
+<hr />
+<h2>Table of Contents</h2>
+<ol>
+<li><a href="#overview">Overview</a></li>
+<li><a href="#installation--requirements">Installation &amp; Requirements</a></li>
+<li><a href="#basic-usage">Basic Usage</a></li>
+<li><a href="#complete-parameter-reference-table">Complete Parameter Reference Table</a></li>
+<li><a href="#plot-types-explained">Plot Types Explained</a></li>
+<li><a href="#json-configuration-examples">JSON Configuration Examples</a></li>
+<li><a href="#elm-vs-eam-differences">ELM vs EAM Differences</a></li>
+<li><a href="#output-files">Output Files</a></li>
+<li><a href="#best-practices">Best Practices</a></li>
+<li><a href="#troubleshooting">Troubleshooting</a></li>
+</ol>
+<hr />
+<h2>Installation &amp; Requirements</h2>
+<h3>Required Python Libraries</h3>
+<div class="codehilite"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>xarray<span class="w"> </span>uxarray<span class="w"> </span>cartopy<span class="w"> </span>matplotlib<span class="w"> </span>scipy<span class="w"> </span>numpy<span class="w"> </span>pandas<span class="w"> </span>multiprocessing
+</code></pre></div>
+
+<h3>Required Utility Modules</h3>
+<ul>
+<li><code>utility_constants</code> - Physical constants</li>
+<li><code>utility_dataframes</code> - DataFrame operations (t-tests)</li>
+<li><code>utility_functions</code> - General utilities</li>
+<li><code>utility_plots</code> - Plotting defaults and functions</li>
+<li><code>utility_xarray</code> - xarray/uxarray operations</li>
+</ul>
+<h3>Additional Requirements</h3>
+<ul>
+<li><strong>For EAM plots:</strong> Grid file (unstructured mesh, e.g., <code>ne30pg2_scrip_c20191218.nc</code>)</li>
+<li><strong>For ELM plots:</strong> No additional files needed (structured lat/lon grid)</li>
+</ul>
+<hr />
+<h2>Basic Usage</h2>
+<h3>Command Line Execution</h3>
+<div class="codehilite"><pre><span></span><code>python<span class="w"> </span>e3sm_plot_spatial_data.py<span class="w"> </span>config.json
+</code></pre></div>
+
+<p><strong>Multiple Configuration Files:</strong></p>
+<div class="codehilite"><pre><span></span><code>python<span class="w"> </span>e3sm_plot_spatial_data.py<span class="w"> </span>elm_config.json<span class="w"> </span>eam_config.json
+</code></pre></div>
+
+<h3>What the Script Does</h3>
+<ol>
+<li>Reads JSON configuration file(s)</li>
+<li>Loads NetCDF spatial data files</li>
+<li>Calculates temporal means/differences</li>
+<li>Performs statistical testing (if ensemble data)</li>
+<li>Creates spatial maps with:<br />
+   - Coastlines<br />
+   - Colorbars<br />
+   - Statistical annotations<br />
+   - Stippling (optional)</li>
+<li>Saves plots as PDF or PNG</li>
+<li>Outputs p-value files</li>
+</ol>
+<hr />
+<h2>Complete Parameter Reference Table</h2>
+<h3>Required Parameters</h3>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>netcdf_files</code></td>
+<td>string/list/nested list</td>
+<td><strong>Yes</strong></td>
+<td>-</td>
+<td>NetCDF file path(s)</td>
+</tr>
+<tr>
+<td><code>plot_directory</code></td>
+<td>string</td>
+<td>No</td>
+<td><code>'./'</code></td>
+<td>Output directory for plots</td>
+</tr>
+</tbody>
+</table>
+<h3>Core Optional Parameters</h3>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>variables</code></td>
+<td>list or <code>'all'</code></td>
+<td>No</td>
+<td><code>'all'</code></td>
+<td>Variables to plot</td>
+</tr>
+<tr>
+<td><code>plot_type</code></td>
+<td>string</td>
+<td>No</td>
+<td><code>'absolute_difference'</code></td>
+<td>Plot type (see below)</td>
+</tr>
+<tr>
+<td><code>start_year</code></td>
+<td>integer</td>
+<td>No</td>
+<td><code>2071</code></td>
+<td>First year for temporal averaging</td>
+</tr>
+<tr>
+<td><code>end_year</code></td>
+<td>integer</td>
+<td>No</td>
+<td><code>2090</code></td>
+<td>Last year for temporal averaging</td>
+</tr>
+<tr>
+<td><code>time_calculation</code></td>
+<td>string</td>
+<td>No</td>
+<td><code>'mean'</code></td>
+<td><code>'mean'</code> or <code>'sum'</code> for temporal aggregation</td>
+</tr>
+<tr>
+<td><code>grid_file</code></td>
+<td>string</td>
+<td>No</td>
+<td><code>None</code></td>
+<td><strong>Required for EAM</strong>, grid file path</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Plot Type Options:</strong><br />
+- <code>'absolute_difference'</code> - Scenario minus control (default)<br />
+- <code>'percent_difference'</code> - (Scenario - Control) / Control × 100<br />
+- <code>'separate_plots'</code> - Individual plots for control and scenario</p>
+<h3>Visual Customization Parameters</h3>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>width</code></td>
+<td>float</td>
+<td>No</td>
+<td><code>10</code></td>
+<td>Figure width (inches)</td>
+</tr>
+<tr>
+<td><code>height</code></td>
+<td>float</td>
+<td>No</td>
+<td><code>8</code></td>
+<td>Figure height (inches)</td>
+</tr>
+<tr>
+<td><code>cmap</code></td>
+<td>string</td>
+<td>No</td>
+<td><code>'bwr'</code></td>
+<td>Colormap (blue-white-red)</td>
+</tr>
+<tr>
+<td><code>projection</code></td>
+<td>cartopy projection</td>
+<td>No</td>
+<td><code>Robinson</code></td>
+<td>Map projection</td>
+</tr>
+<tr>
+<td><code>use_latex</code></td>
+<td>boolean</td>
+<td>No</td>
+<td><code>false</code></td>
+<td>Use LaTeX fonts</td>
+</tr>
+<tr>
+<td><code>produce_png</code></td>
+<td>boolean</td>
+<td>No</td>
+<td><code>false</code></td>
+<td>Output PNG instead of PDF</td>
+</tr>
+<tr>
+<td><code>title_size</code></td>
+<td>integer</td>
+<td>No</td>
+<td><code>24</code></td>
+<td>Title font size</td>
+</tr>
+<tr>
+<td><code>statistics_panel_size</code></td>
+<td>integer</td>
+<td>No</td>
+<td><code>14</code></td>
+<td>Statistics text size</td>
+</tr>
+</tbody>
+</table>
+<h3>Colorbar Parameters</h3>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cbar_on</code></td>
+<td>boolean</td>
+<td>No</td>
+<td><code>true</code></td>
+<td>Show colorbar</td>
+</tr>
+<tr>
+<td><code>cbar_limits</code></td>
+<td>list <code>[min, max]</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>Colorbar limits (auto if None)</td>
+</tr>
+<tr>
+<td><code>cbar_label_size</code></td>
+<td>integer</td>
+<td>No</td>
+<td><code>20</code></td>
+<td>Colorbar tick label size</td>
+</tr>
+<tr>
+<td><code>cbar_x_offset</code></td>
+<td>float</td>
+<td>No</td>
+<td><code>0.06</code></td>
+<td>Colorbar horizontal offset</td>
+</tr>
+</tbody>
+</table>
+<h3>Stippling Parameters (Statistical Significance)</h3>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>stippling_on</code></td>
+<td>boolean</td>
+<td>No</td>
+<td><code>false</code></td>
+<td>Enable stippling</td>
+</tr>
+<tr>
+<td><code>stippling_hatches</code></td>
+<td>string</td>
+<td>No</td>
+<td><code>'xxxx'</code></td>
+<td>Hatch pattern (e.g., <code>'///'</code>, <code>'xxx'</code>)</td>
+</tr>
+<tr>
+<td><code>stippling_std_multiple</code></td>
+<td>float</td>
+<td>No</td>
+<td><code>2</code></td>
+<td>Std deviation multiple for stippling</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Stippling Behavior:</strong><br />
+- <strong>Ensemble data (≥2 members per set):</strong> Stipples where p &lt; threshold<br />
+- <strong>Single dataset:</strong> Stipples where |value| &gt; mean ± N×std</p>
+<h3>Statistical Testing Parameters</h3>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>p_value_threshold</code></td>
+<td>float</td>
+<td>No</td>
+<td><code>0.05</code></td>
+<td>Significance threshold</td>
+</tr>
+<tr>
+<td><code>p_value_file</code></td>
+<td>string</td>
+<td>No</td>
+<td><code>'p_values.dat'</code></td>
+<td>Output file for p-values</td>
+</tr>
+<tr>
+<td><code>p_value_file_print_only_if_below_threshold</code></td>
+<td>boolean</td>
+<td>No</td>
+<td><code>true</code></td>
+<td>Only print significant p-values</td>
+</tr>
+</tbody>
+</table>
+<h3>Advanced Parameters</h3>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>multiplier</code></td>
+<td>float/dict</td>
+<td>No</td>
+<td><code>1</code></td>
+<td>Scale data values</td>
+</tr>
+<tr>
+<td><code>plot_name</code></td>
+<td>dict</td>
+<td>No</td>
+<td>Auto-generated</td>
+<td>Custom plot filenames per variable</td>
+</tr>
+<tr>
+<td><code>title</code></td>
+<td>dict</td>
+<td>No</td>
+<td>Auto-generated</td>
+<td>Custom titles per variable</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>Plot Types Explained</h2>
+<h3>1. Absolute Difference (<code>plot_type: "absolute_difference"</code>)</h3>
+<p><strong>Description:</strong> Shows scenario minus control in original units</p>
+<p><strong>Configuration:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;netcdf_files&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;control.nc&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;scenario.nc&quot;</span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;plot_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;absolute_difference&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p><strong>Formula:</strong></p>
+<div class="codehilite"><pre><span></span><code>Difference = Scenario - Control
+</code></pre></div>
+
+<p><strong>Use When:</strong><br />
+- Showing actual magnitude of changes<br />
+- Variables where absolute change meaningful<br />
+- Comparing against observations</p>
+<p><strong>Example:</strong> GPP change of +2.5 gC/m²/month</p>
+<hr />
+<h3>2. Percent Difference (<code>plot_type: "percent_difference"</code>)</h3>
+<p><strong>Description:</strong> Shows percent change relative to control</p>
+<p><strong>Configuration:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;netcdf_files&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;control.nc&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;scenario.nc&quot;</span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;plot_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;percent_difference&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p><strong>Formula:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="c">% Difference = (Scenario - Control) / |Control| × 100</span>
+</code></pre></div>
+
+<p><strong>Use When:</strong><br />
+- Emphasizing relative changes<br />
+- Variables with widely varying magnitudes<br />
+- Comparing fractional impacts</p>
+<p><strong>Example:</strong> GPP change of +15% (from 16.67 to 19.17 gC/m²/month)</p>
+<p><strong>Auto-limits:</strong> Sets colorbar to [-100, 100]% if max exceeds 100%</p>
+<hr />
+<h3>3. Separate Plots (<code>plot_type: "separate_plots"</code>)</h3>
+<p><strong>Description:</strong> Creates individual maps for control and scenario</p>
+<p><strong>Configuration:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;netcdf_files&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;control.nc&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;scenario.nc&quot;</span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;plot_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;separate_plots&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p><strong>Output:</strong><br />
+- <code>spatial_GPP_set_1.pdf</code> (control)<br />
+- <code>spatial_GPP_set_2.pdf</code> (scenario)</p>
+<p><strong>Use When:</strong><br />
+- Presenting absolute values<br />
+- Side-by-side comparison in publications<br />
+- Showing spatial patterns individually</p>
+<hr />
+<h3>4. Ensemble Analysis (Nested Lists)</h3>
+<p><strong>Description:</strong> Averages across ensemble members, performs t-tests</p>
+<p><strong>Configuration:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;netcdf_files&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="p">[</span><span class="s2">&quot;ctrl_1.nc&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;scen_1.nc&quot;</span><span class="p">],</span>
+<span class="w">        </span><span class="p">[</span><span class="s2">&quot;ctrl_2.nc&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;scen_2.nc&quot;</span><span class="p">],</span>
+<span class="w">        </span><span class="p">[</span><span class="s2">&quot;ctrl_3.nc&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;scen_3.nc&quot;</span><span class="p">]</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;plot_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;absolute_difference&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;stippling_on&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p><strong>Processing:</strong><br />
+1. Average across ensemble members for control<br />
+2. Average across ensemble members for scenario<br />
+3. Calculate difference<br />
+4. Perform t-test at each gridcell<br />
+5. Stipple where p &lt; 0.05</p>
+<p><strong>Use When:</strong><br />
+- Synthetic ensemble members available<br />
+- Need statistical confidence<br />
+- Publication-quality significance testing</p>
+<hr />
+<h2>JSON Configuration Examples</h2>
+<h3>Example 1: Basic ELM Single File Plot</h3>
+<div class="codehilite"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;netcdf_files&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;./control_spatial_data_elm.nc&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;plot_directory&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;./plots/elm_control/&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;use_latex&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p><strong>Creates:</strong> Maps for all variables in control file</p>
+<hr />
+<h3>Example 2: EAM Difference Plot (Requires Grid File)</h3>
+<div class="codehilite"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;netcdf_files&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="s2">&quot;./control_spatial_data_eam.nc&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="s2">&quot;./scenario_spatial_data_eam.nc&quot;</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;plot_directory&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;./plots/eam_difference/&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;plot_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;absolute_difference&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;grid_file&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;./eam_grid_file/ne30pg2_scrip_c20191218.nc&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;use_latex&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p><strong>Creates:</strong> Difference maps (scenario - control) for EAM variables</p>
+<hr />
+<h3>Example 3: Percent Difference</h3>
+<div class="codehilite"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;netcdf_files&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;./control.nc&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;./scenario.nc&quot;</span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;plot_directory&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;./plots/percent_diff/&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;plot_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;percent_difference&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;cbar_limits&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">-50</span><span class="p">,</span><span class="w"> </span><span class="mi">50</span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p><strong>Creates:</strong> Percent change maps with colorbar from -50% to +50%</p>
+<hr />
+<h3>Example 4: Ensemble with Stippling</h3>
+<div class="codehilite"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;netcdf_files&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="p">[</span><span class="s2">&quot;./ctrl_1.nc&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;./scen_1.nc&quot;</span><span class="p">],</span>
+<span class="w">        </span><span class="p">[</span><span class="s2">&quot;./ctrl_2.nc&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;./scen_2.nc&quot;</span><span class="p">],</span>
+<span class="w">        </span><span class="p">[</span><span class="s2">&quot;./ctrl_3.nc&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;./scen_3.nc&quot;</span><span class="p">],</span>
+<span class="w">        </span><span class="p">[</span><span class="s2">&quot;./ctrl_4.nc&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;./scen_4.nc&quot;</span><span class="p">],</span>
+<span class="w">        </span><span class="p">[</span><span class="s2">&quot;./ctrl_5.nc&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;./scen_5.nc&quot;</span><span class="p">]</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;plot_directory&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;./plots/ensemble_diff/&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;plot_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;absolute_difference&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;stippling_on&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;p_value_threshold&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.05</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p><strong>Creates:</strong> <br />
+- Ensemble mean difference maps<br />
+- Stippling where p &lt; 0.05<br />
+- P-value file with significance results</p>
+<hr />
+<h3>Example 5: Separate Control and Scenario Plots</h3>
+<div class="codehilite"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;netcdf_files&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;./control.nc&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;./scenario.nc&quot;</span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;plot_directory&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;./plots/separate/&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;plot_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;separate_plots&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;cmap&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;viridis&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p><strong>Creates:</strong><br />
+- <code>spatial_GPP_set_1.pdf</code> (control)<br />
+- <code>spatial_GPP_set_2.pdf</code> (scenario)</p>
+<hr />
+<h3>Example 6: Custom Colormap and Time Period</h3>
+<div class="codehilite"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;netcdf_files&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;./control.nc&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;./scenario.nc&quot;</span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;plot_directory&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;./plots/custom/&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;plot_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;absolute_difference&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;start_year&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2080</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;end_year&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2090</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;cmap&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;RdBu_r&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;cbar_limits&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">-5</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;width&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">12</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;height&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">8</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p><strong>Customizations:</strong><br />
+- 2080-2090 temporal average<br />
+- Reversed Red-Blue colormap<br />
+- Fixed colorbar limits<br />
+- Custom figure size</p>
+<hr />
+<h2>ELM vs EAM Differences</h2>
+<h3>ELM (Land Model)</h3>
+<p><strong>Grid:</strong> Structured latitude-longitude grid</p>
+<p><strong>Configuration:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;netcdf_files&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;./elm_spatial_data.nc&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;plot_directory&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;./plots/elm/&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p><strong>No grid_file needed</strong> - uses native lat/lon coordinates</p>
+<p><strong>Variables:</strong> GPP, NPP, NBP, ER, TOTECOSYSC, etc.</p>
+<hr />
+<h3>EAM (Atmosphere Model)</h3>
+<p><strong>Grid:</strong> Unstructured spectral element mesh (ne30, ne120, etc.)</p>
+<p><strong>Configuration:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;netcdf_files&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;./eam_spatial_data.nc&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;plot_directory&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;./plots/eam/&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;grid_file&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;./ne30pg2_scrip_c20191218.nc&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p><strong>Requires grid_file</strong> - SCRIP format grid description</p>
+<p><strong>Variables:</strong> PRECC, PRECL, TREFHT, ZCO2, etc.</p>
+<p><strong>Grid Files:</strong><br />
+- ne30: <code>ne30pg2_scrip_c20191218.nc</code><br />
+- ne120: <code>ne120pg2_scrip_c20200803.nc</code></p>
+<hr />
+<h2>Output Files</h2>
+<h3>Plot Files</h3>
+<p><strong>Naming Convention:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="p">{</span><span class="n">plot_directory</span><span class="p">}</span><span class="o">/</span><span class="n">spatial_</span><span class="p">{</span><span class="n">variable</span><span class="p">}</span><span class="o">.</span><span class="n">pdf</span>
+<span class="p">{</span><span class="n">plot_directory</span><span class="p">}</span><span class="o">/</span><span class="n">spatial_</span><span class="p">{</span><span class="n">variable</span><span class="p">}</span><span class="n">_set_1</span><span class="o">.</span><span class="n">pdf</span><span class="w">  </span><span class="p">(</span><span class="n">separate_plots</span><span class="p">)</span>
+<span class="p">{</span><span class="n">plot_directory</span><span class="p">}</span><span class="o">/</span><span class="n">spatial_</span><span class="p">{</span><span class="n">variable</span><span class="p">}</span><span class="n">_set_2</span><span class="o">.</span><span class="n">pdf</span><span class="w">  </span><span class="p">(</span><span class="n">separate_plots</span><span class="p">)</span>
+</code></pre></div>
+
+<p><strong>Example:</strong></p>
+<div class="codehilite"><pre><span></span><code>./plots/elm_control/
+├── spatial_GPP.pdf
+├── spatial_NPP.pdf
+├── spatial_NBP.pdf
+└── ...
+</code></pre></div>
+
+<h3>P-Value Files</h3>
+<p><strong>Purpose:</strong> Records statistical significance at overall level</p>
+<p><strong>Format:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="n">GPP</span><span class="o">:</span><span class="w"> </span><span class="mf">1.2345</span><span class="n">e</span><span class="o">-</span><span class="mi">04</span>
+<span class="n">NPP</span><span class="o">:</span><span class="w"> </span><span class="mf">3.4567</span><span class="n">e</span><span class="o">-</span><span class="mi">02</span>
+<span class="n">NBP</span><span class="o">:</span><span class="w"> </span><span class="mf">6.7890</span><span class="n">e</span><span class="o">-</span><span class="mi">01</span>
+</code></pre></div>
+
+<p><strong>Location:</strong> <code>{plot_directory}/p_values.dat</code></p>
+<p><strong>Note:</strong> Spatial p-values (at each gridcell) shown via stippling, not in file</p>
+<hr />
+<h2>Best Practices</h2>
+<h3>1. Variable Selection</h3>
+<p><strong>Plot all variables:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="nt">&quot;variables&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;all&quot;</span>
+</code></pre></div>
+
+<p><strong>Plot specific variables:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="nt">&quot;variables&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;GPP&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;NPP&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;NBP&quot;</span><span class="p">]</span>
+</code></pre></div>
+
+<p><strong>Recommendation:</strong> Start with specific variables for testing</p>
+<hr />
+<h3>2. Temporal Averaging Period</h3>
+<p><strong>Standard:</strong> 20-year average (2071-2090)</p>
+<div class="codehilite"><pre><span></span><code><span class="nt">&quot;start_year&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2071</span><span class="p">,</span>
+<span class="nt">&quot;end_year&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2090</span>
+</code></pre></div>
+
+<p><strong>End-of-century:</strong> 30-year average</p>
+<div class="codehilite"><pre><span></span><code><span class="nt">&quot;start_year&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2071</span><span class="p">,</span>
+<span class="nt">&quot;end_year&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2100</span>
+</code></pre></div>
+
+<p><strong>Mid-century:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="nt">&quot;start_year&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2041</span><span class="p">,</span>
+<span class="nt">&quot;end_year&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2060</span>
+</code></pre></div>
+
+<hr />
+<h3>3. Colormap Selection</h3>
+<p><strong>Diverging (for differences):</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="nt">&quot;cmap&quot;</span><span class="p">:</span><span class="w"> </span><span class="nt">&quot;bwr&quot;</span><span class="w">       </span><span class="c1">// Blue-White-Red (default)</span>
+<span class="nt">&quot;cmap&quot;</span><span class="p">:</span><span class="w"> </span><span class="nt">&quot;RdBu_r&quot;</span><span class="w">    </span><span class="c1">// Red-Blue reversed</span>
+<span class="nt">&quot;cmap&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;PuOr&quot;</span><span class="w">      </span><span class="c1">// Purple-Orange</span>
+</code></pre></div>
+
+<p><strong>Sequential (for absolute values):</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="nt">&quot;cmap&quot;</span><span class="p">:</span><span class="w"> </span><span class="nt">&quot;viridis&quot;</span><span class="w">   </span><span class="c1">// Yellow-Green-Blue</span>
+<span class="nt">&quot;cmap&quot;</span><span class="p">:</span><span class="w"> </span><span class="nt">&quot;plasma&quot;</span><span class="w">    </span><span class="c1">// Purple-Red-Yellow</span>
+<span class="nt">&quot;cmap&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;YlGnBu&quot;</span><span class="w">    </span><span class="c1">// Yellow-Green-Blue</span>
+</code></pre></div>
+
+<p><strong>For carbon fluxes (can be negative):</strong> Use diverging<br />
+<strong>For temperature (always positive in K):</strong> Can use sequential or diverging</p>
+<hr />
+<h3>4. Colorbar Limits Strategy</h3>
+<p><strong>Auto-scaling (default):</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="nt">&quot;cbar_limits&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+</code></pre></div>
+
+<p><strong>Symmetric (for differences):</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="nt">&quot;cbar_limits&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">-10</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">]</span><span class="w">  </span><span class="c1">// Same magnitude ±</span>
+</code></pre></div>
+
+<p><strong>Asymmetric:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="nt">&quot;cbar_limits&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">-5</span><span class="p">,</span><span class="w"> </span><span class="mi">15</span><span class="p">]</span><span class="w">  </span><span class="c1">// Different ranges</span>
+</code></pre></div>
+
+<p><strong>Recommendation:</strong> <br />
+1. Run once with auto-scaling<br />
+2. Check min/max in statistics panel<br />
+3. Set symmetric limits for clean visualization</p>
+<hr />
+<h3>5. Stippling Usage</h3>
+<p><strong>Enable for ensemble data:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;netcdf_files&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="p">[</span><span class="s2">&quot;ctrl_1.nc&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;scen_1.nc&quot;</span><span class="p">],</span>
+<span class="w">        </span><span class="p">[</span><span class="s2">&quot;ctrl_2.nc&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;scen_2.nc&quot;</span><span class="p">],</span>
+<span class="w">        </span><span class="err">...</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;stippling_on&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;p_value_threshold&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.05</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p><strong>For single file (std-based):</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;netcdf_files&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;./data.nc&quot;</span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;stippling_on&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;stippling_std_multiple&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="w">  </span><span class="c1">// ±2σ from mean</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<hr />
+<h3>6. File Organization</h3>
+<div class="codehilite"><pre><span></span><code>project/
+├── data/
+│   ├── control_spatial_data_elm.nc
+│   ├── scenario_spatial_data_elm.nc
+│   ├── control_spatial_data_eam.nc
+│   ├── scenario_spatial_data_eam.nc
+│   └── grid_files/
+│       └── ne30pg2_scrip_c20191218.nc
+├── configs/
+│   ├── elm_plots.json
+│   └── eam_plots.json
+└── plots/
+    ├── elm/
+    │   ├── control/
+    │   ├── scenario/
+    │   └── difference/
+    └── eam/
+        ├── control/
+        ├── scenario/
+        └── difference/
+</code></pre></div>
+
+<hr />
+<h2>Troubleshooting</h2>
+<h3>Issue 1: File Not Found</h3>
+<p><strong>Error:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="n">FileNotFoundError</span><span class="o">:</span><span class="w"> </span><span class="n">control_spatial_data_elm</span><span class="o">.</span><span class="na">nc</span>
+</code></pre></div>
+
+<p><strong>Solutions:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="c1"># Verify file exists</span>
+ls<span class="w"> </span>-la<span class="w"> </span>control_spatial_data_elm.nc
+
+<span class="c1"># Use absolute paths</span>
+<span class="s2">&quot;netcdf_files&quot;</span>:<span class="w"> </span><span class="s2">&quot;/absolute/path/to/file.nc&quot;</span>
+</code></pre></div>
+
+<hr />
+<h3>Issue 2: Grid File Missing (EAM)</h3>
+<p><strong>Error:</strong></p>
+<div class="codehilite"><pre><span></span><code>TypeError: &#39;NoneType&#39; object is not callable
+</code></pre></div>
+
+<p><strong>Cause:</strong> Forgot <code>grid_file</code> parameter for EAM data</p>
+<p><strong>Solution:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;netcdf_files&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;./eam_data.nc&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;grid_file&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;./ne30pg2_scrip_c20191218.nc&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<hr />
+<h3>Issue 3: Variable Not Found</h3>
+<p><strong>Error:</strong></p>
+<div class="codehilite"><pre><span></span><code>KeyError: &#39;GPP&#39;
+</code></pre></div>
+
+<p><strong>Solution:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="c1"># Check available variables</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
+<span class="n">ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="s1">&#39;spatial_data.nc&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+</code></pre></div>
+
+<hr />
+<h3>Issue 4: Memory Error (Large Files)</h3>
+<p><strong>Error:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="n">MemoryError</span><span class="o">:</span><span class="w"> </span><span class="n">Unable</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="n">allocate</span><span class="w"> </span><span class="n">array</span>
+</code></pre></div>
+
+<p><strong>Solutions:</strong></p>
+<ol>
+<li><strong>Process fewer variables:</strong></li>
+</ol>
+<div class="codehilite"><pre><span></span><code><span class="nt">&quot;variables&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;GPP&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;NPP&quot;</span><span class="p">]</span><span class="w">  </span><span class="c1">// Instead of &quot;all&quot;</span>
+</code></pre></div>
+
+<ol start="2">
+<li><strong>Process one model at a time:</strong></li>
+</ol>
+<div class="codehilite"><pre><span></span><code><span class="c1"># Separate runs</span>
+python<span class="w"> </span>script.py<span class="w"> </span>elm_config.json
+python<span class="w"> </span>script.py<span class="w"> </span>eam_config.json
+</code></pre></div>
+
+<ol start="3">
+<li><strong>Reduce ensemble size:</strong><br />
+Use fewer synthetic members</li>
+</ol>
+<hr />
+<h3>Issue 5: Cartopy/Projection Errors</h3>
+<p><strong>Error:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="n">AttributeError</span><span class="o">:</span><span class="w"> </span><span class="n">module</span><span class="w"> </span><span class="s1">&#39;cartopy.crs&#39;</span><span class="w"> </span><span class="n">has</span><span class="w"> </span><span class="n">no</span><span class="w"> </span><span class="n">attribute</span><span class="w"> </span><span class="s1">&#39;Robinson&#39;</span>
+</code></pre></div>
+
+<p><strong>Solution:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="c1"># Reinstall cartopy</span>
+pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>cartopy
+
+<span class="c1"># Or use different projection</span>
+<span class="s2">&quot;projection&quot;</span>:<span class="w"> </span><span class="s2">&quot;PlateCarree&quot;</span><span class="w">  </span>//<span class="w"> </span>Instead<span class="w"> </span>of<span class="w"> </span>Robinson
+</code></pre></div>
+
+<hr />
+<h3>Issue 6: Unstructured Grid Issues (EAM)</h3>
+<p><strong>Error:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="n">ValueError</span><span class="o">:</span><span class="w"> </span><span class="n">Grid</span><span class="w"> </span><span class="n">dimensions</span><span class="w"> </span><span class="k">do</span><span class="w"> </span><span class="n">not</span><span class="w"> </span><span class="n">match</span>
+</code></pre></div>
+
+<p><strong>Causes:</strong><br />
+- Wrong grid file<br />
+- Grid file version mismatch<br />
+- Data from different resolution</p>
+<p><strong>Solution:</strong><br />
+- Verify grid file matches simulation resolution (ne30, ne120, etc.)<br />
+- Check grid file date matches data generation date</p>
+<hr />
+<h2>Advanced Features</h2>
+<h3>Per-Variable Configuration</h3>
+<p>Most parameters accept dictionaries for per-variable customization:</p>
+<div class="codehilite"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;variables&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;GPP&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;NBP&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;TREFHT&quot;</span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;cbar_limits&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;GPP&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">-5</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">],</span>
+<span class="w">        </span><span class="nt">&quot;NBP&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">-2</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">],</span>
+<span class="w">        </span><span class="nt">&quot;TREFHT&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">-3</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">]</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">&quot;cmap&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;GPP&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;RdBu_r&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;NBP&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;PuOr&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;TREFHT&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;coolwarm&quot;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<hr />
+<h3>Custom Projections</h3>
+<p>Available Cartopy projections:</p>
+<div class="codehilite"><pre><span></span><code><span class="nt">&quot;projection&quot;</span><span class="p">:</span><span class="w"> </span><span class="nt">&quot;Robinson&quot;</span><span class="w">      </span><span class="c1">// Default, good for global</span>
+<span class="nt">&quot;projection&quot;</span><span class="p">:</span><span class="w"> </span><span class="nt">&quot;PlateCarree&quot;</span><span class="w">   </span><span class="c1">// Equirectangular</span>
+<span class="nt">&quot;projection&quot;</span><span class="p">:</span><span class="w"> </span><span class="nt">&quot;Mollweide&quot;</span><span class="w">     </span><span class="c1">// Equal-area</span>
+<span class="nt">&quot;projection&quot;</span><span class="p">:</span><span class="w"> </span><span class="nt">&quot;Orthographic&quot;</span><span class="w">  </span><span class="c1">// Globe view</span>
+<span class="nt">&quot;projection&quot;</span><span class="p">:</span><span class="w"> </span><span class="nt">&quot;NorthPolarStereo&quot;</span><span class="w">  </span><span class="c1">// Arctic</span>
+<span class="nt">&quot;projection&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;SouthPolarStereo&quot;</span><span class="w">  </span><span class="c1">// Antarctic</span>
+</code></pre></div>
+
+<p><strong>Example for Arctic focus:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;projection&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;NorthPolarStereo&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;cbar_x_offset&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.1</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<hr />
+<h3>Stippling Patterns</h3>
+<p>Available hatch patterns:</p>
+<div class="codehilite"><pre><span></span><code><span class="nt">&quot;stippling_hatches&quot;</span><span class="p">:</span><span class="w"> </span><span class="nt">&quot;///&quot;</span><span class="w">    </span><span class="c1">// Forward slashes</span>
+<span class="nt">&quot;stippling_hatches&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;\\\\\\\\  // Backslashes  </span>
+<span class="s2">&quot;</span><span class="err">s</span><span class="kc">t</span><span class="err">ippli</span><span class="kc">n</span><span class="err">g_ha</span><span class="kc">t</span><span class="err">ches</span><span class="s2">&quot;: &quot;</span><span class="err">xxx</span><span class="s2">&quot;    // X&#39;s</span>
+<span class="s2">&quot;</span><span class="err">s</span><span class="kc">t</span><span class="err">ippli</span><span class="kc">n</span><span class="err">g_ha</span><span class="kc">t</span><span class="err">ches</span><span class="s2">&quot;: &quot;</span><span class="err">+++</span><span class="s2">&quot;    // Plus signs</span>
+<span class="s2">&quot;</span><span class="err">s</span><span class="kc">t</span><span class="err">ippli</span><span class="kc">n</span><span class="err">g_ha</span><span class="kc">t</span><span class="err">ches</span><span class="s2">&quot;: &quot;</span><span class="err">...&quot;    // Dots</span>
+</code></pre></div>
+
+<hr />
+<h3>Time Aggregation</h3>
+<p><strong>Mean (default):</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="nt">&quot;time_calculation&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;mean&quot;</span>
+</code></pre></div>
+
+<p>Use for: Temperature, CO₂ concentration, state variables</p>
+<p><strong>Sum:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="nt">&quot;time_calculation&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;sum&quot;</span>
+</code></pre></div>
+
+<p>Use for: Fluxes (GPP, NPP, precipitation)</p>
+<hr />
+<h2>Statistical Details</h2>
+<h3>T-Test Methodology</h3>
+<p><strong>For ensemble data (≥2 members per set):</strong></p>
+<ol>
+<li>
+<p><strong>At each gridcell:</strong><br />
+   - Control ensemble: [ctrl_1, ctrl_2, ..., ctrl_n]<br />
+   - Scenario ensemble: [scen_1, scen_2, ..., scen_n]<br />
+   - Two-sample t-test: t = (mean_scen - mean_ctrl) / SE<br />
+   - P-value calculated</p>
+</li>
+<li>
+<p><strong>Stippling applied where p &lt; threshold (default 0.05)</strong></p>
+</li>
+<li>
+<p><strong>Overall p-value</strong> (spatial average) written to file</p>
+</li>
+</ol>
+<p><strong>For single dataset:</strong><br />
+- Stipples where |value - mean| &gt; N×std<br />
+- No p-values calculated</p>
+<hr />
+<h3>Statistics Panel</h3>
+<p><strong>Displayed on each map:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="n">Max</span><span class="o">:</span><span class="w"> </span><span class="mf">1.23</span><span class="n">e</span><span class="o">+</span><span class="mi">01</span>
+<span class="n">Mean</span><span class="o">:</span><span class="w"> </span><span class="mf">4.56</span><span class="n">e</span><span class="o">+</span><span class="mi">00</span>
+<span class="n">Median</span><span class="o">:</span><span class="w"> </span><span class="mf">3.89</span><span class="n">e</span><span class="o">+</span><span class="mi">00</span>
+<span class="n">Min</span><span class="o">:</span><span class="w"> </span><span class="o">-</span><span class="mf">2.34</span><span class="n">e</span><span class="o">-</span><span class="mi">01</span>
+
+<span class="n">Std</span><span class="o">:</span><span class="w"> </span><span class="mf">2.67</span><span class="n">e</span><span class="o">+</span><span class="mi">00</span>
+</code></pre></div>
+
+<p><strong>Location:</strong> Upper right corner</p>
+<p><strong>Use:</strong> Quick assessment of data range and variability</p>
+<hr />
+<h2>References</h2>
+<ul>
+<li>E3SM Documentation: <a href="https://e3sm.org/">https://e3sm.org/</a></li>
+<li>Cartopy Documentation: <a href="https://scitools.org.uk/cartopy/">https://scitools.org.uk/cartopy/</a></li>
+<li>xarray Documentation: <a href="https://xarray.pydata.org/">https://xarray.pydata.org/</a></li>
+<li>uxarray Documentation: <a href="https://uxarray.readthedocs.io/">https://uxarray.readthedocs.io/</a></li>
+<li>GitHub Repository: <a href="https://github.com/philipmyint/e3sm--gcam_analysis">https://github.com/philipmyint/e3sm--gcam_analysis</a></li>
+</ul>
+<hr />
+<h2>Contact</h2>
+<p>For questions or issues:<br />
+- <strong>Philip Myint</strong>: myint1@llnl.gov<br />
+- <strong>Dalei Hao</strong>: dalei.hao@pnnl.gov</p>
+<hr />
+<h2>Version Information</h2>
+<p><strong>Script:</strong> e3sm_plot_spatial_data.py<br />
+<strong>Documentation Version:</strong> 1.0<br />
+<strong>Last Updated:</strong> January 2026<br />
+<strong>Python Version:</strong> 3.7+<br />
+<strong>Dependencies:</strong> xarray, uxarray, cartopy, matplotlib, scipy, numpy, pandas</p>
+<hr />
+<p><em>This documentation provides comprehensive guidance for using the <code>e3sm_plot_spatial_data.py</code> script to create publication-quality spatial maps from E3SM model output with ensemble analysis and statistical significance testing.</em></p>
+        <footer>
+            <p>E3SM Spatial Data Plotting Script Documentation<br>
+            <strong>Script:</strong> e3sm_plot_spatial_data.py<br>
+            <strong>Authors:</strong> Philip Myint, Dalei Hao<br>
+            <strong>Version:</strong> 1.0 | January 2026</p>
+        </footer>
+    </div>
+</body>
+</html>

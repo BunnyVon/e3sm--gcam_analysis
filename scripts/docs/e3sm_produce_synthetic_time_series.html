@@ -1,0 +1,1506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E3SM Synthetic Time Series Generation Documentation</title>
+    <style>/* 
+ * Documentation Stylesheet for GCAM Synthetic Data Generation Script
+ * A modern, colorful design with good readability
+ */
+
+/* ===== ROOT VARIABLES ===== */
+:root {
+    /* Color Palette */
+    --primary-blue: #2563eb;
+    --primary-blue-light: #3b82f6;
+    --primary-blue-dark: #1e40af;
+    --accent-green: #10b981;
+    --accent-orange: #f59e0b;
+    --accent-purple: #8b5cf6;
+    --accent-red: #ef4444;
+    
+    /* Background Colors */
+    --bg-main: #f8fafc;
+    --bg-code: #1e293b;
+    --bg-code-inline: #e2e8f0;
+    --bg-table-header: #1e40af;
+    --bg-table-row-even: #f1f5f9;
+    --bg-table-row-odd: #ffffff;
+    --bg-note: #fef3c7;
+    --bg-warning: #fee2e2;
+    --bg-info: #dbeafe;
+    --bg-success: #d1fae5;
+    
+    /* Text Colors */
+    --text-main: #1e293b;
+    --text-secondary: #64748b;
+    --text-code: #e2e8f0;
+    --text-link: #2563eb;
+    --text-link-hover: #1e40af;
+    
+    /* Border Colors */
+    --border-light: #e2e8f0;
+    --border-medium: #cbd5e1;
+    --border-dark: #94a3b8;
+    
+    /* Spacing */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-2xl: 3rem;
+}
+
+/* ===== BASE STYLES ===== */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.7;
+    color: var(--text-main);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: var(--spacing-xl) var(--spacing-md);
+    font-size: 16px;
+}
+
+/* Main Container */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: var(--bg-main);
+    padding: var(--spacing-2xl);
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+/* ===== TYPOGRAPHY ===== */
+h1 {
+    font-size: 2.5rem;
+    color: var(--primary-blue-dark);
+    margin-bottom: var(--spacing-xl);
+    padding-bottom: var(--spacing-md);
+    border-bottom: 4px solid var(--primary-blue);
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--accent-purple) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+h2 {
+    font-size: 2rem;
+    color: var(--primary-blue);
+    margin-top: var(--spacing-2xl);
+    margin-bottom: var(--spacing-lg);
+    padding-left: var(--spacing-md);
+    border-left: 5px solid var(--accent-green);
+    font-weight: 600;
+}
+
+h3 {
+    font-size: 1.5rem;
+    color: var(--primary-blue-dark);
+    margin-top: var(--spacing-xl);
+    margin-bottom: var(--spacing-md);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+}
+
+h3::before {
+    content: "▸";
+    color: var(--accent-orange);
+    margin-right: var(--spacing-sm);
+    font-size: 1.2rem;
+}
+
+h4 {
+    font-size: 1.25rem;
+    color: var(--accent-purple);
+    margin-top: var(--spacing-lg);
+    margin-bottom: var(--spacing-sm);
+    font-weight: 600;
+}
+
+p {
+    margin-bottom: var(--spacing-md);
+    color: var(--text-main);
+}
+
+/* ===== LINKS ===== */
+a {
+    color: var(--text-link);
+    text-decoration: none;
+    font-weight: 500;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+a:hover {
+    color: var(--text-link-hover);
+    border-bottom-color: var(--text-link-hover);
+}
+
+/* ===== LISTS ===== */
+ul, ol {
+    margin-left: var(--spacing-xl);
+    margin-bottom: var(--spacing-md);
+}
+
+li {
+    margin-bottom: var(--spacing-sm);
+    padding-left: var(--spacing-sm);
+}
+
+ul li::marker {
+    color: var(--accent-green);
+    font-size: 1.2em;
+}
+
+ol li::marker {
+    color: var(--primary-blue);
+    font-weight: 600;
+}
+
+/* ===== CODE BLOCKS ===== */
+code {
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 0.9em;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background: var(--bg-code-inline);
+    color: var(--accent-red);
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+pre {
+    background: var(--bg-code);
+    color: var(--text-code);
+    padding: var(--spacing-lg);
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: var(--spacing-lg) 0;
+    border-left: 4px solid var(--accent-green);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+pre code {
+    background: transparent;
+    color: var(--text-code);
+    padding: 0;
+    font-size: 0.95em;
+    line-height: 1.5;
+}
+
+/* ===== TABLES ===== */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: var(--spacing-xl) 0;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+thead {
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-dark) 100%);
+    color: white;
+}
+
+th {
+    padding: var(--spacing-md);
+    text-align: left;
+    font-weight: 600;
+    font-size: 1.05em;
+    border-bottom: 3px solid var(--accent-orange);
+}
+
+td {
+    padding: var(--spacing-md);
+    border-bottom: 1px solid var(--border-light);
+}
+
+tbody tr:nth-child(even) {
+    background: var(--bg-table-row-even);
+}
+
+tbody tr:nth-child(odd) {
+    background: var(--bg-table-row-odd);
+}
+
+tbody tr:hover {
+    background: #e0f2fe;
+    transform: scale(1.01);
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* ===== BLOCKQUOTES ===== */
+blockquote {
+    margin: var(--spacing-lg) 0;
+    padding: var(--spacing-md) var(--spacing-lg);
+    background: var(--bg-info);
+    border-left: 5px solid var(--primary-blue);
+    border-radius: 0 8px 8px 0;
+    font-style: italic;
+    color: var(--primary-blue-dark);
+}
+
+/* ===== HORIZONTAL RULES ===== */
+hr {
+    border: none;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent-green) 0%, var(--primary-blue) 50%, var(--accent-purple) 100%);
+    margin: var(--spacing-2xl) 0;
+    border-radius: 2px;
+}
+
+/* ===== SPECIAL BOXES ===== */
+.note {
+    background: var(--bg-note);
+    border-left: 5px solid var(--accent-orange);
+    padding: var(--spacing-md) var(--spacing-lg);
+    margin: var(--spacing-lg) 0;
+    border-radius: 0 8px 8px 0;
+}
+
+.warning {
+    background: var(--bg-warning);
+    border-left: 5px solid var(--accent-red);
+    padding: var(--spacing-md) var(--spacing-lg);
+    margin: var(--spacing-lg) 0;
+    border-radius: 0 8px 8px 0;
+}
+
+.info {
+    background: var(--bg-info);
+    border-left: 5px solid var(--primary-blue);
+    padding: var(--spacing-md) var(--spacing-lg);
+    margin: var(--spacing-lg) 0;
+    border-radius: 0 8px 8px 0;
+}
+
+.success {
+    background: var(--bg-success);
+    border-left: 5px solid var(--accent-green);
+    padding: var(--spacing-md) var(--spacing-lg);
+    margin: var(--spacing-lg) 0;
+    border-radius: 0 8px 8px 0;
+}
+
+/* ===== BADGES ===== */
+.badge {
+    display: inline-block;
+    padding: var(--spacing-xs) var(--spacing-md);
+    border-radius: 20px;
+    font-size: 0.85em;
+    font-weight: 600;
+    margin: 0 var(--spacing-xs);
+}
+
+.badge-required {
+    background: var(--accent-red);
+    color: white;
+}
+
+.badge-optional {
+    background: var(--accent-green);
+    color: white;
+}
+
+.badge-default {
+    background: var(--primary-blue);
+    color: white;
+}
+
+/* ===== STRONG & EM ===== */
+strong {
+    color: var(--primary-blue-dark);
+    font-weight: 700;
+}
+
+em {
+    color: var(--accent-purple);
+    font-style: italic;
+}
+
+/* ===== IMAGES ===== */
+img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin: var(--spacing-lg) 0;
+}
+
+/* ===== SCROLLBAR STYLING ===== */
+::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-table-row-even);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--accent-purple) 100%);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, var(--primary-blue-dark) 0%, var(--accent-purple) 100%);
+}
+
+/* ===== PRINT STYLES ===== */
+@media print {
+    body {
+        background: white;
+        padding: 0;
+    }
+    
+    .container {
+        box-shadow: none;
+        max-width: 100%;
+    }
+    
+    h1, h2, h3 {
+        page-break-after: avoid;
+    }
+    
+    pre, table {
+        page-break-inside: avoid;
+    }
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+@media (max-width: 768px) {
+    body {
+        padding: var(--spacing-md) var(--spacing-sm);
+        font-size: 14px;
+    }
+    
+    .container {
+        padding: var(--spacing-lg);
+    }
+    
+    h1 {
+        font-size: 2rem;
+    }
+    
+    h2 {
+        font-size: 1.5rem;
+    }
+    
+    h3 {
+        font-size: 1.25rem;
+    }
+    
+    table {
+        font-size: 0.9em;
+    }
+    
+    th, td {
+        padding: var(--spacing-sm);
+    }
+}
+
+/* ===== ADDITIONAL UTILITY CLASSES ===== */
+.text-center {
+    text-align: center;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.margin-top-lg {
+    margin-top: var(--spacing-2xl);
+}
+
+.margin-bottom-lg {
+    margin-bottom: var(--spacing-2xl);
+}
+
+.highlight {
+    background: linear-gradient(120deg, #fef3c7 0%, #fde68a 100%);
+    padding: 0 var(--spacing-xs);
+    border-radius: 3px;
+}
+
+/* ===== SECTION DIVIDERS ===== */
+.section-divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: var(--spacing-2xl) 0;
+}
+
+.section-divider::before,
+.section-divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 2px solid var(--border-medium);
+}
+
+.section-divider::before {
+    margin-right: var(--spacing-md);
+}
+
+.section-divider::after {
+    margin-left: var(--spacing-md);
+}
+
+/* ===== FOOTER ===== */
+footer {
+    margin-top: var(--spacing-2xl);
+    padding-top: var(--spacing-lg);
+    border-top: 2px solid var(--border-light);
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.9em;
+}
+</style>
+</head>
+<body>
+    <div class="container"><h1>E3SM Synthetic Time Series Generation Script Documentation</h1>
+<h2>Overview</h2>
+<p><strong>Script Name:</strong> <code>e3sm_produce_synthetic_time_series.py</code></p>
+<p><strong>Purpose:</strong> Generates synthetic ensemble members from existing E3SM time series data files by applying systematic and random perturbations. This creates multiple realizations for statistical testing and uncertainty quantification when only single simulation outputs are available.</p>
+<p><strong>Key Difference from Spatial Script:</strong> Uses both systematic (progressive base multipliers) and random (varying across time) perturbations, whereas the spatial script uses only uniform random multipliers.</p>
+<p><strong>Author:</strong> Philip Myint (myint1@llnl.gov) and Dalei Hao (dalei.hao@pnnl.gov)</p>
+<p><strong>Repository:</strong> <a href="https://github.com/philipmyint/e3sm--gcam_analysis">E3SM-GCAM Analysis Scripts</a></p>
+<hr />
+<h2>Table of Contents</h2>
+<ol>
+<li><a href="#overview">Overview</a></li>
+<li><a href="#installation--requirements">Installation &amp; Requirements</a></li>
+<li><a href="#basic-usage">Basic Usage</a></li>
+<li><a href="#how-it-works">How It Works</a></li>
+<li><a href="#configuration-parameters">Configuration Parameters</a></li>
+<li><a href="#perturbation-method">Perturbation Method</a></li>
+<li><a href="#usage-examples">Usage Examples</a></li>
+<li><a href="#output-files">Output Files</a></li>
+<li><a href="#integration-with-other-scripts">Integration with Other Scripts</a></li>
+<li><a href="#best-practices">Best Practices</a></li>
+<li><a href="#troubleshooting">Troubleshooting</a></li>
+<li><a href="#comparison-with-spatial-script">Comparison with Spatial Script</a></li>
+</ol>
+<hr />
+<h2>Installation &amp; Requirements</h2>
+<h3>Required Python Libraries</h3>
+<div class="codehilite"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>numpy<span class="w"> </span>pandas<span class="w"> </span>multiprocessing
+</code></pre></div>
+
+<h3>Required Utility Modules</h3>
+<p>The script imports:<br />
+- <code>utility_dataframes</code> - <strong>Required</strong> for reading/writing data files<br />
+  - <code>read_file_into_dataframe()</code><br />
+  - <code>write_dataframe_to_fwf()</code></p>
+<h3>System Requirements</h3>
+<ul>
+<li>Python 3.7+</li>
+<li>Multi-core processor (script uses parallel processing)</li>
+<li>Sufficient RAM for DataFrame operations (2+ GB recommended)</li>
+<li>Sufficient disk space for synthetic ensemble files</li>
+</ul>
+<hr />
+<h2>Basic Usage</h2>
+<h3>Direct Execution (Hardcoded Configuration)</h3>
+<div class="codehilite"><pre><span></span><code>python<span class="w"> </span>e3sm_produce_synthetic_time_series.py
+</code></pre></div>
+
+<p><strong>Note:</strong> This script does NOT use JSON configuration files. All parameters are hardcoded and must be edited directly in the script.</p>
+<h3>Editing the Script</h3>
+<p>Open the script and modify the configuration section:</p>
+<div class="codehilite"><pre><span></span><code><span class="c1"># Edit these lists in the script:</span>
+<span class="n">files</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;./control_time_series.dat&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;./scenario_time_series.dat&quot;</span>
+<span class="p">]</span>
+<span class="n">num_files_in_each_set</span> <span class="o">=</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">]</span>  <span class="c1"># Total ensemble members per base file</span>
+</code></pre></div>
+
+<h3>What the Script Does</h3>
+<ol>
+<li><strong>Reads</strong> base time series file(s) (.dat or .csv)</li>
+<li><strong>Generates</strong> systematic base multipliers (linearly spaced)</li>
+<li><strong>Adds</strong> random temporal perturbations</li>
+<li><strong>Creates</strong> synthetic copies with combined perturbations</li>
+<li><strong>Preserves</strong> Year and Month columns (unperturbed)</li>
+<li><strong>Saves</strong> synthetic files with numbered suffixes</li>
+<li><strong>Processes</strong> multiple base files in parallel</li>
+</ol>
+<hr />
+<h2>How It Works</h2>
+<h3>Dual Perturbation Method</h3>
+<p>Unlike the spatial script, this uses <strong>two types of perturbations</strong>:</p>
+<p><strong>1. Systematic Base Multipliers (Progressive)</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="n">base_multipliers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">1.02</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">,</span> <span class="n">num_synthetic_members</span><span class="p">)</span>
+<span class="c1"># Example for 4 synthetic members:</span>
+<span class="c1"># [1.02, 1.03, 1.04, 1.05]</span>
+</code></pre></div>
+
+<p><strong>2. Random Temporal Multipliers (Time-Varying)</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="n">random_multipliers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">low</span><span class="o">=-</span><span class="mf">0.02</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mf">0.02</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">num_timesteps</span><span class="p">)</span>
+<span class="c1"># Example for each timestep:</span>
+<span class="c1"># [-0.015, 0.008, -0.003, 0.018, ...]</span>
+</code></pre></div>
+
+<p><strong>Combined Perturbation:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="n">final_multiplier</span><span class="p">[</span><span class="n">timestep</span><span class="p">]</span> <span class="o">=</span> <span class="n">base_multiplier</span> <span class="o">+</span> <span class="n">random_multiplier</span><span class="p">[</span><span class="n">timestep</span><span class="p">]</span>
+
+<span class="c1"># Example:</span>
+<span class="n">timestep</span> <span class="mi">1</span><span class="p">:</span> <span class="mf">1.02</span> <span class="o">+</span> <span class="p">(</span><span class="o">-</span><span class="mf">0.015</span><span class="p">)</span> <span class="o">=</span> <span class="mf">1.005</span> <span class="err">→</span> <span class="mf">0.5</span><span class="o">%</span> <span class="n">increase</span>
+<span class="n">timestep</span> <span class="mi">2</span><span class="p">:</span> <span class="mf">1.02</span> <span class="o">+</span> <span class="p">(</span><span class="mf">0.008</span><span class="p">)</span>  <span class="o">=</span> <span class="mf">1.028</span> <span class="err">→</span> <span class="mf">2.8</span><span class="o">%</span> <span class="n">increase</span>
+<span class="n">timestep</span> <span class="mi">3</span><span class="p">:</span> <span class="mf">1.02</span> <span class="o">+</span> <span class="p">(</span><span class="o">-</span><span class="mf">0.003</span><span class="p">)</span> <span class="o">=</span> <span class="mf">1.017</span> <span class="err">→</span> <span class="mf">1.7</span><span class="o">%</span> <span class="n">increase</span>
+</code></pre></div>
+
+<h3>Example Calculation</h3>
+<p><strong>Base time series:</strong></p>
+<div class="codehilite"><pre><span></span><code>Year  Month  GPP (PgC/month)
+2015    1         10.0
+2015    2         12.0
+2015    3         11.5
+</code></pre></div>
+
+<p><strong>Synthetic member #2 (base_multiplier = 1.02):</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="n">random_multipliers</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.015</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.005</span><span class="p">]</span>
+
+<span class="c1"># Month 1: 10.0 × (1.02 + (-0.01))  = 10.0 × 1.01  = 10.1</span>
+<span class="c1"># Month 2: 12.0 × (1.02 + 0.015)    = 12.0 × 1.035 = 12.42</span>
+<span class="c1"># Month 3: 11.5 × (1.02 + (-0.005)) = 11.5 × 1.015 = 11.67</span>
+</code></pre></div>
+
+<p><strong>Result:</strong></p>
+<div class="codehilite"><pre><span></span><code>Year  Month  GPP (PgC/month)
+2015    1         10.1
+2015    2         12.42
+2015    3         11.67
+</code></pre></div>
+
+<hr />
+<h2>Configuration Parameters</h2>
+<h3>Hardcoded Parameters (Edit in Script)</h3>
+<h4>1. <code>files</code></h4>
+<p><strong>Type:</strong> List of strings<br />
+<strong>Description:</strong> Paths to base time series files (.dat or .csv).</p>
+<p><strong>Location in Script:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="n">files</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;./../2025_DiVittorio_et_al_e3sm/control_time_series.dat&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;./../2025_DiVittorio_et_al_e3sm/full_feedback_time_series.dat&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;./../2025_DiVittorio_et_al_e3sm/ag_scaling_time_series.dat&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;./../2025_DiVittorio_et_al_e3sm/carbon_scaling_time_series.dat&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;./../2025_DiVittorio_et_al_e3sm/control_time_series_amazon.dat&quot;</span>
+<span class="p">]</span>
+<span class="n">files</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span>
+    <span class="s2">&quot;./../2025_DiVittorio_et_al_e3sm/control_time_series_surfdata_iESM_dyn_20240730.dat&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;./../2025_DiVittorio_et_al_e3sm/control_time_series_surfdata_iESM_dyn_20240730_amazon.dat&quot;</span><span class="p">,</span>
+    <span class="o">...</span>
+<span class="p">])</span>
+</code></pre></div>
+
+<p><strong>File Formats Supported:</strong><br />
+- <code>.dat</code> - Fixed-width format (default E3SM output)<br />
+- <code>.csv</code> - Comma-separated values</p>
+<p><strong>Example Modification:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="c1"># Single file</span>
+<span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;./my_time_series.dat&quot;</span><span class="p">]</span>
+
+<span class="c1"># Multiple files</span>
+<span class="n">files</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;./control_time_series.dat&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;./scenario_time_series.dat&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;./control_amazon.csv&quot;</span>
+<span class="p">]</span>
+</code></pre></div>
+
+<hr />
+<h4>2. <code>num_files_in_each_set</code></h4>
+<p><strong>Type:</strong> List of integers<br />
+<strong>Description:</strong> Total number of ensemble members (including base file) for each base file.</p>
+<p><strong>Location in Script:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="n">num_files_in_each_set</span> <span class="o">=</span> <span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>  <span class="c1"># 5 members for each base file</span>
+</code></pre></div>
+
+<p><strong>Interpretation:</strong><br />
+- <code>num_files_in_each_set = [5]</code> means 5 total members:<br />
+  - 1 original file (base_file.dat)<br />
+  - 4 synthetic files (base_file_2.dat, _3.dat, _4.dat, _5.dat)</p>
+<p><strong>Example Modifications:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="c1"># 10 members for each file</span>
+<span class="n">num_files_in_each_set</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>
+
+<span class="c1"># Different ensemble sizes</span>
+<span class="n">num_files_in_each_set</span> <span class="o">=</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">]</span>  <span class="c1"># First 2 get 5, next 2 get 10</span>
+
+<span class="c1"># Single file with 20 members</span>
+<span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;./time_series.dat&quot;</span><span class="p">]</span>
+<span class="n">num_files_in_each_set</span> <span class="o">=</span> <span class="p">[</span><span class="mi">20</span><span class="p">]</span>
+</code></pre></div>
+
+<hr />
+<h4>3. Base Multiplier Range (Inside Function)</h4>
+<p><strong>Type:</strong> Float range<br />
+<strong>Description:</strong> Range for systematic base multipliers.</p>
+<p><strong>Location in Script:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">produce_synthetic_time_series</span><span class="p">(</span><span class="n">inputs</span><span class="p">):</span>
+    <span class="o">...</span>
+    <span class="n">base_multipliers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">1.02</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">,</span> <span class="n">num_synthetic_sets_in_ensemble</span><span class="p">)</span>
+</code></pre></div>
+
+<p><strong>Default:</strong> 1.02 to 1.05 (2% to 5% systematic increase)</p>
+<p><strong>Modification Examples:</strong></p>
+<p><strong>Conservative (1% to 3%):</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="n">base_multipliers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">1.01</span><span class="p">,</span> <span class="mf">1.03</span><span class="p">,</span> <span class="n">num_synthetic_sets_in_ensemble</span><span class="p">)</span>
+</code></pre></div>
+
+<p><strong>Aggressive (3% to 10%):</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="n">base_multipliers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">1.03</span><span class="p">,</span> <span class="mf">1.10</span><span class="p">,</span> <span class="n">num_synthetic_sets_in_ensemble</span><span class="p">)</span>
+</code></pre></div>
+
+<p><strong>Symmetric around 1.0:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="n">base_multipliers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.98</span><span class="p">,</span> <span class="mf">1.02</span><span class="p">,</span> <span class="n">num_synthetic_sets_in_ensemble</span><span class="p">)</span>
+</code></pre></div>
+
+<hr />
+<h4>4. Random Multiplier Range (Inside Function)</h4>
+<p><strong>Type:</strong> Float range<br />
+<strong>Description:</strong> Range for random temporal perturbations.</p>
+<p><strong>Location in Script:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">produce_synthetic_time_series</span><span class="p">(</span><span class="n">inputs</span><span class="p">):</span>
+    <span class="o">...</span>
+    <span class="n">random_multipliers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">low</span><span class="o">=-</span><span class="mf">0.02</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mf">0.02</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">))</span>
+</code></pre></div>
+
+<p><strong>Default:</strong> -0.02 to +0.02 (±2% random variation)</p>
+<p><strong>Modification Examples:</strong></p>
+<p><strong>Smaller variation (±1%):</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="n">random_multipliers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">low</span><span class="o">=-</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">))</span>
+</code></pre></div>
+
+<p><strong>Larger variation (±5%):</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="n">random_multipliers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">low</span><span class="o">=-</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">))</span>
+</code></pre></div>
+
+<p><strong>Asymmetric (0% to +4%):</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="n">random_multipliers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mf">0.04</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">))</span>
+</code></pre></div>
+
+<hr />
+<h2>Perturbation Method</h2>
+<h3>Step-by-Step Process</h3>
+<p><strong>For each base file:</strong></p>
+<ol>
+<li><strong>Read base time series</strong></li>
+</ol>
+<div class="codehilite"><pre><span></span><code><span class="n">df</span> <span class="o">=</span> <span class="n">read_file_into_dataframe</span><span class="p">(</span><span class="s1">&#39;control_time_series.dat&#39;</span><span class="p">)</span>
+<span class="c1"># Contains: Year, Month, GPP, NPP, NBP, etc.</span>
+</code></pre></div>
+
+<ol start="2">
+<li><strong>Identify data columns</strong></li>
+</ol>
+<div class="codehilite"><pre><span></span><code><span class="c1"># Columns to perturb (excludes Year, Month)</span>
+<span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">column</span> <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">column</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;Year&#39;</span><span class="p">,</span> <span class="s1">&#39;Month&#39;</span><span class="p">]]</span>
+<span class="c1"># Example: [&#39;GPP (PgC/month)&#39;, &#39;NPP (PgC/month)&#39;, &#39;NBP (PgC/month)&#39;, ...]</span>
+</code></pre></div>
+
+<ol start="3">
+<li><strong>Generate base multipliers</strong></li>
+</ol>
+<div class="codehilite"><pre><span></span><code><span class="c1"># For num_files_in_each_set = 5 (4 synthetic members):</span>
+<span class="n">base_multipliers</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.02</span><span class="p">,</span> <span class="mf">1.03</span><span class="p">,</span> <span class="mf">1.04</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">]</span>
+</code></pre></div>
+
+<ol start="4">
+<li><strong>Generate random multipliers</strong></li>
+</ol>
+<div class="codehilite"><pre><span></span><code><span class="c1"># One per timestep (e.g., 1032 months for 2015-2100):</span>
+<span class="n">random_multipliers</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.015</span><span class="p">,</span> <span class="mf">0.008</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.003</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mf">0.011</span><span class="p">]</span>  <span class="c1"># 1032 values</span>
+</code></pre></div>
+
+<ol start="5">
+<li><strong>Apply combined perturbations</strong></li>
+</ol>
+<div class="codehilite"><pre><span></span><code><span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>  <span class="c1"># 4 synthetic members</span>
+    <span class="c1"># Combined multiplier for each timestep</span>
+    <span class="n">multipliers</span> <span class="o">=</span> <span class="n">base_multipliers</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">+</span> <span class="n">random_multipliers</span>
+    <span class="c1"># Example: [1.005, 1.028, 1.017, ..., 1.061]</span>
+
+    <span class="c1"># Apply to all data columns</span>
+    <span class="n">df_new</span><span class="p">[</span><span class="n">columns</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">columns</span><span class="p">]</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">multipliers</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">)</span>
+</code></pre></div>
+
+<ol start="6">
+<li><strong>Save synthetic file</strong></li>
+</ol>
+<div class="codehilite"><pre><span></span><code><span class="c1"># First synthetic: control_time_series_2.dat</span>
+<span class="c1"># Second synthetic: control_time_series_3.dat</span>
+<span class="c1"># ...</span>
+</code></pre></div>
+
+<hr />
+<h3>Mathematical Details</h3>
+<p><strong>Full Formula:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="n">synthetic_value</span><span class="o">[</span><span class="n">t</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">base_value</span><span class="o">[</span><span class="n">t</span><span class="o">]</span><span class="w"> </span><span class="err">×</span><span class="w"> </span><span class="p">(</span><span class="n">base_multiplier</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">random_multiplier</span><span class="o">[</span><span class="n">t</span><span class="o">]</span><span class="p">)</span>
+
+<span class="k">where</span><span class="err">:</span>
+<span class="w">  </span><span class="n">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">timestep</span><span class="w"> </span><span class="p">(</span><span class="nf">month</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="nf">year</span><span class="p">)</span>
+<span class="w">  </span><span class="n">base_multiplier</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">linearly</span><span class="w"> </span><span class="n">spaced</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="o">[</span><span class="n">1.02, 1.05</span><span class="o">]</span>
+<span class="w">  </span><span class="n">random_multiplier</span><span class="o">[</span><span class="n">t</span><span class="o">]</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">Uniform</span><span class="p">(</span><span class="o">-</span><span class="mf">0.02</span><span class="p">,</span><span class="w"> </span><span class="mf">0.02</span><span class="p">)</span>
+</code></pre></div>
+
+<p><strong>Properties:</strong><br />
+- <strong>Progressive systematic increase:</strong> Each synthetic member has progressively higher base multiplier<br />
+- <strong>Temporal variability:</strong> Random component varies at each timestep<br />
+- <strong>Column-wise uniform:</strong> Same multiplier applied to all variables at each timestep<br />
+- <strong>Year/Month preserved:</strong> Temporal indices unchanged</p>
+<p><strong>Example with 4 synthetic members:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="n">Synthetic</span><span class="w"> </span><span class="c1">#2: base = 1.02, random varies → overall ~1.00 to 1.04 per timestep</span>
+<span class="n">Synthetic</span><span class="w"> </span><span class="c1">#3: base = 1.03, random varies → overall ~1.01 to 1.05 per timestep</span>
+<span class="n">Synthetic</span><span class="w"> </span><span class="c1">#4: base = 1.04, random varies → overall ~1.02 to 1.06 per timestep</span>
+<span class="n">Synthetic</span><span class="w"> </span><span class="c1">#5: base = 1.05, random varies → overall ~1.03 to 1.07 per timestep</span>
+</code></pre></div>
+
+<hr />
+<h2>Usage Examples</h2>
+<h3>Example 1: Default Configuration</h3>
+<p><strong>As provided in script:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="n">files</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;./../2025_DiVittorio_et_al_e3sm/control_time_series.dat&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;./../2025_DiVittorio_et_al_e3sm/full_feedback_time_series.dat&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;./../2025_DiVittorio_et_al_e3sm/ag_scaling_time_series.dat&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;./../2025_DiVittorio_et_al_e3sm/carbon_scaling_time_series.dat&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;./../2025_DiVittorio_et_al_e3sm/control_time_series_amazon.dat&quot;</span><span class="p">,</span>
+    <span class="o">...</span>
+<span class="p">]</span>
+<span class="n">num_files_in_each_set</span> <span class="o">=</span> <span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>
+</code></pre></div>
+
+<p><strong>Execution:</strong></p>
+<div class="codehilite"><pre><span></span><code>python<span class="w"> </span>e3sm_produce_synthetic_time_series.py
+</code></pre></div>
+
+<p><strong>Output:</strong></p>
+<div class="codehilite"><pre><span></span><code>Creates 4 synthetic files per base file × 10 base files = 40 synthetic files:
+control_time_series_2.dat
+control_time_series_3.dat
+control_time_series_4.dat
+control_time_series_5.dat
+full_feedback_time_series_2.dat
+...
+
+Total: 10 base + 40 synthetic = 50 files
+</code></pre></div>
+
+<hr />
+<h3>Example 2: Single File, Large Ensemble</h3>
+<p><strong>Edit script:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;./my_time_series.dat&quot;</span><span class="p">]</span>
+<span class="n">num_files_in_each_set</span> <span class="o">=</span> <span class="p">[</span><span class="mi">20</span><span class="p">]</span>  <span class="c1"># 20 total members</span>
+</code></pre></div>
+
+<p><strong>Output:</strong></p>
+<div class="codehilite"><pre><span></span><code>Creates 19 synthetic files:
+my_time_series_2.dat
+my_time_series_3.dat
+...
+my_time_series_20.dat
+
+Total ensemble: 1 base + 19 synthetic = 20 members
+</code></pre></div>
+
+<p><strong>Base multipliers:</strong> Linearly spaced from 1.02 to 1.05</p>
+<div class="codehilite"><pre><span></span><code>Member 2:  1.02
+Member 3:  1.0216
+Member 4:  1.0232
+...
+Member 20: 1.05
+</code></pre></div>
+
+<hr />
+<h3>Example 3: CSV Output</h3>
+<p><strong>Edit script:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;./time_series.csv&quot;</span><span class="p">]</span>  <span class="c1"># Note: .csv extension</span>
+<span class="n">num_files_in_each_set</span> <span class="o">=</span> <span class="p">[</span><span class="mi">5</span><span class="p">]</span>
+</code></pre></div>
+
+<p><strong>Output:</strong></p>
+<div class="codehilite"><pre><span></span><code>Script automatically detects .csv and outputs:
+time_series.csv       (base, unchanged)
+time_series_2.csv     (synthetic)
+time_series_3.csv     (synthetic)
+time_series_4.csv     (synthetic)
+time_series_5.csv     (synthetic)
+</code></pre></div>
+
+<hr />
+<h3>Example 4: Conservative Perturbations</h3>
+<p><strong>Edit script function:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">produce_synthetic_time_series</span><span class="p">(</span><span class="n">inputs</span><span class="p">):</span>
+    <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">file</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">num_synthetic_sets_in_ensemble</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">read_file_into_dataframe</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+    <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">column</span> <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">column</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;Year&#39;</span><span class="p">,</span> <span class="s1">&#39;Month&#39;</span><span class="p">]]</span>
+
+    <span class="c1"># Change these lines:</span>
+    <span class="n">base_multipliers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">1.005</span><span class="p">,</span> <span class="mf">1.015</span><span class="p">,</span> <span class="n">num_synthetic_sets_in_ensemble</span><span class="p">)</span>  <span class="c1"># 0.5% to 1.5%</span>
+    <span class="n">random_multipliers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">low</span><span class="o">=-</span><span class="mf">0.005</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">))</span>  <span class="c1"># ±0.5%</span>
+
+    <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">base_multipliers</span><span class="p">)):</span>
+        <span class="o">...</span>
+</code></pre></div>
+
+<p><strong>Use case:</strong> More conservative uncertainty estimates</p>
+<hr />
+<h3>Example 5: Symmetric Perturbations</h3>
+<p><strong>Edit script function:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="c1"># Symmetric around 1.0 (some decrease, some increase)</span>
+<span class="n">base_multipliers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.98</span><span class="p">,</span> <span class="mf">1.02</span><span class="p">,</span> <span class="n">num_synthetic_sets_in_ensemble</span><span class="p">)</span>  <span class="c1"># -2% to +2%</span>
+<span class="n">random_multipliers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">low</span><span class="o">=-</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">))</span>  <span class="c1"># ±1%</span>
+</code></pre></div>
+
+<p><strong>Result:</strong> Some synthetic members have lower values than base</p>
+<hr />
+<h2>Output Files</h2>
+<h3>File Naming Convention</h3>
+<p><strong>Pattern:</strong></p>
+<div class="codehilite"><pre><span></span><code>base_filename.dat           → Original (untouched)
+base_filename_2.dat         → First synthetic member
+base_filename_3.dat         → Second synthetic member
+...
+base_filename_N.dat         → (N-1)th synthetic member
+</code></pre></div>
+
+<p><strong>For CSV files:</strong></p>
+<div class="codehilite"><pre><span></span><code>base_filename.csv           → Original (untouched)
+base_filename_2.csv         → First synthetic member
+...
+</code></pre></div>
+
+<p><strong>Example:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="n">Input</span><span class="o">:</span><span class="w"> </span><span class="n">control_time_series</span><span class="o">.</span><span class="na">dat</span>
+<span class="n">Output</span><span class="o">:</span>
+<span class="w">  </span><span class="n">control_time_series</span><span class="o">.</span><span class="na">dat</span><span class="w">     </span><span class="o">(</span><span class="n">original</span><span class="o">,</span><span class="w"> </span><span class="n">unchanged</span><span class="o">)</span>
+<span class="w">  </span><span class="n">control_time_series_2</span><span class="o">.</span><span class="na">dat</span><span class="w">   </span><span class="o">(</span><span class="n">synthetic</span><span class="o">,</span><span class="w"> </span><span class="n">base</span><span class="w"> </span><span class="err">×</span><span class="w"> </span><span class="mf">1.02</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">random</span><span class="o">)</span>
+<span class="w">  </span><span class="n">control_time_series_3</span><span class="o">.</span><span class="na">dat</span><span class="w">   </span><span class="o">(</span><span class="n">synthetic</span><span class="o">,</span><span class="w"> </span><span class="n">base</span><span class="w"> </span><span class="err">×</span><span class="w"> </span><span class="mf">1.03</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">random</span><span class="o">)</span>
+<span class="w">  </span><span class="n">control_time_series_4</span><span class="o">.</span><span class="na">dat</span><span class="w">   </span><span class="o">(</span><span class="n">synthetic</span><span class="o">,</span><span class="w"> </span><span class="n">base</span><span class="w"> </span><span class="err">×</span><span class="w"> </span><span class="mf">1.04</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">random</span><span class="o">)</span>
+<span class="w">  </span><span class="n">control_time_series_5</span><span class="o">.</span><span class="na">dat</span><span class="w">   </span><span class="o">(</span><span class="n">synthetic</span><span class="o">,</span><span class="w"> </span><span class="n">base</span><span class="w"> </span><span class="err">×</span><span class="w"> </span><span class="mf">1.05</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">random</span><span class="o">)</span>
+</code></pre></div>
+
+<hr />
+<h3>File Structure</h3>
+<p>Each synthetic file has identical structure to base file:</p>
+<p><strong>Fixed-Width Format (.dat):</strong></p>
+<div class="codehilite"><pre><span></span><code>Year  Month  GPP (PgC/month)  NPP (PgC/month)  NBP (PgC/month)
+2015      1        10.1234          8.5678          1.2345
+2015      2        12.3456         10.1234          2.1234
+2015      3        11.5678          9.8765          1.6789
+...
+</code></pre></div>
+
+<p><strong>CSV Format (.csv):</strong></p>
+<div class="codehilite"><pre><span></span><code>Year,Month,GPP (PgC/month),NPP (PgC/month),NBP (PgC/month)
+2015,1,10.1234,8.5678,1.2345
+2015,2,12.3456,10.1234,2.1234
+2015,3,11.5678,9.8765,1.6789
+...
+</code></pre></div>
+
+<p><strong>Preserved:</strong><br />
+- Year and Month columns (unchanged)<br />
+- Column headers<br />
+- File format</p>
+<p><strong>Modified:</strong><br />
+- All data columns (perturbed by combined multipliers)</p>
+<hr />
+<h3>File Sizes</h3>
+<p><strong>Typical sizes:</strong><br />
+- Base file: 100 KB (86 years × 12 months × 10 variables)<br />
+- Each synthetic file: 100 KB<br />
+- 5-member ensemble: ~500 KB (5 × 100 KB)<br />
+- 10-member ensemble: ~1 MB (10 × 100 KB)</p>
+<p><strong>Storage requirement:</strong></p>
+<div class="codehilite"><pre><span></span><code>Total storage = base_file_size × num_files_in_each_set × num_base_files
+</code></pre></div>
+
+<p><strong>Example:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="mf">10</span><span class="w"> </span><span class="n">base</span><span class="w"> </span><span class="n">files</span><span class="w"> </span><span class="err">×</span><span class="w"> </span><span class="mf">100</span><span class="w"> </span><span class="n">KB</span><span class="w"> </span><span class="n">each</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="n">MB</span>
+<span class="mf">5</span><span class="w"> </span><span class="n">members</span><span class="w"> </span><span class="n">each</span><span class="w"> </span><span class="err">×</span><span class="w"> </span><span class="mf">10</span><span class="w"> </span><span class="n">files</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">50</span><span class="w"> </span><span class="kr">to</span><span class="n">tal</span><span class="w"> </span><span class="n">files</span>
+<span class="kr">To</span><span class="n">tal</span><span class="w"> </span><span class="n">storage</span><span class="p">:</span><span class="w"> </span><span class="mf">50</span><span class="w"> </span><span class="err">×</span><span class="w"> </span><span class="mf">100</span><span class="w"> </span><span class="n">KB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">5</span><span class="w"> </span><span class="n">MB</span>
+</code></pre></div>
+
+<hr />
+<h2>Integration with Other Scripts</h2>
+<h3>Typical Workflow</h3>
+<h4>1. Extract Time Series from E3SM</h4>
+<div class="codehilite"><pre><span></span><code><span class="c1"># Extract h0 time series</span>
+python<span class="w"> </span>e3sm_extract_time_series_h0.py<span class="w"> </span>config.json
+<span class="c1"># Output: control_time_series.dat</span>
+
+<span class="c1"># Or extract surfdata time series</span>
+python<span class="w"> </span>e3sm_extract_time_series_surfdata_iesm_dyn.py<span class="w"> </span>config.json
+<span class="c1"># Output: control_time_series_surfdata.dat</span>
+</code></pre></div>
+
+<h4>2. Create Synthetic Ensemble</h4>
+<div class="codehilite"><pre><span></span><code><span class="c1"># Generate synthetic members</span>
+python<span class="w"> </span>e3sm_produce_synthetic_time_series.py
+
+<span class="c1"># Output:</span>
+<span class="c1">#   control_time_series.dat (base)</span>
+<span class="c1">#   control_time_series_2.dat (synthetic)</span>
+<span class="c1">#   control_time_series_3.dat (synthetic)</span>
+<span class="c1">#   ...</span>
+</code></pre></div>
+
+<h4>3. Plot with Statistical Analysis</h4>
+<div class="codehilite"><pre><span></span><code><span class="c1"># Use ensemble for statistical testing</span>
+python<span class="w"> </span>gcam_plot_time_series.py<span class="w"> </span>plot_config.json
+
+<span class="c1"># plot_config.json specifies ensemble members for comparison</span>
+</code></pre></div>
+
+<hr />
+<h3>Use with Time Series Plotting Script</h3>
+<p><strong>Enable ensemble mean and spread:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;files&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="s2">&quot;control_time_series.dat&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="s2">&quot;control_time_series_2.dat&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="s2">&quot;control_time_series_3.dat&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="s2">&quot;control_time_series_4.dat&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="s2">&quot;control_time_series_5.dat&quot;</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;variable&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;GPP (PgC/month)&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;plot_ensemble_mean&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;plot_ensemble_spread&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p><strong>Result:</strong> Plot shows ensemble mean with shaded spread (min-max or std deviation)</p>
+<hr />
+<h2>Best Practices</h2>
+<h3>1. Ensemble Size Selection</h3>
+<p><strong>Small ensembles (n=3-5):</strong><br />
+- <strong>Pros:</strong> Fast, low storage, good for initial exploration<br />
+- <strong>Cons:</strong> Limited statistical power<br />
+- <strong>Use:</strong> Quick analysis, method development</p>
+<p><strong>Medium ensembles (n=5-10):</strong><br />
+- <strong>Pros:</strong> Good statistical power, reasonable storage<br />
+- <strong>Cons:</strong> Moderate computation<br />
+- <strong>Use:</strong> Standard analysis (recommended)</p>
+<p><strong>Large ensembles (n=10-20):</strong><br />
+- <strong>Pros:</strong> High statistical power, robust estimates<br />
+- <strong>Cons:</strong> Storage requirements, processing time<br />
+- <strong>Use:</strong> Publication-quality analysis</p>
+<p><strong>Recommendation:</strong> Start with n=5</p>
+<hr />
+<h3>2. Perturbation Range Selection</h3>
+<p><strong>Base Multiplier Range:</strong></p>
+<p><strong>Conservative (0.5% to 1.5%):</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="n">base_multipliers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">1.005</span><span class="p">,</span> <span class="mf">1.015</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+</code></pre></div>
+
+<ul>
+<li>Tight systematic increase</li>
+<li>Use when model output highly certain</li>
+</ul>
+<p><strong>Standard (2% to 5%):</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="n">base_multipliers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">1.02</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>  <span class="c1"># Default</span>
+</code></pre></div>
+
+<ul>
+<li>Moderate systematic increase</li>
+<li>General use case</li>
+</ul>
+<p><strong>Wide (5% to 10%):</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="n">base_multipliers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">1.05</span><span class="p">,</span> <span class="mf">1.10</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+</code></pre></div>
+
+<ul>
+<li>Large systematic increase</li>
+<li>Sensitivity testing</li>
+</ul>
+<p><strong>Random Multiplier Range:</strong></p>
+<p><strong>Conservative (±0.5%):</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="n">random_multipliers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">low</span><span class="o">=-</span><span class="mf">0.005</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+</code></pre></div>
+
+<p><strong>Standard (±2%):</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="n">random_multipliers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">low</span><span class="o">=-</span><span class="mf">0.02</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mf">0.02</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>  <span class="c1"># Default</span>
+</code></pre></div>
+
+<p><strong>Wide (±5%):</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="n">random_multipliers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">low</span><span class="o">=-</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+</code></pre></div>
+
+<hr />
+<h3>3. File Organization</h3>
+<p><strong>Recommended structure:</strong></p>
+<div class="codehilite"><pre><span></span><code>project/
+├── base_time_series/
+│   ├── control_time_series.dat
+│   └── scenario_time_series.dat
+├── synthetic_ensembles/
+│   ├── control_time_series_2.dat
+│   ├── control_time_series_3.dat
+│   └── ...
+└── plots/
+</code></pre></div>
+
+<p><strong>Or keep together:</strong></p>
+<div class="codehilite"><pre><span></span><code>project/
+├── time_series/
+│   ├── control_time_series.dat       (base)
+│   ├── control_time_series_2.dat     (synthetic)
+│   ├── control_time_series_3.dat     (synthetic)
+│   └── ...
+</code></pre></div>
+
+<hr />
+<h3>4. Reproducibility</h3>
+<p><strong>Set random seed:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">produce_synthetic_time_series</span><span class="p">(</span><span class="n">inputs</span><span class="p">):</span>
+    <span class="c1"># Add at beginning:</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>  <span class="c1"># Fixed seed</span>
+
+    <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">file</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="o">...</span>
+</code></pre></div>
+
+<p><strong>Caution:</strong> Same seed = same synthetic ensemble every run</p>
+<p><strong>Alternative:</strong> Save random values</p>
+<div class="codehilite"><pre><span></span><code><span class="c1"># After generating:</span>
+<span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;random_multipliers.npy&#39;</span><span class="p">,</span> <span class="n">random_multipliers</span><span class="p">)</span>
+</code></pre></div>
+
+<hr />
+<h3>5. Validation</h3>
+<p><strong>After generation, verify:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="c1"># Load base and synthetic</span>
+<span class="n">base</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_fwf</span><span class="p">(</span><span class="s1">&#39;control_time_series.dat&#39;</span><span class="p">)</span>
+<span class="n">synthetic</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_fwf</span><span class="p">(</span><span class="s1">&#39;control_time_series_2.dat&#39;</span><span class="p">)</span>
+
+<span class="c1"># Calculate ratio for data columns</span>
+<span class="n">data_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">base</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;Year&#39;</span><span class="p">,</span> <span class="s1">&#39;Month&#39;</span><span class="p">]]</span>
+<span class="n">ratio</span> <span class="o">=</span> <span class="n">synthetic</span><span class="p">[</span><span class="n">data_cols</span><span class="p">]</span> <span class="o">/</span> <span class="n">base</span><span class="p">[</span><span class="n">data_cols</span><span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Mean ratio: </span><span class="si">{</span><span class="n">ratio</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Min ratio: </span><span class="si">{</span><span class="n">ratio</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Max ratio: </span><span class="si">{</span><span class="n">ratio</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># For synthetic #2 with base=1.02, random±0.02:</span>
+<span class="c1"># Expected mean: ~1.02</span>
+<span class="c1"># Expected min: ~1.00</span>
+<span class="c1"># Expected max: ~1.04</span>
+</code></pre></div>
+
+<hr />
+<h2>Troubleshooting</h2>
+<h3>Issue 1: Memory Error</h3>
+<p><strong>Error:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="n">MemoryError</span><span class="o">:</span><span class="w"> </span><span class="n">Unable</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="n">allocate</span><span class="w"> </span><span class="n">array</span>
+</code></pre></div>
+
+<p><strong>Cause:</strong><br />
+- Large time series files<br />
+- Many files processed simultaneously</p>
+<p><strong>Solutions:</strong></p>
+<ol>
+<li><strong>Reduce parallel processing:</strong></li>
+</ol>
+<div class="codehilite"><pre><span></span><code><span class="c1"># Instead of all CPUs:</span>
+<span class="k">with</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Pool</span><span class="p">(</span><span class="n">processes</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="k">as</span> <span class="n">pool</span><span class="p">:</span>  <span class="c1"># Use only 4</span>
+    <span class="n">pool</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">produce_synthetic_time_series</span><span class="p">,</span> <span class="n">inputs</span><span class="p">)</span>
+</code></pre></div>
+
+<ol start="2">
+<li><strong>Process sequentially:</strong></li>
+</ol>
+<div class="codehilite"><pre><span></span><code><span class="c1"># Replace parallel loop:</span>
+<span class="k">for</span> <span class="n">inp</span> <span class="ow">in</span> <span class="n">inputs</span><span class="p">:</span>
+    <span class="n">produce_synthetic_time_series</span><span class="p">(</span><span class="n">inp</span><span class="p">)</span>
+</code></pre></div>
+
+<ol start="3">
+<li><strong>Reduce ensemble size:</strong></li>
+</ol>
+<div class="codehilite"><pre><span></span><code><span class="n">num_files_in_each_set</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>  <span class="c1"># 3 instead of 5</span>
+</code></pre></div>
+
+<hr />
+<h3>Issue 2: File Not Found</h3>
+<p><strong>Error:</strong></p>
+<div class="codehilite"><pre><span></span><code>FileNotFoundError: [Errno 2] No such file or directory
+</code></pre></div>
+
+<p><strong>Cause:</strong><br />
+- Incorrect file path in <code>files</code> list<br />
+- Base file doesn't exist</p>
+<p><strong>Solutions:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="c1"># Verify file exists</span>
+ls<span class="w"> </span>-la<span class="w"> </span>control_time_series.dat
+
+<span class="c1"># Use absolute paths</span>
+<span class="nv">files</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">[</span><span class="s2">&quot;/absolute/path/to/control_time_series.dat&quot;</span><span class="o">]</span>
+
+<span class="c1"># Or correct relative path</span>
+<span class="nv">files</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">[</span><span class="s2">&quot;./output/control_time_series.dat&quot;</span><span class="o">]</span>
+</code></pre></div>
+
+<hr />
+<h3>Issue 3: Year/Month Column Issues</h3>
+<p><strong>Error:</strong></p>
+<div class="codehilite"><pre><span></span><code>KeyError: &#39;Year&#39; or KeyError: &#39;Month&#39;
+</code></pre></div>
+
+<p><strong>Cause:</strong><br />
+- Time series file doesn't have Year/Month columns<br />
+- Column names different (e.g., "year" vs "Year")</p>
+<p><strong>Solutions:</strong></p>
+<p><strong>Check columns:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_fwf</span><span class="p">(</span><span class="s1">&#39;time_series.dat&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+</code></pre></div>
+
+<p><strong>Modify script if needed:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="c1"># If columns are &#39;year&#39; and &#39;month&#39; (lowercase):</span>
+<span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">column</span> <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">column</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;year&#39;</span><span class="p">,</span> <span class="s1">&#39;month&#39;</span><span class="p">]]</span>
+</code></pre></div>
+
+<hr />
+<h3>Issue 4: All Values Same</h3>
+<p><strong>Symptom:</strong> All synthetic files identical</p>
+<p><strong>Cause:</strong><br />
+- Random seed set elsewhere in code<br />
+- numpy random not seeded properly</p>
+<p><strong>Solution:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="c1"># Ensure numpy random is working:</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">low</span><span class="o">=-</span><span class="mf">0.02</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mf">0.02</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">5</span><span class="p">))</span>
+<span class="c1"># Should show different values each time (unless seed set)</span>
+</code></pre></div>
+
+<hr />
+<h3>Issue 5: Negative Values</h3>
+<p><strong>Symptom:</strong> Some values become negative</p>
+<p><strong>Cause:</strong><br />
+- Original values close to zero<br />
+- Perturbations too large<br />
+- Combined perturbation &lt; 0</p>
+<p><strong>Example:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="n">Original</span><span class="w"> </span><span class="n">NBP</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.1</span><span class="w"> </span><span class="n">PgC</span><span class="o">/</span><span class="nf">month</span>
+<span class="n">Multiplier</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.02</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="o">-</span><span class="mf">0.03</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.99</span>
+<span class="k">Result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.1</span><span class="w"> </span><span class="err">×</span><span class="w"> </span><span class="mf">0.99</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.099</span><span class="w">  </span><span class="p">(</span><span class="n">OK</span><span class="p">)</span>
+
+<span class="n">But</span><span class="w"> </span><span class="k">if</span><span class="err">:</span>
+<span class="n">Original</span><span class="w"> </span><span class="n">NBP</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.05</span><span class="w"> </span><span class="n">PgC</span><span class="o">/</span><span class="nf">month</span>
+<span class="n">Multiplier</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.02</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="o">-</span><span class="mf">0.04</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.98</span><span class="w">  </span><span class="p">(</span><span class="n">random</span><span class="w"> </span><span class="n">can</span><span class="w"> </span><span class="k">go</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="o">-</span><span class="mf">0.02</span><span class="p">,</span><span class="w"> </span><span class="n">base</span><span class="w"> </span><span class="mf">1.02</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="mf">1.00</span><span class="p">)</span>
+<span class="k">Result</span><span class="w"> </span><span class="n">still</span><span class="w"> </span><span class="n">positive</span>
+
+<span class="n">However</span><span class="p">,</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="k">values</span><span class="w"> </span><span class="n">very</span><span class="w"> </span><span class="k">close</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="n">zero</span><span class="p">,</span><span class="w"> </span><span class="n">issues</span><span class="w"> </span><span class="n">can</span><span class="w"> </span><span class="n">arise</span>
+</code></pre></div>
+
+<p><strong>Solutions:</strong></p>
+<ol>
+<li><strong>Reduce random range:</strong></li>
+</ol>
+<div class="codehilite"><pre><span></span><code><span class="n">random_multipliers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">low</span><span class="o">=-</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>  <span class="c1"># ±1% instead of ±2%</span>
+</code></pre></div>
+
+<ol start="2">
+<li><strong>Ensure multipliers stay positive:</strong></li>
+</ol>
+<div class="codehilite"><pre><span></span><code><span class="c1"># Add clipping:</span>
+<span class="n">multipliers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">base_multipliers</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">+</span> <span class="n">random_multipliers</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>  <span class="c1"># Min 50%</span>
+</code></pre></div>
+
+<ol start="3">
+<li><strong>Check original data:</strong></li>
+</ol>
+<div class="codehilite"><pre><span></span><code><span class="c1"># Identify columns with near-zero values</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">columns</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">())</span>
+</code></pre></div>
+
+<hr />
+<h2>Comparison with Spatial Script</h2>
+<h3>Key Differences</h3>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Time Series Script</th>
+<th>Spatial Script</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Perturbation Type</strong></td>
+<td>Systematic + Random</td>
+<td>Random only</td>
+</tr>
+<tr>
+<td><strong>Base Multipliers</strong></td>
+<td>Linearly spaced (1.02-1.05)</td>
+<td>Uniform random (0.99-1.02)</td>
+</tr>
+<tr>
+<td><strong>Random Component</strong></td>
+<td>Temporal (-0.02 to +0.02)</td>
+<td>Spatially uniform</td>
+</tr>
+<tr>
+<td><strong>Variation</strong></td>
+<td>Across time</td>
+<td>Across space</td>
+</tr>
+<tr>
+<td><strong>File Format</strong></td>
+<td>Text (.dat, .csv)</td>
+<td>NetCDF (.nc)</td>
+</tr>
+<tr>
+<td><strong>Data Type</strong></td>
+<td>Time series (1D/2D)</td>
+<td>Spatial grids (3D)</td>
+</tr>
+<tr>
+<td><strong>Preserved Columns</strong></td>
+<td>Year, Month</td>
+<td>Coordinates (lat, lon, year)</td>
+</tr>
+</tbody>
+</table>
+<h3>Perturbation Comparison</h3>
+<p><strong>Time Series Script:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="c1"># Progressive + temporal variability</span>
+<span class="n">base_multipliers</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.02</span><span class="p">,</span> <span class="mf">1.03</span><span class="p">,</span> <span class="mf">1.04</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">]</span>  <span class="c1"># Systematic</span>
+<span class="n">random_multipliers</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.015</span><span class="p">,</span> <span class="mf">0.008</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>     <span class="c1"># Per timestep</span>
+
+<span class="n">Synthetic</span> <span class="c1">#2: 1.02 + random[t]  → varies 1.00-1.04 over time</span>
+<span class="n">Synthetic</span> <span class="c1">#3: 1.03 + random[t]  → varies 1.01-1.05 over time</span>
+</code></pre></div>
+
+<p><strong>Spatial Script:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="c1"># Uniform random only</span>
+<span class="n">random_multipliers</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.015</span><span class="p">,</span> <span class="mf">0.992</span><span class="p">,</span> <span class="mf">1.008</span><span class="p">,</span> <span class="mf">0.997</span><span class="p">]</span>  <span class="c1"># Per member</span>
+
+<span class="n">Synthetic</span> <span class="c1">#2: 1.015 × base  → uniform 1.5% increase everywhere</span>
+<span class="n">Synthetic</span> <span class="c1">#3: 0.992 × base  → uniform 0.8% decrease everywhere</span>
+</code></pre></div>
+
+<hr />
+<h3>When to Use Each Script</h3>
+<p><strong>Use Time Series Script when:</strong><br />
+- Working with time series data (.dat, .csv files)<br />
+- Need temporal variability in synthetic members<br />
+- Want progressive systematic increases across ensemble<br />
+- Analyzing trends, time evolution<br />
+- Input from time series extraction scripts</p>
+<p><strong>Use Spatial Script when:</strong><br />
+- Working with spatial data (NetCDF files)<br />
+- Need spatial variability representation<br />
+- Want uniform perturbations across space<br />
+- Analyzing spatial patterns, maps<br />
+- Input from spatial data extraction script</p>
+<hr />
+<h2>Scientific Considerations</h2>
+<h3>Interpretation of Perturbations</h3>
+<p><strong>Systematic Component (Base Multipliers):</strong><br />
+- Represents progressive uncertainty levels<br />
+- Member #2 (1.02) = conservative estimate<br />
+- Member #5 (1.05) = less conservative estimate<br />
+- Allows exploring range of possible outcomes</p>
+<p><strong>Random Component:</strong><br />
+- Represents temporal variability/uncertainty<br />
+- Different from interannual variability (which is in base data)<br />
+- Adds "noise" to time series<br />
+- Not physically based</p>
+<p><strong>Combined:</strong><br />
+- Creates ensemble with both systematic spread and temporal variability<br />
+- Useful for statistical testing<br />
+- Not substitute for true model ensemble</p>
+<hr />
+<h3>Limitations</h3>
+<p><strong>1. Not True Ensemble Members:</strong><br />
+- Don't represent different initial conditions<br />
+- Don't capture true model physics uncertainty<br />
+- Synthetic, not physically based</p>
+<p><strong>2. Artificial Perturbations:</strong><br />
+- Linear systematic increase not physically motivated<br />
+- Random temporal component arbitrary<br />
+- Doesn't represent real climate variability</p>
+<p><strong>3. Statistical Limitations:</strong><br />
+- May not represent true uncertainty distribution<br />
+- P-values approximate<br />
+- Ensemble spread artificial</p>
+<hr />
+<h3>Appropriate Use Cases</h3>
+<p><strong>Good for:</strong><br />
+- Exploratory statistical testing<br />
+- Method development<br />
+- Sensitivity analysis<br />
+- When true ensemble unavailable</p>
+<p><strong>Not appropriate for:</strong><br />
+- Representing true climate variability<br />
+- Publishing as actual ensemble<br />
+- Quantifying model uncertainty (use true ensemble)<br />
+- Attribution studies</p>
+<hr />
+<h2>Advanced Modifications</h2>
+<h3>Normal Distribution Random Perturbations</h3>
+<p><strong>Current:</strong> Uniform distribution<br />
+<strong>Modification:</strong> Normal (Gaussian) distribution</p>
+<div class="codehilite"><pre><span></span><code><span class="c1"># In function, replace:</span>
+<span class="n">random_multipliers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">low</span><span class="o">=-</span><span class="mf">0.02</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mf">0.02</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">))</span>
+
+<span class="c1"># With:</span>
+<span class="n">random_multipliers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">))</span>
+<span class="c1"># loc = mean (0.0 = centered on base)</span>
+<span class="c1"># scale = standard deviation (0.01 = 1% std)</span>
+</code></pre></div>
+
+<hr />
+<h3>Variable-Specific Perturbations</h3>
+<p><strong>Current:</strong> Same perturbation for all variables<br />
+<strong>Modification:</strong> Different perturbation per variable</p>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">produce_synthetic_time_series</span><span class="p">(</span><span class="n">inputs</span><span class="p">):</span>
+    <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">file</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">num_synthetic_sets_in_ensemble</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">read_file_into_dataframe</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+    <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">column</span> <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">column</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;Year&#39;</span><span class="p">,</span> <span class="s1">&#39;Month&#39;</span><span class="p">]]</span>
+    <span class="n">base_multipliers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">1.02</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">,</span> <span class="n">num_synthetic_sets_in_ensemble</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">base_multipliers</span><span class="p">)):</span>
+        <span class="n">df_new</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="c1"># Different random perturbation for each column</span>
+        <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">:</span>
+            <span class="n">random_multipliers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">low</span><span class="o">=-</span><span class="mf">0.02</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mf">0.02</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">))</span>
+            <span class="n">multipliers</span> <span class="o">=</span> <span class="n">base_multipliers</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">+</span> <span class="n">random_multipliers</span>
+            <span class="n">df_new</span><span class="p">[</span><span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">]</span> <span class="o">*</span> <span class="n">multipliers</span>
+
+        <span class="c1"># Save file...</span>
+</code></pre></div>
+
+<hr />
+<h3>Autocorrelated Random Perturbations</h3>
+<p><strong>Current:</strong> Independent random at each timestep<br />
+<strong>Modification:</strong> Temporally correlated (more realistic)</p>
+<div class="codehilite"><pre><span></span><code><span class="c1"># Add autocorrelation:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">generate_autocorrelated_noise</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate autocorrelated noise with AR(1) process&quot;&quot;&quot;</span>
+    <span class="n">noise</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="n">noise</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="n">noise</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">noise</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">noise</span>
+
+<span class="c1"># In function:</span>
+<span class="n">random_multipliers</span> <span class="o">=</span> <span class="n">generate_autocorrelated_noise</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">),</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
+</code></pre></div>
+
+<hr />
+<h2>Appendix: Complete Modified Example</h2>
+<h3>Custom Script for 3 Files, Different Settings</h3>
+<div class="codehilite"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">multiprocessing</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">utility_dataframes</span><span class="w"> </span><span class="kn">import</span> <span class="n">read_file_into_dataframe</span><span class="p">,</span> <span class="n">write_dataframe_to_fwf</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">produce_synthetic_time_series</span><span class="p">(</span><span class="n">inputs</span><span class="p">):</span>
+    <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">file</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">num_synthetic_sets_in_ensemble</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">read_file_into_dataframe</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+    <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">column</span> <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">column</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;Year&#39;</span><span class="p">,</span> <span class="s1">&#39;Month&#39;</span><span class="p">]]</span>
+
+    <span class="c1"># Custom: Conservative perturbations</span>
+    <span class="n">base_multipliers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">1.005</span><span class="p">,</span> <span class="mf">1.015</span><span class="p">,</span> <span class="n">num_synthetic_sets_in_ensemble</span><span class="p">)</span>
+    <span class="n">random_multipliers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">low</span><span class="o">=-</span><span class="mf">0.005</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">base_multipliers</span><span class="p">)):</span>
+        <span class="n">df_new</span> <span class="o">=</span> <span class="n">df</span>
+        <span class="n">multipliers</span> <span class="o">=</span> <span class="n">base_multipliers</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">+</span> <span class="n">random_multipliers</span>
+        <span class="n">df_new</span><span class="p">[</span><span class="n">columns</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">columns</span><span class="p">]</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">multipliers</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">file</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.csv&#39;</span><span class="p">):</span>
+            <span class="n">new_file</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.csv&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;_</span><span class="si">{</span><span class="n">index</span><span class="o">+</span><span class="mi">2</span><span class="si">}</span><span class="s1">.csv&#39;</span><span class="p">)</span>
+            <span class="n">df_new</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">new_file</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">new_file</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.dat&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;_</span><span class="si">{</span><span class="n">index</span><span class="o">+</span><span class="mi">2</span><span class="si">}</span><span class="s1">.dat&#39;</span><span class="p">)</span>
+            <span class="n">write_dataframe_to_fwf</span><span class="p">(</span><span class="n">new_file</span><span class="p">,</span> <span class="n">df_new</span><span class="p">)</span>
+
+    <span class="n">end_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">elapsed_time</span> <span class="o">=</span> <span class="n">end_time</span> <span class="o">-</span> <span class="n">start_time</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Elapsed time for </span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">elapsed_time</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> seconds&quot;</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+    <span class="c1"># Configuration</span>
+    <span class="n">files</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;./control_time_series.dat&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;./scenario_time_series.dat&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;./regional_time_series.csv&quot;</span>
+    <span class="p">]</span>
+    <span class="n">num_files_in_each_set</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">]</span>  <span class="c1"># Different sizes</span>
+
+    <span class="n">inputs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">files</span><span class="p">,</span> <span class="n">num_files_in_each_set</span><span class="p">))</span>
+
+    <span class="k">with</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Pool</span><span class="p">(</span><span class="n">processes</span><span class="o">=</span><span class="n">multiprocessing</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">())</span> <span class="k">as</span> <span class="n">pool</span><span class="p">:</span>
+        <span class="n">pool</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">produce_synthetic_time_series</span><span class="p">,</span> <span class="n">inputs</span><span class="p">)</span>
+
+    <span class="n">end_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">elapsed_time</span> <span class="o">=</span> <span class="n">end_time</span> <span class="o">-</span> <span class="n">start_time</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total time: </span><span class="si">{</span><span class="n">elapsed_time</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> seconds&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+<hr />
+<h2>References</h2>
+<ul>
+<li>E3SM Documentation: <a href="https://e3sm.org/">https://e3sm.org/</a></li>
+<li>NumPy Documentation: <a href="https://numpy.org/doc/stable/">https://numpy.org/doc/stable/</a></li>
+<li>Pandas Documentation: <a href="https://pandas.pydata.org/">https://pandas.pydata.org/</a></li>
+<li>GitHub Repository: <a href="https://github.com/philipmyint/e3sm--gcam_analysis">https://github.com/philipmyint/e3sm--gcam_analysis</a></li>
+</ul>
+<hr />
+<h2>Contact</h2>
+<p>For questions or issues:<br />
+- <strong>Philip Myint</strong>: myint1@llnl.gov<br />
+- <strong>Dalei Hao</strong>: dalei.hao@pnnl.gov</p>
+<hr />
+<h2>Version Information</h2>
+<p><strong>Script:</strong> e3sm_produce_synthetic_time_series.py<br />
+<strong>Documentation Version:</strong> 1.0<br />
+<strong>Last Updated:</strong> January 2026<br />
+<strong>Python Version:</strong> 3.7+<br />
+<strong>Dependencies:</strong> numpy, pandas, multiprocessing, utility_dataframes</p>
+<hr />
+<p><em>This documentation provides comprehensive guidance for using the <code>e3sm_produce_synthetic_time_series.py</code> script to generate synthetic ensemble members from E3SM time series data for statistical testing and uncertainty quantification.</em></p>
+        <footer>
+            <p>E3SM Synthetic Time Series Generation Script Documentation<br>
+            <strong>Script:</strong> e3sm_produce_synthetic_time_series.py<br>
+            <strong>Authors:</strong> Philip Myint, Dalei Hao<br>
+            <strong>Version:</strong> 1.0 | January 2026</p>
+        </footer>
+    </div>
+</body>
+</html>
