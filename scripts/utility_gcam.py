@@ -84,49 +84,6 @@ gcam_basin_names_and_abbrevations = {
 'Mid_Atlantic_Basin': 'UsaCstE', 'South_Atlantic_Gulf_Basin': 'UsaCstSE'
 }
 
-
-def produce_dataframe_for_landtype_group(df, category, category_label, value_label, 
-                landtype_groups, mean_or_sum_if_more_than_one_row_in_same_landtype_group, key_columns):
-    """ 
-    Aggregates the rows of a given Pandas DataFrame that match the specified landtype_group (e.g., crop, forest, pasture, shrub, grass).
-    Performs one of four user-specified operations on the rows in the group: mean, sum, area-weighted mean, or area-weighted sum.
-
-    Parameters:
-        df: DataFrame containing the data of interest.
-        category: String specifying the name of the landtype category of interest (e.g., 'forest', 'shrub', 'pasture').
-        category_label: String specifying the label for the landtype column in the DataFrame (most likely this will just be 'landtype').
-        value_label: String specifying the label for the column containing the value of interest.
-        landtype_groups: Dictionary where the keys are landtype group names and the values are all the landtypes that belong to each group.
-        mean_or_sum_if_more_than_one_row_in_same_landtype_group: String that indicates the operation that should be performed on each group.
-        key_columns: Columns on which the aggregation (group-by) operation should be performed.
-
-    Returns:
-        DataFrame with aggregated rows and the value_label column modified to reflect a mean, sum, area-weighted mean, or area-weighted sum.
-    """
-    # Get all landtypes for the group and filter the DataFrame to keep only the rows that correspond to one of the landtypes in the group.
-    landtypes = landtype_groups[category]
-    df = df[df[category_label].isin(landtypes)]
-
-    if mean_or_sum_if_more_than_one_row_in_same_landtype_group == 'mean':
-        landtypes_in_df = [x for x in landtypes if x in df[category_label].unique()]
-        num_landtypes_in_df = len(landtypes_in_df)
-        df = df.groupby(key_columns).sum()
-        df.loc[:, value_label] /= num_landtypes_in_df
-        df = df.reset_index()
-    elif mean_or_sum_if_more_than_one_row_in_same_landtype_group == 'sum':
-        df = df.groupby(key_columns).sum().reset_index()
-    elif mean_or_sum_if_more_than_one_row_in_same_landtype_group == 'area_weighted_mean':
-        df.loc[:, value_label] = df['area']*df[value_label]
-        df = df.groupby(key_columns).sum()
-        total_area = df['area']
-        df.loc[:, value_label] = df.loc[:, value_label].div(total_area, axis=0)
-        df = df.reset_index()
-    elif mean_or_sum_if_more_than_one_row_in_same_landtype_group == 'area_weighted_sum':
-        df[:, value_label] = df['area']*df[value_label]
-        df = df.groupby(key_columns).sum().reset_index()
-    df[category_label] = category
-    return df
-
 def modify_crop_names(df, columns, mean_or_sum_if_more_than_one_row_for_crop_name='mean'):
     """
     Applies the mappings in gcam_crop_mappings dictionary to produce a modified set of crop names in the given Pandas DataFrame.
@@ -171,3 +128,45 @@ def modify_crop_names(df, columns, mean_or_sum_if_more_than_one_row_for_crop_nam
 
         # Apply the weighted mean function to each group.
         return df.groupby(columns).apply(weighted_mean).reset_index()
+    
+def produce_dataframe_for_landtype_group(df, category, category_label, value_label, 
+                landtype_groups, mean_or_sum_if_more_than_one_row_in_same_landtype_group, key_columns):
+    """ 
+    Aggregates the rows of a given Pandas DataFrame that match the specified landtype_group (e.g., crop, forest, pasture, shrub, grass).
+    Performs one of four user-specified operations on the rows in the group: mean, sum, area-weighted mean, or area-weighted sum.
+
+    Parameters:
+        df: DataFrame containing the data of interest.
+        category: String specifying the name of the landtype category of interest (e.g., 'forest', 'shrub', 'pasture').
+        category_label: String specifying the label for the landtype column in the DataFrame (most likely this will just be 'landtype').
+        value_label: String specifying the label for the column containing the value of interest.
+        landtype_groups: Dictionary where the keys are landtype group names and the values are all the landtypes that belong to each group.
+        mean_or_sum_if_more_than_one_row_in_same_landtype_group: String that indicates the operation that should be performed on each group.
+        key_columns: Columns on which the aggregation (group-by) operation should be performed.
+
+    Returns:
+        DataFrame with aggregated rows and the value_label column modified to reflect a mean, sum, area-weighted mean, or area-weighted sum.
+    """
+    # Get all landtypes for the group and filter the DataFrame to keep only the rows that correspond to one of the landtypes in the group.
+    landtypes = landtype_groups[category]
+    df = df[df[category_label].isin(landtypes)]
+
+    if mean_or_sum_if_more_than_one_row_in_same_landtype_group == 'mean':
+        landtypes_in_df = [x for x in landtypes if x in df[category_label].unique()]
+        num_landtypes_in_df = len(landtypes_in_df)
+        df = df.groupby(key_columns).sum()
+        df.loc[:, value_label] /= num_landtypes_in_df
+        df = df.reset_index()
+    elif mean_or_sum_if_more_than_one_row_in_same_landtype_group == 'sum':
+        df = df.groupby(key_columns).sum().reset_index()
+    elif mean_or_sum_if_more_than_one_row_in_same_landtype_group == 'area_weighted_mean':
+        df.loc[:, value_label] = df['area']*df[value_label]
+        df = df.groupby(key_columns).sum()
+        total_area = df['area']
+        df.loc[:, value_label] = df.loc[:, value_label].div(total_area, axis=0)
+        df = df.reset_index()
+    elif mean_or_sum_if_more_than_one_row_in_same_landtype_group == 'area_weighted_sum':
+        df[:, value_label] = df['area']*df[value_label]
+        df = df.groupby(key_columns).sum().reset_index()
+    df[category_label] = category
+    return df

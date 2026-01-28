@@ -9,7 +9,7 @@ import sys
 import time
 from utility_constants import *
 from utility_dataframes import read_file_into_dataframe
-from utility_functions import check_is_list_of_lists
+from utility_functions import check_is_list_of_lists, transpose_scenarios_if_needed
 from utility_gcam import gcam_landtype_groups, gcam_landtype_groups_original, produce_dataframe_for_landtype_group
 from utility_plots import *
 
@@ -33,6 +33,7 @@ default_inputs = {
     'marker_size': 6,
     'multiplier': 1,
     'mean_or_sum_if_more_than_one_row_in_same_landtype_group': 'area_weighted_mean',
+    'notify_scenarios_transposed': False,
     'plot_colors': plot_colors_default,
     'plot_directory': './',
     'plot_percent_difference': False,
@@ -116,6 +117,19 @@ def process_inputs(inputs):
     for key in default_inputs.keys():
         if key not in inputs:
             inputs[key] = default_inputs[key]
+
+    # If the scenarios are specified as a list of lists (for ensemble plots), check if they need to be transposed.
+    # Users can now specify scenarios in two formats:
+    #   Format A (organized by ensemble member - original format):
+    #       [["Control", "Full feedback"], ["Control_2", "Full feedback_2"], ...]
+    #   Format B (organized by scenario set - new user-friendly format):
+    #       [["Control", "Control_2", ...], ["Full feedback", "Full feedback_2", ...]]
+    # The plotting functions expect Format A internally, so Format B will be automatically transposed.
+    if check_is_list_of_lists(inputs['scenarios']):
+        scenario_sets = inputs.get('scenario_sets', None)
+        inputs['scenarios'], was_transposed = transpose_scenarios_if_needed(inputs['scenarios'], scenario_sets)
+        if was_transposed and inputs['notify_scenarios_transposed']:
+            print(f"Note: Scenarios were automatically transposed from 'organized by scenario set' format to 'organized by ensemble member' format.")
 
     # If the scenarios have not been specified, use all the scenarios in the Pandas DataFrame.
     if 'scenarios' not in inputs:

@@ -478,7 +478,7 @@ footer {
 <h2>Overview</h2>
 <p><strong>Script Name:</strong> <code>gcam_plot_box_and_whiskers.py</code></p>
 <p><strong>Purpose:</strong> Creates box-and-whisker plots (box plots) from GCAM (Global Change Analysis Model) output files to visualize data distributions across different scenarios, categories, and regions. Box plots provide a statistical summary showing median, quartiles, and outliers, making them ideal for comparing distributions and identifying variability in GCAM outputs.</p>
-<p><strong>Author:</strong> Philip Myint (myint1@llnl.gov) and Dalei Hao (dalei.hao@pnnl.gov)</p>
+<p><strong>Author:</strong> Philip Myint (<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="177a6e7e796326577b7b797b39707861">[email&#160;protected]</a>) and Dalei Hao (<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="cfabaea3aaa6e1a7aea08fbfa1a1a3e1a8a0b9">[email&#160;protected]</a>)</p>
 <p><strong>Repository:</strong> <a href="https://github.com/philipmyint/e3sm--gcam_analysis">E3SM-GCAM Analysis Scripts</a></p>
 <hr />
 <h2>Table of Contents</h2>
@@ -700,6 +700,14 @@ footer {
 <td><code>None</code></td>
 <td>List of strings</td>
 <td>Names for ensemble groups (when using nested scenarios)</td>
+</tr>
+<tr>
+<td><code>notify_scenarios_transposed</code></td>
+<td>boolean</td>
+<td>No</td>
+<td><code>false</code></td>
+<td><code>true</code>, <code>false</code></td>
+<td>Print console message when scenarios are automatically transposed</td>
 </tr>
 <tr>
 <td><code>categories</code></td>
@@ -1157,20 +1165,34 @@ footer {
 
 <p>Each scenario creates separate box(es) in the plot.</p>
 <p><strong>Format 2 - Ensemble Plots (Nested List):</strong></p>
+<p>Users can specify ensemble scenarios in <strong>either of two formats</strong>. The script automatically detects and handles both formats using the <code>transpose_scenarios_if_needed()</code> function in <code>utility_functions.py</code>.</p>
+<p><strong>Format 2A - Organized by Scenario Set (Recommended):</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="nt">&quot;scenarios&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">[</span><span class="s2">&quot;Control&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Control_2&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Control_3&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Control_4&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Control_5&quot;</span><span class="p">],</span>
+<span class="w">    </span><span class="p">[</span><span class="s2">&quot;Full feedback&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Full feedback_2&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Full feedback_3&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Full feedback_4&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Full feedback_5&quot;</span><span class="p">]</span>
+<span class="p">],</span>
+<span class="nt">&quot;scenario_sets&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;Control&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Full feedback&quot;</span><span class="p">]</span>
+</code></pre></div>
+
+<p>Each inner list contains all ensemble members for one scenario set. This format is more intuitive as it groups related scenarios together.</p>
+<p><strong>Format 2B - Organized by Ensemble Member (Alternative):</strong></p>
 <div class="codehilite"><pre><span></span><code><span class="nt">&quot;scenarios&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">    </span><span class="p">[</span><span class="s2">&quot;Control&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Full feedback&quot;</span><span class="p">],</span>
 <span class="w">    </span><span class="p">[</span><span class="s2">&quot;Control_2&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Full feedback_2&quot;</span><span class="p">],</span>
 <span class="w">    </span><span class="p">[</span><span class="s2">&quot;Control_3&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Full feedback_3&quot;</span><span class="p">],</span>
 <span class="w">    </span><span class="p">[</span><span class="s2">&quot;Control_4&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Full feedback_4&quot;</span><span class="p">],</span>
 <span class="w">    </span><span class="p">[</span><span class="s2">&quot;Control_5&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Full feedback_5&quot;</span><span class="p">]</span>
-<span class="p">]</span>
+<span class="p">],</span>
+<span class="nt">&quot;scenario_sets&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;Control&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Full feedback&quot;</span><span class="p">]</span>
 </code></pre></div>
 
 <p>Each inner list is one ensemble member. Data from all members at the same position are combined.</p>
 <p><strong>Important Notes:</strong><br />
 - For ensemble plots, all inner lists must have the same length<br />
 - Scenario names must match exactly with values in the CSV file's scenario column<br />
-- Order matters for percent difference calculations (first scenario/group is the reference)</p>
+- Order matters for percent difference calculations (first scenario/group is the reference)<br />
+- The <code>scenario_sets</code> parameter helps the script detect which format you're using<br />
+- Scenario names do not need to follow any specific naming convention</p>
 <hr />
 <h4><code>scenario_sets</code></h4>
 <p><strong>Type:</strong> List of strings<br />
@@ -1179,8 +1201,8 @@ footer {
 <strong>Description:</strong> Names for each ensemble group when using nested scenarios.</p>
 <p><strong>Example:</strong></p>
 <div class="codehilite"><pre><span></span><code><span class="nt">&quot;scenarios&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">    </span><span class="p">[</span><span class="s2">&quot;Control&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Full feedback&quot;</span><span class="p">],</span>
-<span class="w">    </span><span class="p">[</span><span class="s2">&quot;Control_2&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Full feedback_2&quot;</span><span class="p">]</span>
+<span class="w">    </span><span class="p">[</span><span class="s2">&quot;Control&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Control_2&quot;</span><span class="p">],</span>
+<span class="w">    </span><span class="p">[</span><span class="s2">&quot;Full feedback&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Full feedback_2&quot;</span><span class="p">]</span>
 <span class="p">],</span>
 <span class="nt">&quot;scenario_sets&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;Control&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Full feedback&quot;</span><span class="p">]</span>
 </code></pre></div>
@@ -2156,8 +2178,8 @@ For "Rice" in "Control" scenario from 2015-2100:<br />
 <hr />
 <h2>Contact</h2>
 <p>For questions or issues:<br />
-- <strong>Philip Myint</strong>: myint1@llnl.gov<br />
-- <strong>Dalei Hao</strong>: dalei.hao@pnnl.gov</p>
+- <strong>Philip Myint</strong>: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="523f2b3b3c2663123e3e3c3e7c353d24">[email&#160;protected]</a><br />
+- <strong>Dalei Hao</strong>: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="3a5e5b565f5314525b557a4a545456145d554c">[email&#160;protected]</a></p>
 <hr />
 <h2>Version Information</h2>
 <p><strong>Script:</strong> gcam_plot_box_and_whiskers.py<br />
@@ -2167,15 +2189,4 @@ For "Rice" in "Control" scenario from 2015-2100:<br />
 <hr />
 <p><em>This documentation provides comprehensive guidance for using the <code>gcam_plot_box_and_whiskers.py</code> script to create statistical visualizations of GCAM output data distributions.</em></p>
         
-        <footer>
-            <p>
-                Documentation generated for the E3SM-GCAM Analysis Scripts<br>
-                <strong>Script:</strong> gcam_plot_box_and_whiskers.py<br>
-                <strong>Authors:</strong> Philip Myint (myint1@llnl.gov) and Dalei Hao (dalei.hao@pnnl.gov)<br>
-                <strong>Documentation Version:</strong> 1.0<br>
-                <strong>Last Updated:</strong> January 2026
-            </p>
-        </footer>
-    </div>
-</body>
-</html>
+       

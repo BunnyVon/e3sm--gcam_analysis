@@ -208,3 +208,97 @@ def sort_file(file_path):
     with open(file_path, 'w') as file:
         file.writelines(lines)
     return f"File sorted successfully: {file_path}"
+
+def transpose_scenarios_if_needed(scenarios, scenario_sets=None):
+    """
+    Detects the format of the scenarios list of lists representing collections of ensembles of scenarios, 
+    and transposes the list of lists if necessary to match the internal format expected by the plotting functions.
+    
+    The plotting functions expect scenarios organized by ensemble member (rows = members, columns = scenario sets):
+        [["Control", "Full feedback"],           # Member 1
+         ["Control_2", "Full feedback_2"],       # Member 2
+         ["Control_3", "Full feedback_3"]]       # Member 3
+    
+    This function also supports an alternative user-friendly format organized by scenario set (rows = sets, columns = members):
+        [["Control", "Control_2", "Control_3"],           # Control set
+         ["Full feedback", "Full feedback_2", "Full feedback_3"]]  # Full feedback set
+    
+    The function uses the following heuristics to detect the format:
+    1. If scenario_sets is provided, its length should match the number of scenario sets (columns in the original format,
+       rows in the alternative format). This is the primary detection method and works regardless of scenario naming conventions.
+    2. If scenario_sets is not provided and the matrix is not square, the function assumes the format where rows > columns
+       is the original format (more ensemble members than scenario sets is typical).
+    3. For square matrices without scenario_sets, the function cannot determine the format and returns as-is.
+    
+    Parameters:
+        scenarios: A list of lists containing scenario names. Can be in either format. Scenario names can follow any 
+                   naming convention - they do not need to share common base names or follow patterns like "Name_1", "Name_2", etc.
+        scenario_sets: Optional list of scenario set names (e.g., ["Control", "Full feedback"]). This is the recommended
+                       way to specify the format, as it allows unambiguous detection regardless of scenario naming conventions.
+                       When provided, the function compares len(scenario_sets) to the dimensions of the scenarios matrix
+                       to determine which format is being used.
+    
+    Returns:
+        A tuple of (transposed_scenarios, was_transposed):
+        - transposed_scenarios: The scenarios in the internal format (organized by ensemble member).
+        - was_transposed: Boolean indicating whether the input was transposed (True if the input was in the 
+          alternative format and was converted to the internal format).
+    
+    Examples:
+        # Example 1: Using scenario_sets for unambiguous detection (recommended)
+        scenarios = [["run_A", "run_B", "run_C"], ["exp_X", "exp_Y", "exp_Z"]]
+        scenario_sets = ["Control", "Treatment"]
+        # len(scenario_sets) = 2 matches num_rows = 2, so this is the alternative format
+        # Result: [["run_A", "exp_X"], ["run_B", "exp_Y"], ["run_C", "exp_Z"]], True
+        
+        # Example 2: Without scenario_sets, using row/column count heuristic
+        scenarios = [["A1", "B1"], ["A2", "B2"], ["A3", "B3"]]  # 3 rows, 2 cols
+        # More rows than columns suggests original format (3 members, 2 sets)
+        # Result: scenarios (unchanged), False
+        
+        # Example 3: Square matrix without scenario_sets (ambiguous)
+        scenarios = [["A", "B"], ["C", "D"]]  # 2x2 - could be either format
+        # Result: scenarios (unchanged), False
+    """
+    if not scenarios or not isinstance(scenarios[0], list):
+        # Not a list of lists; return as-is.
+        return scenarios, False
+    
+    num_rows = len(scenarios)
+    num_cols = len(scenarios[0]) if scenarios else 0
+    
+    # If all inner lists don't have the same length, we cannot reliably detect format; return as-is.
+    if not all(len(row) == num_cols for row in scenarios):
+        return scenarios, False
+    
+    # Heuristic 1 (Primary): If scenario_sets is provided, use its length to determine the format.
+    # This is the most reliable method and works regardless of scenario naming conventions.
+    if scenario_sets is not None:
+        num_sets = len(scenario_sets)
+        if num_sets == num_rows and num_sets != num_cols:
+            # scenario_sets length matches rows, so input is in alternative format (organized by scenario set).
+            # Transpose to convert to internal format (organized by ensemble member).
+            transposed = [[scenarios[row][col] for row in range(num_rows)] for col in range(num_cols)]
+            return transposed, True
+        elif num_sets == num_cols and num_sets != num_rows:
+            # scenario_sets length matches columns, so input is already in internal format.
+            return scenarios, False
+        elif num_sets == num_rows == num_cols:
+            # Square matrix and scenario_sets matches both dimensions - ambiguous.
+            # In this case, we assume the user is using the new format (organized by scenario set) since that's
+            # the more intuitive format for users. Each row in scenarios corresponds to a scenario set.
+            transposed = [[scenarios[row][col] for row in range(num_rows)] for col in range(num_cols)]
+            return transposed, True
+        # If num_sets matches neither, fall through to heuristic 2.
+    
+    # Heuristic 2: Without scenario_sets, use the shape of the matrix.
+    # Typically, there are more ensemble members than scenario sets (e.g., 5 members x 2 sets).
+    # So if rows > cols, assume original format; if cols > rows, assume alternative format and transpose.
+    if num_cols > num_rows:
+        # More columns than rows suggests alternative format (few sets, many members per set).
+        # Transpose to convert to internal format.
+        transposed = [[scenarios[row][col] for row in range(num_rows)] for col in range(num_cols)]
+        return transposed, True
+    else:
+        # rows >= cols: assume original format or ambiguous square matrix; return as-is.
+        return scenarios, False

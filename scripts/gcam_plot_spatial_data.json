@@ -96,12 +96,10 @@
         "shape_file": "./../2025_DiVittorio_et_al_gcam/gcam_boundaries_moirai_3p1_0p5arcmin_wgs84/reg_glu_boundaries_moirai_combined_3p1_0p5arcmin.shp",
         "output_file": "./../2025_DiVittorio_et_al_gcam/land_allocation_processed_ensemble.csv",
         "scenarios": [
-            ["Control", "Full feedback"],
-            ["Control_2", "Full feedback_2"],
-            ["Control_3", "Full feedback_3"],
-            ["Control_4", "Full feedback_4"],
-            ["Control_5", "Full feedback_5"]
+            ["Control", "Control_2", "Control_3", "Control_4", "Control_5"],
+            ["Full feedback", "Full feedback_2", "Full feedback_3", "Full feedback_4", "Full feedback_5"]
         ],
+        "scenario_sets": ["Control", "Full feedback"],
         "categories": ["forest"],
         "plot_directory": "./../2025_DiVittorio_et_al_gcam/spatial_plots",
         "plot_name": "spatial_land_allocation_forest_ensemble_absolute_difference.pdf",
@@ -116,12 +114,10 @@
         "shape_file": "./../2025_DiVittorio_et_al_gcam/gcam_boundaries_moirai_3p1_0p5arcmin_wgs84/reg_glu_boundaries_moirai_combined_3p1_0p5arcmin.shp",
         "output_file": "./../2025_DiVittorio_et_al_gcam/ag_commodity_prices_processed_ensemble.csv",
         "scenarios": [
-            ["Control", "Full feedback"],
-            ["Control_2", "Full feedback_2"],
-            ["Control_3", "Full feedback_3"],
-            ["Control_4", "Full feedback_4"],
-            ["Control_5", "Full feedback_5"]
+            ["Control", "Control_2", "Control_3", "Control_4", "Control_5"],
+            ["Full feedback", "Full feedback_2", "Full feedback_3", "Full feedback_4", "Full feedback_5"]
         ],
+        "scenario_sets": ["Control", "Full feedback"],
         "categories": ["BioenergyCrop", "Rice", "SugarCrop", "Soybean", "Wheat"],
         "plot_directory": "./../2025_DiVittorio_et_al_gcam/spatial_plots",
         "plot_name": "spatial_ag_commodity_ensemble_absolute_difference.pdf",
@@ -131,12 +127,10 @@
         "shape_file": "./../2025_DiVittorio_et_al_gcam/gcam_boundaries_moirai_3p1_0p5arcmin_wgs84/reg_glu_boundaries_moirai_combined_3p1_0p5arcmin.shp",
         "output_file": "./../2025_DiVittorio_et_al_gcam/ag_commodity_prices_processed_ensemble.csv",
         "scenarios": [
-            ["Control", "Full feedback"],
-            ["Control_2", "Full feedback_2"],
-            ["Control_3", "Full feedback_3"],
-            ["Control_4", "Full feedback_4"],
-            ["Control_5", "Full feedback_5"]
+            ["Control", "Control_2", "Control_3", "Control_4", "Control_5"],
+            ["Full feedback", "Full feedback_2", "Full feedback_3", "Full feedback_4", "Full feedback_5"]
         ],
+        "scenario_sets": ["Control", "Full feedback"],
         "categories": ["BioenergyCrop", "Rice", "SugarCrop", "Soybean", "Wheat"],
         "plot_directory": "./../2025_DiVittorio_et_al_gcam/spatial_plots",
         "plot_type": "percent_difference", 
@@ -147,12 +141,10 @@
         "shape_file": "./../2025_DiVittorio_et_al_gcam/gcam_boundaries_moirai_3p1_0p5arcmin_wgs84/reg_glu_boundaries_moirai_combined_3p1_0p5arcmin.shp",
         "output_file": "./../2025_DiVittorio_et_al_gcam/scalars_control+full_feedback_ensemble.csv",
         "scenarios": [
-            ["Control", "Full feedback"],
-            ["Control_2", "Full feedback_2"],
-            ["Control_3", "Full feedback_3"],
-            ["Control_4", "Full feedback_4"],
-            ["Control_5", "Full feedback_5"]
+            ["Control", "Control_2", "Control_3", "Control_4", "Control_5"],
+            ["Full feedback", "Full feedback_2", "Full feedback_3", "Full feedback_4", "Full feedback_5"]
         ],
+        "scenario_sets": ["Control", "Full feedback"],
         "categories": ["BioenergyCrop", "Rice", "SugarCrop", "Soybean", "Wheat"],
         "plot_directory": "./../2025_DiVittorio_et_al_gcam/spatial_plots",
         "plot_name": "spatial_vegetation_scalars_ensemble_mean.pdf",
@@ -166,12 +158,10 @@
         "shape_file": "./../2025_DiVittorio_et_al_gcam/gcam_boundaries_moirai_3p1_0p5arcmin_wgs84/reg_glu_boundaries_moirai_combined_3p1_0p5arcmin.shp",
         "output_file": "./../2025_DiVittorio_et_al_gcam/scalars_control+full_feedback_ensemble.csv",
         "scenarios": [
-            ["Control", "Full feedback"],
-            ["Control_2", "Full feedback_2"],
-            ["Control_3", "Full feedback_3"],
-            ["Control_4", "Full feedback_4"],
-            ["Control_5", "Full feedback_5"]
+            ["Control", "Control_2", "Control_3", "Control_4", "Control_5"],
+            ["Full feedback", "Full feedback_2", "Full feedback_3", "Full feedback_4", "Full feedback_5"]
         ],
+        "scenario_sets": ["Control", "Full feedback"],
         "categories": ["BioenergyCrop", "Rice", "SugarCrop", "Soybean", "Wheat"],
         "plot_directory": "./../2025_DiVittorio_et_al_gcam/spatial_plots",
         "plot_name": "spatial_vegetation_scalars_ensemble_absolute_difference.pdf",
@@ -184,12 +174,10 @@
         "shape_file": "./../2025_DiVittorio_et_al_gcam/gcam_boundaries_moirai_3p1_0p5arcmin_wgs84/reg_glu_boundaries_moirai_combined_3p1_0p5arcmin.shp",
         "output_file": "./../2025_DiVittorio_et_al_gcam/scalars_control+full_feedback_ensemble.csv",
         "scenarios": [
-            ["Control", "Full feedback"],
-            ["Control_2", "Full feedback_2"],
-            ["Control_3", "Full feedback_3"],
-            ["Control_4", "Full feedback_4"],
-            ["Control_5", "Full feedback_5"]
+            ["Control", "Control_2", "Control_3", "Control_4", "Control_5"],
+            ["Full feedback", "Full feedback_2", "Full feedback_3", "Full feedback_4", "Full feedback_5"]
         ],
+        "scenario_sets": ["Control", "Full feedback"],
         "categories": ["BioenergyCrop", "Rice", "SugarCrop", "Soybean", "Wheat"],
         "plot_directory": "./../2025_DiVittorio_et_al_gcam/spatial_plots",
         "plot_name": "spatial_vegetation_scalars_ensemble_absolute_difference_no_stippling.pdf",
@@ -203,12 +191,10 @@
         "shape_file": "./../2025_DiVittorio_et_al_gcam/gcam_boundaries_moirai_3p1_0p5arcmin_wgs84/reg_glu_boundaries_moirai_combined_3p1_0p5arcmin.shp",
         "output_file": "./../2025_DiVittorio_et_al_gcam/scalars_control+full_feedback_ensemble.csv",
         "scenarios": [
-            ["Control", "Full feedback"],
-            ["Control_2", "Full feedback_2"],
-            ["Control_3", "Full feedback_3"],
-            ["Control_4", "Full feedback_4"],
-            ["Control_5", "Full feedback_5"]
+            ["Control", "Control_2", "Control_3", "Control_4", "Control_5"],
+            ["Full feedback", "Full feedback_2", "Full feedback_3", "Full feedback_4", "Full feedback_5"]
         ],
+        "scenario_sets": ["Control", "Full feedback"],
         "categories": ["BioenergyCrop", "Rice", "SugarCrop", "Soybean", "Wheat"],
         "plot_directory": "./../2025_DiVittorio_et_al_gcam/spatial_plots",
         "plot_name": "spatial_vegetation_scalars_ensemble_percent_difference.pdf",
@@ -223,12 +209,10 @@
         "shape_file": "./../2025_DiVittorio_et_al_gcam/gcam_boundaries_moirai_3p1_0p5arcmin_wgs84/reg_glu_boundaries_moirai_combined_3p1_0p5arcmin.shp",
         "output_file": "./../2025_DiVittorio_et_al_gcam/scalars_control+full_feedback_ensemble.csv",
         "scenarios": [
-            ["Control", "Full feedback"],
-            ["Control_2", "Full feedback_2"],
-            ["Control_3", "Full feedback_3"],
-            ["Control_4", "Full feedback_4"],
-            ["Control_5", "Full feedback_5"]
+            ["Control", "Control_2", "Control_3", "Control_4", "Control_5"],
+            ["Full feedback", "Full feedback_2", "Full feedback_3", "Full feedback_4", "Full feedback_5"]
         ],
+        "scenario_sets": ["Control", "Full feedback"],
         "categories": ["BioenergyCrop", "Rice", "SugarCrop", "Soybean", "Wheat"],
         "plot_directory": "./../2025_DiVittorio_et_al_gcam/spatial_plots",
         "plot_name": "spatial_vegetation_scalars_ensemble_percent_difference_no_stippling.pdf",

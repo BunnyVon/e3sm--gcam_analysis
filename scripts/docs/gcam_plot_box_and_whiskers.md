@@ -171,6 +171,7 @@ Scenarios are grouped into sets, boxes show combined distribution from ensemble 
 | `output_file` | string | **Yes** | - | Valid file path | Path to processed CSV file |
 | `scenarios` | list/nested list | **Yes** | - | List of scenario names or nested lists | Scenarios to plot |
 | `scenario_sets` | list | No | `None` | List of strings | Names for ensemble groups (when using nested scenarios) |
+| `notify_scenarios_transposed` | boolean | No | `false` | `true`, `false` | Print console message when scenarios are automatically transposed |
 | `categories` | list | No | All categories | List of category names | Specific categories to plot |
 | `categories_to_exclude` | list | No | `None` | List of category names | Categories to exclude from plotting |
 | `category_label` | string | No | `"sector"` | Column name | Column identifying categories |
@@ -277,6 +278,20 @@ Scenarios are grouped into sets, boxes show combined distribution from ensemble 
 Each scenario creates separate box(es) in the plot.
 
 **Format 2 - Ensemble Plots (Nested List):**
+
+Users can specify ensemble scenarios in **either of two formats**. The script automatically detects and handles both formats using the `transpose_scenarios_if_needed()` function in `utility_functions.py`.
+
+**Format 2A - Organized by Scenario Set (Recommended):**
+```json
+"scenarios": [
+    ["Control", "Control_2", "Control_3", "Control_4", "Control_5"],
+    ["Full feedback", "Full feedback_2", "Full feedback_3", "Full feedback_4", "Full feedback_5"]
+],
+"scenario_sets": ["Control", "Full feedback"]
+```
+Each inner list contains all ensemble members for one scenario set. This format is more intuitive as it groups related scenarios together.
+
+**Format 2B - Organized by Ensemble Member (Alternative):**
 ```json
 "scenarios": [
     ["Control", "Full feedback"],
@@ -284,7 +299,8 @@ Each scenario creates separate box(es) in the plot.
     ["Control_3", "Full feedback_3"],
     ["Control_4", "Full feedback_4"],
     ["Control_5", "Full feedback_5"]
-]
+],
+"scenario_sets": ["Control", "Full feedback"]
 ```
 Each inner list is one ensemble member. Data from all members at the same position are combined.
 
@@ -292,6 +308,8 @@ Each inner list is one ensemble member. Data from all members at the same positi
 - For ensemble plots, all inner lists must have the same length
 - Scenario names must match exactly with values in the CSV file's scenario column
 - Order matters for percent difference calculations (first scenario/group is the reference)
+- The `scenario_sets` parameter helps the script detect which format you're using
+- Scenario names do not need to follow any specific naming convention
 
 ---
 
@@ -304,8 +322,8 @@ Each inner list is one ensemble member. Data from all members at the same positi
 **Example:**
 ```json
 "scenarios": [
-    ["Control", "Full feedback"],
-    ["Control_2", "Full feedback_2"]
+    ["Control", "Control_2"],
+    ["Full feedback", "Full feedback_2"]
 ],
 "scenario_sets": ["Control", "Full feedback"]
 ```
@@ -767,11 +785,8 @@ percent_difference = (value - reference_value) / reference_value × 100
     "output_file": "./data/scalars_control+full_feedback.csv",
     "hue": "scenario",
     "scenarios": [
-        ["Control", "Full feedback"],
-        ["Control_2", "Full feedback_2"],
-        ["Control_3", "Full feedback_3"],
-        ["Control_4", "Full feedback_4"],
-        ["Control_5", "Full feedback_5"]
+        ["Control", "Control_2", "Control_3", "Control_4", "Control_5"],
+        ["Full feedback", "Full feedback_2", "Full feedback_3", "Full feedback_4", "Full feedback_5"]
     ],
     "scenario_sets": ["Control", "Full feedback"],
     "category_label": "landtype",
@@ -801,9 +816,8 @@ percent_difference = (value - reference_value) / reference_value × 100
     "output_file": "./data/land_allocation_processed_ensemble.csv",
     "hue": "scenario",
     "scenarios": [
-        ["Control", "Full feedback"],
-        ["Control_2", "Full feedback_2"],
-        ["Control_3", "Full feedback_3"]
+        ["Control", "Control_2", "Control_3"],
+        ["Full feedback", "Full feedback_2", "Full feedback_3"]
     ],
     "scenario_sets": ["Control", "Full feedback"],
     "category_label": "landtype",
@@ -994,9 +1008,8 @@ For "Rice" in "Control" scenario from 2015-2100:
 **Ensemble Plots:**
 ```json
 "scenarios": [
-    ["Control", "Full feedback"],
-    ["Control_2", "Full feedback_2"],
-    ["Control_3", "Full feedback_3"]
+    ["Control", "Control_2", "Control_3"],
+    ["Full feedback", "Full feedback_2", "Full feedback_3"]
 ]
 ```
 
@@ -1125,14 +1138,14 @@ python gcam_plot_box_and_whiskers.py config1.json config2.json config3.json
 ```json
 // Incorrect
 "scenarios": [
-    ["Control", "Full feedback"],
-    ["Control_2"]  // Missing Full feedback_2
+    ["Control", "Control_2"],
+    ["Full feedback"]  // Missing Full feedback_2
 ]
 
 // Correct
 "scenarios": [
-    ["Control", "Full feedback"],
-    ["Control_2", "Full feedback_2"]
+    ["Control", "Control_2"],
+    ["Full feedback", "Full feedback_2"]
 ]
 ```
 

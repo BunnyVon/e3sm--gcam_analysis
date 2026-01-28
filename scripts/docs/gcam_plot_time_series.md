@@ -296,6 +296,7 @@ Value
 | `output_file` | string | **Yes** | - | Valid file path | Path to processed CSV file |
 | `scenarios` | list/nested list | **Yes** | - | List of scenario names or nested lists | Scenarios to plot |
 | `scenario_sets` | list | No | `None` | List of strings | Names for ensemble groups (when using nested scenarios) |
+| `notify_scenarios_transposed` | boolean | No | `false` | `true`, `false` | Print console message when scenarios are automatically transposed |
 | `categories` | list | No | All categories | List of category names | Specific categories to plot |
 | `categories_to_exclude` | list | No | `None` | List of category names | Categories to exclude from plotting |
 | `category_label` | string | No | `"sector"` | Column name | Column identifying categories |
@@ -433,6 +434,20 @@ Value
 Each scenario plotted as a separate line.
 
 **Format 2 - Ensemble Plots (Nested List):**
+
+Users can specify ensemble scenarios in **either of two formats**. The script automatically detects and handles both formats using the `transpose_scenarios_if_needed()` function in `utility_functions.py`.
+
+**Format 2A - Organized by Scenario Set (Recommended):**
+```json
+"scenarios": [
+    ["Control", "Control_2", "Control_3", "Control_4", "Control_5"],
+    ["Full feedback", "Full feedback_2", "Full feedback_3", "Full feedback_4", "Full feedback_5"]
+],
+"scenario_sets": ["Control", "Full feedback"]
+```
+Each inner list contains all ensemble members for one scenario set. This format is more intuitive as it groups related scenarios together.
+
+**Format 2B - Organized by Ensemble Member (Alternative):**
 ```json
 "scenarios": [
     ["Control", "Full feedback"],
@@ -440,7 +455,8 @@ Each scenario plotted as a separate line.
     ["Control_3", "Full feedback_3"],
     ["Control_4", "Full feedback_4"],
     ["Control_5", "Full feedback_5"]
-]
+],
+"scenario_sets": ["Control", "Full feedback"]
 ```
 Each inner list is one ensemble member. Scenarios at the same position across inner lists are grouped together.
 
@@ -448,6 +464,8 @@ Each inner list is one ensemble member. Scenarios at the same position across in
 - For ensemble plots, all inner lists must have the same length
 - Scenario names must match exactly with values in the CSV file's scenario column
 - Order matters for statistical comparisons (first scenario/group is the reference)
+- The `scenario_sets` parameter helps the script detect which format you're using
+- Scenario names do not need to follow any specific naming convention (e.g., they don't need `_2`, `_3` suffixes)
 
 ---
 
@@ -981,11 +999,8 @@ All font sizes specified in **points** (from utility_plots.py).
 {
     "output_file": "./../2025_DiVittorio_et_al_gcam/ag_commodity_prices_processed_ensemble.csv",
     "scenarios": [
-        ["Control", "Full feedback"],
-        ["Control_2", "Full feedback_2"],
-        ["Control_3", "Full feedback_3"],
-        ["Control_4", "Full feedback_4"],
-        ["Control_5", "Full feedback_5"]
+        ["Control", "Control_2", "Control_3", "Control_4", "Control_5"],
+        ["Full feedback", "Full feedback_2", "Full feedback_3", "Full feedback_4", "Full feedback_5"]
     ],
     "scenario_sets": ["Control", "Full feedback"],
     "categories": ["Rice", "Soybean", "Wheat"],
@@ -1013,11 +1028,8 @@ All font sizes specified in **points** (from utility_plots.py).
 {
     "output_file": "./../2025_DiVittorio_et_al_gcam/ag_commodity_prices_processed_ensemble.csv",
     "scenarios": [
-        ["Control", "Full feedback"],
-        ["Control_2", "Full feedback_2"],
-        ["Control_3", "Full feedback_3"],
-        ["Control_4", "Full feedback_4"],
-        ["Control_5", "Full feedback_5"]
+        ["Control", "Control_2", "Control_3", "Control_4", "Control_5"],
+        ["Full feedback", "Full feedback_2", "Full feedback_3", "Full feedback_4", "Full feedback_5"]
     ],
     "scenario_sets": ["Control", "Full feedback"],
     "categories": ["Rice", "Soybean", "Wheat"],
@@ -1148,11 +1160,7 @@ All font sizes specified in **points** (from utility_plots.py).
 {
     "output_file": "./../2025_DiVittorio_et_al_gcam/scalars_control+full_feedback_ensemble.csv",
     "scenarios": [
-        ["Control"],
-        ["Control_2"],
-        ["Control_3"],
-        ["Control_4"],
-        ["Control_5"]
+        ["Control", "Control_2", "Control_3", "Control_4", "Control_5"]
     ],
     "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/ensemble_plots_control_only",
     "plot_name": "time_series_vegetation_scalars.pdf",
@@ -1183,11 +1191,8 @@ All font sizes specified in **points** (from utility_plots.py).
 {
     "output_file": "./../2025_DiVittorio_et_al_gcam/land_allocation_processed_original_crop_names_ensemble.csv",
     "scenarios": [
-        ["Control", "Full feedback"],
-        ["Control_2", "Full feedback_2"],
-        ["Control_3", "Full feedback_3"],
-        ["Control_4", "Full feedback_4"],
-        ["Control_5", "Full feedback_5"]
+        ["Control", "Control_2", "Control_3", "Control_4", "Control_5"],
+        ["Full feedback", "Full feedback_2", "Full feedback_3", "Full feedback_4", "Full feedback_5"]
     ],
     "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/ensemble_plots",
     "scenario_sets": ["Control", "Full feedback"],
@@ -1571,7 +1576,7 @@ The script supports two levels of landtype aggregation:
 **Modified Groups (default):**
 - Aggregates GCAM landtypes into major categories
 - Example: "crop" includes all crop types
-- Defined in `utility_gcam.py`
+- Defined in `utility_functions.py`
 
 **Original Groups:**
 - Uses original GCAM landtype names
@@ -2398,9 +2403,8 @@ Before finalizing plots:
 {
     "output_file": "./data/file_ensemble.csv",
     "scenarios": [
-        ["Control", "Full feedback"],
-        ["Control_2", "Full feedback_2"],
-        ["Control_3", "Full feedback_3"]
+        ["Control", "Control_2", "Control_3"],
+        ["Full feedback", "Full feedback_2", "Full feedback_3"]
     ],
     "scenario_sets": ["Control", "Full feedback"],
     "categories": ["Rice", "Wheat", "Corn"],

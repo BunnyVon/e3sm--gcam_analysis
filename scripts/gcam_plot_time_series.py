@@ -9,7 +9,7 @@ import sys
 import time
 from utility_constants import *
 from utility_dataframes import perform_ttest, read_file_into_dataframe
-from utility_functions import check_is_list_of_lists, print_p_values, sort_file
+from utility_functions import check_is_list_of_lists, print_p_values, sort_file, transpose_scenarios_if_needed
 from utility_gcam import gcam_landtype_groups, gcam_landtype_groups_original, produce_dataframe_for_landtype_group
 from utility_plots import *
 
@@ -34,6 +34,7 @@ default_inputs = {
     'markers': markers_default,
     'multiplier': 1,
     'mean_or_sum_if_more_than_one_row_in_same_landtype_group': 'area_weighted_mean',
+    'notify_scenarios_transposed': False,
     'p_value_file': 'p_values.dat',
     'p_value_file_print_only_if_below_threshold': True,
     'p_value_marker_size': 10, 
@@ -131,6 +132,19 @@ def process_inputs(inputs):
     if 'scenarios' not in inputs:
         scenario_label = inputs['scenario_label']
         inputs['scenarios'] = df[scenario_label].unique()
+
+    # If the scenarios are specified as a list of lists (for ensemble plots), check if they need to be transposed.
+    # Users can now specify scenarios in two formats:
+    #   Format A (organized by ensemble member - original format):
+    #       [["Control", "Full feedback"], ["Control_2", "Full feedback_2"], ...]
+    #   Format B (organized by scenario set - new user-friendly format):
+    #       [["Control", "Control_2", ...], ["Full feedback", "Full feedback_2", ...]]
+    # The plotting functions expect Format A internally, so Format B will be automatically transposed.
+    if check_is_list_of_lists(inputs['scenarios']):
+        scenario_sets = inputs.get('scenario_sets', None)
+        inputs['scenarios'], was_transposed = transpose_scenarios_if_needed(inputs['scenarios'], scenario_sets)
+        if was_transposed and inputs['notify_scenarios_transposed']:
+            print(f"Note: Scenarios were automatically transposed from 'organized by scenario set' format to 'organized by ensemble member' format.")
 
     # If the user specified anything other than a dictionary for the 'regions', create a dictionary with the keys given by the categories. 
     if 'regions' not in inputs or not isinstance(inputs['regions'], dict):

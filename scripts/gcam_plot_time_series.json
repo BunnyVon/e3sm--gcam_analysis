@@ -37,11 +37,8 @@
     {
         "output_file": "./../2025_DiVittorio_et_al_gcam/ag_commodity_prices_processed_ensemble.csv",
         "scenarios": [
-            ["Control", "Full feedback"],
-            ["Control_2", "Full feedback_2"],
-            ["Control_3", "Full feedback_3"],
-            ["Control_4", "Full feedback_4"],
-            ["Control_5", "Full feedback_5"]
+            ["Control", "Control_2", "Control_3", "Control_4", "Control_5"],
+            ["Full feedback", "Full feedback_2", "Full feedback_3", "Full feedback_4", "Full feedback_5"]
         ],
         "scenario_sets": ["Control", "Full feedback"],
         "categories": ["Rice", "Soybean", "Wheat"],
@@ -54,11 +51,8 @@
     {
         "output_file": "./../2025_DiVittorio_et_al_gcam/ag_commodity_prices_processed_ensemble.csv",
         "scenarios": [
-            ["Control", "Full feedback"],
-            ["Control_2", "Full feedback_2"],
-            ["Control_3", "Full feedback_3"],
-            ["Control_4", "Full feedback_4"],
-            ["Control_5", "Full feedback_5"]
+            ["Control", "Control_2", "Control_3", "Control_4", "Control_5"],
+            ["Full feedback", "Full feedback_2", "Full feedback_3", "Full feedback_4", "Full feedback_5"]
         ],
         "scenario_sets": ["Control", "Full feedback"],
         "categories": ["Rice", "Soybean", "Wheat"],
@@ -90,11 +84,8 @@
     {
         "output_file": "./../2025_DiVittorio_et_al_gcam/co2_emissions_sectors_processed_ensemble.csv",
         "scenarios": [
-            ["Control", "Full feedback"],
-            ["Control_2", "Full feedback_2"],
-            ["Control_3", "Full feedback_3"],
-            ["Control_4", "Full feedback_4"],
-            ["Control_5", "Full feedback_5"]
+            ["Control", "Control_2", "Control_3", "Control_4", "Control_5"],
+            ["Full feedback", "Full feedback_2", "Full feedback_3", "Full feedback_4", "Full feedback_5"]
         ],
         "scenario_sets": ["Control", "Full feedback"],
         "categories": ["agricultural energy use", "construction energy use", "trn_aviation_intl", "refining"],
@@ -107,11 +98,8 @@
     {
         "output_file": "./../2025_DiVittorio_et_al_gcam/co2_emissions_sectors_processed_ensemble.csv",
         "scenarios": [
-            ["Control", "Full feedback"],
-            ["Control_2", "Full feedback_2"],
-            ["Control_3", "Full feedback_3"],
-            ["Control_4", "Full feedback_4"],
-            ["Control_5", "Full feedback_5"]
+            ["Control", "Control_2", "Control_3", "Control_4", "Control_5"],
+            ["Full feedback", "Full feedback_2", "Full feedback_3", "Full feedback_4", "Full feedback_5"]
         ],
         "scenario_sets": ["Control", "Full feedback"],
         "categories": ["agricultural energy use", "construction energy use", "trn_aviation_intl", "refining"],
@@ -153,11 +141,7 @@
     {
         "output_file": "./../2025_DiVittorio_et_al_gcam/scalars_control+full_feedback_ensemble.csv",
         "scenarios": [
-            ["Control"],
-            ["Control_2"],
-            ["Control_3"],
-            ["Control_4"],
-            ["Control_5"]
+            ["Control", "Control_2", "Control_3", "Control_4", "Control_5"]
         ],
         "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/ensemble_plots_control_only",
         "plot_name": "time_series_vegetation_scalars.pdf",
@@ -174,11 +158,8 @@
     {
         "output_file": "./../2025_DiVittorio_et_al_gcam/scalars_control+full_feedback_ensemble.csv",
         "scenarios": [
-            ["Control", "Full feedback"],
-            ["Control_2", "Full feedback_2"],
-            ["Control_3", "Full feedback_3"],
-            ["Control_4", "Full feedback_4"],
-            ["Control_5", "Full feedback_5"]
+            ["Control", "Control_2", "Control_3", "Control_4", "Control_5"],
+            ["Full feedback", "Full feedback_2", "Full feedback_3", "Full feedback_4", "Full feedback_5"]
         ],
         "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/ensemble_plots",
         "plot_name": "time_series_vegetation_scalars.pdf",
@@ -195,11 +176,8 @@
     {
         "output_file": "./../2025_DiVittorio_et_al_gcam/scalars_control+full_feedback_ensemble.csv",
         "scenarios": [
-            ["Control", "Full feedback"],
-            ["Control_2", "Full feedback_2"],
-            ["Control_3", "Full feedback_3"],
-            ["Control_4", "Full feedback_4"],
-            ["Control_5", "Full feedback_5"]
+            ["Control", "Control_2", "Control_3", "Control_4", "Control_5"],
+            ["Full feedback", "Full feedback_2", "Full feedback_3", "Full feedback_4", "Full feedback_5"]
         ],
         "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/ensemble_plots_percent_difference",
         "plot_name": "time_series_vegetation_scalars.pdf",
@@ -216,11 +194,8 @@
     {
         "output_file": "./../2025_DiVittorio_et_al_gcam/land_allocation_processed_original_crop_names_ensemble.csv",
         "scenarios": [
-            ["Control", "Full feedback"],
-            ["Control_2", "Full feedback_2"],
-            ["Control_3", "Full feedback_3"],
-            ["Control_4", "Full feedback_4"],
-            ["Control_5", "Full feedback_5"]
+            ["Control", "Control_2", "Control_3", "Control_4", "Control_5"],
+            ["Full feedback", "Full feedback_2", "Full feedback_3", "Full feedback_4", "Full feedback_5"]
         ],
         "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/ensemble_plots",
         "scenario_sets": ["Control", "Full feedback"],
@@ -238,11 +213,8 @@
     {
         "output_file": "./../2025_DiVittorio_et_al_gcam/land_allocation_processed_ensemble.csv",
         "scenarios": [
-            ["Control", "Full feedback"],
-            ["Control_2", "Full feedback_2"],
-            ["Control_3", "Full feedback_3"],
-            ["Control_4", "Full feedback_4"],
-            ["Control_5", "Full feedback_5"]
+            ["Control", "Control_2", "Control_3", "Control_4", "Control_5"],
+            ["Full feedback", "Full feedback_2", "Full feedback_3", "Full feedback_4", "Full feedback_5"]
         ],
         "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/ensemble_plots",
         "scenario_sets": ["Control", "Full feedback"],

@@ -178,6 +178,7 @@ percent_difference = ((value_2 - value_1) / value_1) × 100
 | `category_label` | string | No | `"sector"` | Column name | Column identifying categories |
 | `scenario_label` | string | No | `"scenario"` | Column name | Column identifying scenarios |
 | `scenario_sets` | list | No | `None` | List of strings | Names for ensemble groups |
+| `notify_scenarios_transposed` | boolean | No | `false` | `true`, `false` | Print console message when scenarios are automatically transposed |
 | `year_label` | string | No | `"year"` | Column name | Column identifying years |
 | `value_label` | string | No | `"value"` | Column name | Column with numeric data |
 | `region_label` | string | No | `"region"` | Column name | Column identifying regions |
@@ -302,19 +303,39 @@ percent_difference = ((value_2 - value_1) / value_1) × 100
 ```
 
 **Format 2 - Ensemble Comparison (Nested List):**
+
+Users can specify ensemble scenarios in **either of two formats**. The script automatically detects and handles both formats using the `transpose_scenarios_if_needed()` function in `utility_functions.py`.
+
+**Format 2A - Organized by Scenario Set (Recommended):**
+```json
+"scenarios": [
+    ["Control", "Control_2", "Control_3"],
+    ["Full feedback", "Full feedback_2", "Full feedback_3"]
+],
+"scenario_sets": ["Control", "Full feedback"]
+```
+Each inner list contains all ensemble members for one scenario set. This format is more intuitive as it groups related scenarios together.
+
+**Format 2B - Organized by Ensemble Member (Alternative):**
 ```json
 "scenarios": [
     ["Control", "Full feedback"],
     ["Control_2", "Full feedback_2"],
     ["Control_3", "Full feedback_3"]
-]
+],
+"scenario_sets": ["Control", "Full feedback"]
 ```
+Each inner list is one ensemble member.
 
 **Behavior by Plot Type:**
 - **Single scenario:** Shows absolute values
 - **Multiple scenarios (list) + `plot_type: "mean"`:** Shows ensemble mean
 - **Multiple scenarios (list):** Shows absolute or percent difference (2nd - 1st)
 - **Nested list:** Compares ensemble means (Set 2 mean - Set 1 mean)
+
+**Important Notes:**
+- The `scenario_sets` parameter helps the script detect which format you're using
+- Scenario names do not need to follow any specific naming convention
 
 ---
 
@@ -751,12 +772,10 @@ print(gdf.columns)
     "shape_file": "./../2025_DiVittorio_et_al_gcam/gcam_boundaries_moirai_3p1_0p5arcmin_wgs84/reg_glu_boundaries_moirai_combined_3p1_0p5arcmin.shp",
     "output_file": "./../2025_DiVittorio_et_al_gcam/land_allocation_processed_ensemble.csv",
     "scenarios": [
-        ["Control", "Full feedback"],
-        ["Control_2", "Full feedback_2"],
-        ["Control_3", "Full feedback_3"],
-        ["Control_4", "Full feedback_4"],
-        ["Control_5", "Full feedback_5"]
+        ["Control", "Control_2", "Control_3", "Control_4", "Control_5"],
+        ["Full feedback", "Full feedback_2", "Full feedback_3", "Full feedback_4", "Full feedback_5"]
     ],
+    "scenario_sets": ["Control", "Full feedback"],
     "categories": ["forest"],
     "plot_directory": "./../2025_DiVittorio_et_al_gcam/spatial_plots",
     "plot_name": "spatial_land_allocation_forest_ensemble_absolute_difference.pdf",
@@ -786,12 +805,10 @@ print(gdf.columns)
     "shape_file": "./../2025_DiVittorio_et_al_gcam/gcam_boundaries_moirai_3p1_0p5arcmin_wgs84/reg_glu_boundaries_moirai_combined_3p1_0p5arcmin.shp",
     "output_file": "./../2025_DiVittorio_et_al_gcam/scalars_control+full_feedback_ensemble.csv",
     "scenarios": [
-        ["Control", "Full feedback"],
-        ["Control_2", "Full feedback_2"],
-        ["Control_3", "Full feedback_3"],
-        ["Control_4", "Full feedback_4"],
-        ["Control_5", "Full feedback_5"]
+        ["Control", "Control_2", "Control_3", "Control_4", "Control_5"],
+        ["Full feedback", "Full feedback_2", "Full feedback_3", "Full feedback_4", "Full feedback_5"]
     ],
+    "scenario_sets": ["Control", "Full feedback"],
     "categories": ["BioenergyCrop", "Rice", "SugarCrop", "Soybean", "Wheat"],
     "plot_directory": "./../2025_DiVittorio_et_al_gcam/spatial_plots",
     "plot_name": "spatial_vegetation_scalars_ensemble_percent_difference.pdf",
@@ -821,12 +838,10 @@ print(gdf.columns)
     "shape_file": "./../2025_DiVittorio_et_al_gcam/gcam_boundaries_moirai_3p1_0p5arcmin_wgs84/reg_glu_boundaries_moirai_combined_3p1_0p5arcmin.shp",
     "output_file": "./../2025_DiVittorio_et_al_gcam/scalars_control+full_feedback_ensemble.csv",
     "scenarios": [
-        ["Control", "Full feedback"],
-        ["Control_2", "Full feedback_2"],
-        ["Control_3", "Full feedback_3"],
-        ["Control_4", "Full feedback_4"],
-        ["Control_5", "Full feedback_5"]
+        ["Control", "Control_2", "Control_3", "Control_4", "Control_5"],
+        ["Full feedback", "Full feedback_2", "Full feedback_3", "Full feedback_4", "Full feedback_5"]
     ],
+    "scenario_sets": ["Control", "Full feedback"],
     "categories": ["BioenergyCrop", "Rice", "SugarCrop", "Soybean", "Wheat"],
     "plot_directory": "./../2025_DiVittorio_et_al_gcam/spatial_plots",
     "plot_name": "spatial_vegetation_scalars_ensemble_absolute_difference_no_stippling.pdf",
