@@ -81,7 +81,7 @@ def clean_up_dataframe(df, print_to_console=False):
 
 def get_columns_without_units_in_dataframe(df):
     """
-    Returns all column names in a Pandas DataFrame without the units. For example, return 'Mass' if the column name is 'Mass (kg)'.
+    Returns all column names in a Pandas DataFrame after stripping out the units. For example, return 'Mass' if the column name is 'Mass (kg)'.
 
     Parameters:
         df: The input DataFrame.

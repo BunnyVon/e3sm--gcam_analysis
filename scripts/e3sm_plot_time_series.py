@@ -11,10 +11,11 @@ import time
 from utility_constants import *
 from utility_dataframes import get_columns_without_units_in_dataframe, get_matching_column_in_dataframe, perform_ttest, read_file_into_dataframe
 from utility_functions import check_is_list_of_lists, check_substrings_in_list, print_p_values, replace_inside_parentheses, sort_file
+from utility_functions import transpose_scenarios_if_needed
 from utility_plots import *
 
 """ Dictionary of default input values for time series plots. """
-default_inputs_time_series = {
+default_inputs = {
     'areas_in_thousands_km2': True,
     'end_year': 2100,
     'error_bars_alpha': 0.2,
@@ -33,6 +34,7 @@ default_inputs_time_series = {
     'monthly_time_series_x_limits': axis_limits_default,
     'monthly_time_series_y_limits': axis_limits_default,
     'multiplier': 1,
+    'notify_output_files_transposed': False,
     'p_value_file': 'p_values.dat',
     'p_value_file_print_only_if_below_threshold': True,
     'p_value_marker': 'o',
@@ -41,7 +43,7 @@ default_inputs_time_series = {
     'plot_colors': plot_colors_default,
     'plot_directory': './',
     'plot_percent_difference': False,
-    'plot_type': 'ensemble_averages',
+    'plot_type': 'ensemble',
     'produce_png': produce_png_default, 
     'seasons_to_plot_separately': {'MAM': False, 'JJA': False, 'SON': False, 'DJF': False},
     'start_year': 2015,
@@ -102,14 +104,27 @@ def process_inputs(inputs):
         inputs['variables'] = variables
 
     # Add keys for plotting options that have not been specified in the inputs dictionary, and set to an empty dictionary or use default values.
-    for key in default_inputs_time_series.keys():
+    for key in default_inputs.keys():
         if key not in inputs:
             if key in ['include_seasons', 'seasons_to_plot_separately']:
                 # For these two plotting options, set them as empty dictionaries if they are not keys in the inputs dictionary.
                 inputs[key] = {}
             else:
                 # Use the default values for the other plotting options.
-                inputs[key] = default_inputs_time_series[key]
+                inputs[key] = default_inputs[key]
+
+    # If the output files are specified as a list of lists (for ensemble plots), check if they need to be transposed.
+    # Users can now specify output files in two formats:
+    #   Format A (organized by ensemble member - original format):
+    #       [["Control", "Full feedback"], ["Control_2", "Full feedback_2"], ...]
+    #   Format B (organized by file set - new user-friendly format):
+    #       [["Control", "Control_2", ...], ["Full feedback", "Full feedback_2", ...]]
+    # The plotting functions expect Format A internally, so Format B will be automatically transposed.
+    if check_is_list_of_lists(inputs['output_files']):
+        output_labels = inputs.get('output_labels', None)
+        inputs['output_files'], was_transposed = transpose_scenarios_if_needed(inputs['output_files'], output_labels)
+        if was_transposed and inputs['notify_output_files_transposed']:
+            print(f"Note: Output files were automatically transposed from 'organized by file set' format to 'organized by ensemble member' format.")
 
     # If the user specified anything other than a dictionary (e.g., a single value [string, integer, float] or a list) for the other plotting options, 
     # assume that they want to use that value/list for all the variables. Enable this by creating dictionaries with the keys given by the variables. 
@@ -134,7 +149,7 @@ def process_inputs(inputs):
     for variable in variables:
         # Use the default for the plot directory and create the directory if it does not already exist.
         if not any(key == variable for key in inputs['plot_directory'].keys()):
-            inputs['plot_directory'][variable] = default_inputs_time_series['plot_directory']
+            inputs['plot_directory'][variable] = default_inputs['plot_directory']
         if not os.path.exists(inputs['plot_directory'][variable]):
             os.makedirs(inputs['plot_directory'][variable])
         # Default for the plot names is to call it 'time_series_[var_name]', where '[var_name]' is the name of the variable.
@@ -145,11 +160,11 @@ def process_inputs(inputs):
         # Default for the y_label of a variable is to use the column header for that variable from the DataFrame.
         if not any(key == variable for key in inputs['y_label'].keys()):
             inputs['y_label'][variable] = get_matching_column_in_dataframe(df, variable)
-        # Default for the other plotting options are specified in the default_inputs_time_series dictionary.
+        # Default for the other plotting options are specified in the default_inputs dictionary.
         for key, value in inputs.items():
             if key not in ['variables', 'plot_directory', 'plot_name', 'y_label']:
                 if not any(value_key == variable for value_key in value.keys()):
-                    inputs[key][variable] = default_inputs_time_series[key]
+                    inputs[key][variable] = default_inputs[key]
 
     # Now that the dictionary has been populated with complete plotting options for each variable, separate it into a list of dictionaries,
     # where each of these smaller dictionaries contain the plotting options for a single variable. Return this list of dictionaries.
@@ -292,10 +307,10 @@ def read_file_set_into_single_variable_dataframe(output_files, file_set_index, v
 def plot_time_series(inputs):
     """ 
     Create time series plots and performs statistical analysis for a single variable. 
-    Time series plots can be annual, with time presented in years (including seasonal variants that can be plotted separately), or 
+    Time series plots can be either annual, with time presented in years (including seasonal variants that can be plotted separately), or 
     monthly, in which the values that are plotted indicate averages between specified start and end years for each month. 
-    Types of plots: 1) Direct plots in which each output file is treated as an individual curve in the time series collection. 2) Ensemble plots in 
-    which the files are grouped into sets and averages of each set are plotted. Output files must be specified as a list of lists for ensemble plots.
+    Types of plots: 1) Individual plots in which each output file is treated as an individual curve in the time series collection. 
+    2) Ensemble plots in which the files, arranged in a list of lists, are grouped into sets and averages of each set are plotted. 
 
     Parameters:
         input: Dictionary containing user inputs for different plotting options, where the keys are options and values are choices for those options.
@@ -397,11 +412,12 @@ def plot_time_series(inputs):
     df_all_annual_time_series = pd.DataFrame()
     df_all_monthly_time_series = pd.DataFrame()
 
-    # Direct plots, in which each such time series plot can include one or more sets of individual (not grouped) curves.
-    if not check_is_list_of_lists(output_files) or plot_type == 'direct':
+    # Option 1: individual plots, in which each such time series plot can include one or more sets of individual (not grouped) curves.
+    if not check_is_list_of_lists(output_files) or plot_type == 'individual':
         
-        # If output_files is a list of lists, but we want a direct plot, unpack output_files into a list of strings, one string for each output file.
-        if check_is_list_of_lists(output_files) and plot_type == 'direct':
+        # If output_files is entered as a list of lists, but we want an individual plot, unpack output_files into a 1D list of strings, 
+        # with one string for each output file.
+        if check_is_list_of_lists(output_files) and plot_type == 'individual':
             # Turn the corresponding output_labels and plot_colors to list of lists with enough rows to match output_labels, then unpack them.
             output_labels = [output_labels]*len(output_files)
             output_labels = list(itertools.chain.from_iterable(output_labels))
@@ -431,11 +447,12 @@ def plot_time_series(inputs):
             if plot_percent_difference:
                 if file_index == 0:
                     reference_data['annual'] = y
+                # Add a tiny number to avoid divide-by-zero errors.
                 y = (y - reference_data['annual'])/(reference_data['annual'] + EPSILON)*100
                     
             # Plot the annual time series, including possibly the error bars. 
             x = df.groupby('Year', as_index=False).mean()['Year']
-            # Do not include the first file if plotting a percent difference. Include the data in the plot otherwise.
+            # Do not include the first file if plotting a percent difference. But include it in the plot otherwise.
             if not plot_percent_difference or file_index != 0:
                 ax.plot(x, y, label=output_label, color=line_color, linestyle=linestyle_tuples[0][1], linewidth=linewidth)
             # Join the annual time series data from the current file into the larger DataFrame.
@@ -445,7 +462,7 @@ def plot_time_series(inputs):
             y_series = pd.Series(y, name=f'{column}_{file_index}')
             df_all_annual_time_series = pd.concat([df_all_annual_time_series, y_series], axis=1)
 
-            # Add time series for one or more seasonal averages if specified to do so.
+            # Add time series for one or more seasonal averages to the annual plot if specified to do so.
             if monthly_aggregation_type == 'mean' and any(include_seasons.values()):
                 reference_data = plot_seasons(include_seasons, ax, df, x, output_label, line_color, linestyle_tuples, linewidth, columns=column, 
                                               reference_data=reference_data, file_or_file_set_index=file_index)
@@ -509,11 +526,11 @@ def plot_time_series(inputs):
                     test_data = df[column + f'_{file_index}']
                     ttest = stats.ttest_ind(control_data, test_data)
                     print_p_values(ttest, variable, p_value_threshold, p_value_file, output_file, p_value_file_print_only_if_below_threshold)
-    
-    # Ensemble plots, in which the ensemble is further subdivided into sets/groups of curves.
-    elif check_is_list_of_lists(output_files) and plot_type == 'ensemble_averages':
 
-        # Get the total number of file sets (groups) in the ensemble and iterate over each set.
+    # Option 2: ensemble plots, in which the outputs are subdivided into groups of curves, where each group (ensemble) represents a set of files.
+    elif check_is_list_of_lists(output_files) and plot_type == 'ensemble':
+
+        # Get the total number of file sets (groups/ensembles) and iterate over each set.
         num_file_sets = len(output_files[0])
         for file_set_index in range(num_file_sets):
 
@@ -546,7 +563,7 @@ def plot_time_series(inputs):
 
             # Plot the annual time series, including possibly the error bars. 
             x = df.groupby('Year', as_index=False).mean()['Year']
-            # Do not include the first file set if plotting a percent difference. Include the data in the plot otherwise.
+            # Do not include the first file set if plotting a percent difference. Include it in the plot otherwise.
             if not plot_percent_difference or file_set_index != 0:
                 ax.plot(x, y, label=output_label, color=line_color, linestyle=linestyle_tuples[0][1], linewidth=linewidth)
                 if std_annual_multiplier:
@@ -588,7 +605,7 @@ def plot_time_series(inputs):
                 # Join the monthly time series data from the current file into the larger DataFrame.
                 df_all_monthly_time_series = pd.concat([df_all_monthly_time_series, df.groupby('Month', as_index=False).mean()], axis=1)
 
-        # Calculate the mean and error bars for each of the annual and monthly time series data set groups. Perform multiple different t-tests.
+        # Calculate the mean and error bars for each of the annual and monthly time series data set ensembles. Perform multiple different t-tests.
         conditions = [include_annual_mean_across_all_sets, monthly_time_series_plot and include_monthly_mean_across_all_sets]
         dataframes = [df_all_annual_time_series, df_all_monthly_time_series]
         time_columns = ['Year', 'Month']
@@ -602,15 +619,15 @@ def plot_time_series(inputs):
 
                 # Remove the duplicate 'Year' or 'Month' columns.
                 df = df.loc[:,~df.columns.duplicated()]
-                # Create DataFrame to store the means of each of the data set groups.
+                # Create DataFrame to store the means of each of the data set ensembles.
                 df_all_data_set_means = pd.DataFrame()
 
-                # Get all columns (except for the time) and find the columns for the first (assumed to be control) set. Calculate control set mean.
+                # Get all columns except for time and find the columns for the first (assumed to be control) set/ensemble. Calculate control set mean.
                 columns = get_matching_column_in_dataframe(df, variable, all_matches=True)
                 columns_control_set = [column for column in columns if column.endswith(f'_0')]
                 df_control_mean = df[columns_control_set].mean(axis=1)
 
-                # For each of the non-control set, perform a t-test at each individual time period against the control, as well as an overall t-test.
+                # For each of the non-control sets, perform a t-test at each individual time period against the control, as well as an overall t-test.
                 for file_set_index in range(1, num_file_sets):
 
                     # Calculate the mean of the current set.
@@ -629,6 +646,7 @@ def plot_time_series(inputs):
                     if plot_percent_difference:
                         df_this_set_mean = (df_this_set_mean - df_control_mean)/df_control_mean*100
                     df_all_data_set_means = pd.concat([df_all_data_set_means, df_this_set_mean], axis=1)
+                    # Plot markers at the time periods where the p-value is below the threshold.
                     axis.plot(df[time_column][mask], df_this_set_mean[mask], marker=p_value_marker, markersize=p_value_marker_size, 
                               linestyle='None', color=color)
                     
@@ -636,10 +654,10 @@ def plot_time_series(inputs):
                     # If plotting a percent difference with respect to the first file (control) set, the data for the control should be set to zeros.
                     df_control_mean -= df_control_mean
                 else:
-                    # If not plotting a percent difference, include the control set in the ensemble mean over all data sets.
+                    # If not plotting a percent difference, include the control set in the mean over all data sets.
                     df_all_data_set_means = pd.concat([df_all_data_set_means, df_control_mean], axis=1)
 
-                # Calculate the ensemble mean, which is the mean of each of the data set means, and the error bars on this ensemble mean.
+                # Calculate the mean over all data sets, which is the mean of each of the data set means, and the error bars on this overall mean.
                 if condition:
                     x = df[time_column]
                     y = df_all_data_set_means.mean(axis=1)
@@ -687,7 +705,7 @@ if __name__ == '__main__':
         input_file = sys.argv[i]
         with open(input_file) as f:
             inputs.extend(json.load(f))
-
+    
     # Process each dictionary to produce a list of smaller dictionaries, where each smaller dictionary specifies options for a single plot.
     start_time = time.time()
     list_of_inputs = []

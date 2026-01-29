@@ -42,7 +42,7 @@ default_inputs = {
     'plot_colors': plot_colors_default,
     'plot_directory': './',
     'plot_percent_difference': False,
-    'plot_type': 'ensemble_averages',
+    'plot_type': 'ensemble',
     'produce_png': produce_png_default, 
     'region_label': 'region', 
     'regions': ['Global'],
@@ -405,7 +405,7 @@ def plot_time_series(inputs):
                     print_p_values(ttest, label, p_value_threshold, p_value_file, plot_name, p_value_file_print_only_if_below_threshold)
 
     # Option 2: ensemble plots, in which the outputs are subdivided into groups of curves, where each group (ensemble) represents a set of scenarios.
-    elif check_is_list_of_lists(scenarios) and plot_type == 'ensemble_averages':
+    elif check_is_list_of_lists(scenarios) and plot_type == 'ensemble':
 
         # Get the total number of scenario sets (i.e., groups or ensembles) and the number of scenarios in each set.
         num_scenario_sets = len(scenarios[0])

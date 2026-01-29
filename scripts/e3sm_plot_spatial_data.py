@@ -12,37 +12,38 @@ import uxarray as ux
 import xarray as xr
 from utility_constants import *
 from utility_dataframes import perform_ttest
-from utility_functions import check_is_list_of_lists, print_p_values, replace_inside_parentheses, sort_file
+from utility_functions import check_is_list_of_lists, print_p_values, replace_inside_parentheses, sort_file, transpose_scenarios_if_needed
 from utility_plots import *
 from utility_xarray import calculate_statistics_of_xarray, convert_xarray_to_uxarray
 
 """ Dictionary of default input values for spatial plots. """
-default_inputs_spatial_data = {
-                    'cbar_label_size': tick_label_size_default,
-                    'cbar_limits': None,
-                    'cbar_on': True,
-                    'cbar_x_offset': 0.06,
-                    'cmap': 'bwr',
-                    'end_year': 2090,
-                    'grid_file': None,
-                    'height': height_default,
-                    'multiplier': 1,
-                    'p_value_file': "p_values.dat",
-                    'p_value_file_print_only_if_below_threshold': True,
-                    'p_value_threshold': 0.05,
-                    'plot_directory': './',
-                    'plot_type': 'absolute_difference',
-                    'produce_png': False,
-                    'projection': ccrs.Robinson,
-                    'start_year': 2071,
-                    'statistics_panel_size': legend_label_size_default,
-                    'stippling_hatches': 'xxxx',
-                    'stippling_on': False,
-                    'stippling_std_multiple': 2,
-                    'time_calculation': 'mean',
-                    'title_size': axis_label_size_default, 
-                    'use_latex': False,
-                    'width': width_default               
+default_inputs = {
+    'cbar_label_size': tick_label_size_default,
+    'cbar_limits': None,
+    'cbar_on': True,
+    'cbar_x_offset': 0.06,
+    'cmap': 'bwr',
+    'end_year': 2090,
+    'grid_file': None,
+    'height': height_default,
+    'multiplier': 1,
+    'notify_scenarios_transposed': False,
+    'p_value_file': "p_values.dat",
+    'p_value_file_print_only_if_below_threshold': True,
+    'p_value_threshold': 0.05,
+    'plot_directory': './',
+    'plot_type': 'absolute_difference',
+    'produce_png': False,
+    'projection': ccrs.Robinson,
+    'start_year': 2071,
+    'statistics_panel_size': legend_label_size_default,
+    'stippling_hatches': 'xxxx',
+    'stippling_on': False,
+    'stippling_std_multiple': 2,
+    'time_calculation': 'mean',
+    'title_size': axis_label_size_default, 
+    'use_latex': False,
+    'width': width_default               
 }
 
 def process_inputs(inputs):
@@ -80,9 +81,9 @@ def process_inputs(inputs):
         inputs['variables'] = variables
 
     # For the plotting options that have not been specified in the inputs dictionary, add keys for them if necessary and use the default values.
-    for key in default_inputs_spatial_data.keys():
+    for key in default_inputs.keys():
         if key not in inputs:
-            inputs[key] = default_inputs_spatial_data[key]
+            inputs[key] = default_inputs[key]
 
     # If the user specified anything other than a dictionary (e.g., a single value [string, integer, float] or a list) for the other plotting options, 
     # assume that they want to use that value/list for all the variables. Enable this by creating dictionaries with the keys given by the variables. 
@@ -100,7 +101,7 @@ def process_inputs(inputs):
     for variable in variables:
         # Use the default for the plot directory and create the directory if it does not already exist.
         if not any(key == variable for key in inputs['plot_directory'].keys()):
-            inputs['plot_directory'][variable] = default_inputs_spatial_data['plot_directory']
+            inputs['plot_directory'][variable] = default_inputs['plot_directory']
         if not os.path.exists(inputs['plot_directory'][variable]):
             os.makedirs(inputs['plot_directory'][variable])
         # Default for the plot names is to call it 'spatial_[var_name]', where '[var_name]' is the name of the variable.
@@ -115,11 +116,11 @@ def process_inputs(inputs):
             # Replace /m2 with /m$^2$ in the units for the variable, so that it gets rendered correctly.
             units = units.replace('/m2', '/m$^2$')
             inputs['title'][variable] = rf'{variable} ({units})'
-        # Default for the other plotting options are specified in the default_inputs_spatial_data dictionary.
+        # Default for the other plotting options are specified in the default_inputs dictionary.
         for key, value in inputs.items():
             if key not in ['variables', 'plot_directory', 'plot_name', 'title']:
                 if not any(value_key == variable for value_key in value.keys()):
-                    inputs[key][variable] = default_inputs_spatial_data[key]
+                    inputs[key][variable] = default_inputs[key]
 
     # Now that the dictionary has been populated with complete plotting options for each variable, separate it into a list of dictionaries,
     # where each of these smaller dictionaries contain the plotting options for a single variable. Return this list of dictionaries.

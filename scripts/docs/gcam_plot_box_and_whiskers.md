@@ -194,7 +194,7 @@ Scenarios are grouped into sets, boxes show combined distribution from ensemble 
 | `hue` | string | No | `None` | Column name or `None` | Variable for color-coding boxes |
 | `plot_directory` | string | No | `"./"` | Valid directory path | Directory for output plots |
 | `plot_name` | string | No | Auto-generated | Filename with .pdf extension | Name of output plot file |
-| `plot_type` | string | No | `"ensemble_averages"` | `"ensemble_averages"`, `"individual"` | Type of plot to create |
+| `plot_type` | string | No | `"ensemble"` | `"ensemble"`, `"individual"` | Type of plot to create |
 | `plot_percent_difference` | boolean | No | `false` | `true`, `false` | Plot percent difference from first scenario |
 
 ### Aggregation & Processing Parameters
@@ -1386,7 +1386,7 @@ print(f"Years: {df['year'].min()} to {df['year'].max()}")
     'plot_colors': Matplotlib Tableau colors (see utility_plots.py),
     'plot_directory': './',
     'plot_percent_difference': False,
-    'plot_type': 'ensemble_averages',
+    'plot_type': 'ensemble',
     'produce_png': False, 
     'region_label': 'region', 
     'regions': ['Global'],

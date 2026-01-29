@@ -37,7 +37,7 @@ default_inputs = {
     'plot_colors': plot_colors_default,
     'plot_directory': './',
     'plot_percent_difference': False,
-    'plot_type': 'ensemble_averages',
+    'plot_type': 'ensemble',
     'produce_png': produce_png_default, 
     'region_label': 'region', 
     'regions': ['Global'],
@@ -256,7 +256,7 @@ def plot_box_and_whiskers(inputs):
         scenario_list = scenarios
     
     # Option 2: ensemble plots, in which the outputs are subdivided into groups, where each group (ensemble) represents a set of scenarios.
-    elif check_is_list_of_lists(scenarios) and plot_type == 'ensemble_averages':
+    elif check_is_list_of_lists(scenarios) and plot_type == 'ensemble':
         # For each scenario set, collect all scenarios that belong to that set and put in a DataFrame, then concatenate the DataFrames for all sets.
         dataframes = []
         for index, scenario_set_name in enumerate(scenario_sets):

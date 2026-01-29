@@ -332,7 +332,7 @@ Value
 |-----------|------|----------|---------|-----------------|-------------|
 | `plot_directory` | string | No | `"./"` | Valid directory path | Directory for output plots |
 | `plot_name` | string | No | Auto-generated | Filename with .pdf extension | Name of output plot file |
-| `plot_type` | string | No | `"ensemble_averages"` | `"ensemble_averages"`, `"individual"` | Type of plot to create |
+| `plot_type` | string | No | `"ensemble"` | `"ensemble"`, `"individual"` | Type of plot to create |
 | `plot_percent_difference` | boolean | No | `false` | `true`, `false` | Plot percent difference from first scenario |
 | `y_label` | string | No | Auto-generated | Any string | Y-axis label |
 | `y_scale` | string | No | `"linear"` (from utility_plots.py) | `"linear"`, `"log"` | Y-axis scale |
@@ -2262,7 +2262,7 @@ Before finalizing plots:
     'p_value_threshold': 0.05,
     'plot_directory': './',
     'plot_percent_difference': False,
-    'plot_type': 'ensemble_averages',
+    'plot_type': 'ensemble',
     'region_label': 'region',
     'regions': ['Global'],
     'scenario_label': 'scenario',
