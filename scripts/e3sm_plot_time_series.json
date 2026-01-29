@@ -121,7 +121,7 @@
         ],
         "output_labels": ["Control", "Full feedback", "Ag scaling", "Carbon scaling"],
         "plot_type": "individual", 
-        "plot_directory": "./../2025_DiVittorio_et_al_e3sm/time_series_plots/individual_not_grouped_into_ensemble",
+        "plot_directory": "./../2025_DiVittorio_et_al_e3sm/time_series_plots/individual_override_ensemble_default",
         "y_label": {"ZCO2": "CO$_2$ concentration (ppm)", "SFCO2": "CO$_2$ surface flux (Pg C/month)"},
         "monthly_aggregation_type": {"PRECIP": "sum", "NPP": "sum"},
         "x_limits": {"ZCO2": [2015, 2100]},
