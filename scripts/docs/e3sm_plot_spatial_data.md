@@ -4,11 +4,12 @@
 
 **Script Name:** `e3sm_plot_spatial_data.py`
 
-**Purpose:** Creates publication-quality spatial (map) plots from E3SM NetCDF data files with support for absolute differences, percent differences, ensemble analysis, statistical significance testing (stippling), and separate visualizations for different scenarios.
+**Purpose:** Creates publication-quality spatial (map) plots from E3SM NetCDF data files with support for absolute differences, percent differences, means, sums, ensemble analysis, statistical significance testing (stippling), and separate visualizations for different scenarios.
 
 **Key Capabilities:**
 - Global and regional spatial maps
 - Absolute and percent difference plots
+- Mean or sum across multiple individual files
 - Ensemble mean with statistical significance stippling
 - Separate plots for individual scenarios or ensemble members
 - Support for both ELM (structured grid) and EAM (unstructured grid)
@@ -30,13 +31,14 @@
 3. [Basic Usage](#basic-usage)
 4. [Complete Parameter Reference](#complete-parameter-reference)
 5. [Plot Types Explained](#plot-types-explained)
-6. [Statistical Testing Explained](#statistical-testing-explained)
-7. [Ensemble File Organization](#ensemble-file-organization)
-8. [ELM vs EAM Differences](#elm-vs-eam-differences)
-9. [Comprehensive JSON Examples](#comprehensive-json-examples)
-10. [Output Files](#output-files)
-11. [Best Practices](#best-practices)
-12. [Troubleshooting](#troubleshooting)
+6. [Individual vs Ensemble Plots](#individual-vs-ensemble-plots)
+7. [Statistical Testing Explained](#statistical-testing-explained)
+8. [Ensemble File Organization](#ensemble-file-organization)
+9. [ELM vs EAM Differences](#elm-vs-eam-differences)
+10. [Comprehensive JSON Examples](#comprehensive-json-examples)
+11. [Output Files](#output-files)
+12. [Best Practices](#best-practices)
+13. [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -80,7 +82,7 @@ python e3sm_plot_spatial_data.py elm_config.json eam_config.json
 
 1. Reads JSON configuration file(s)
 2. Loads NetCDF spatial data files (from `e3sm_extract_spatial_data_h0.py`)
-3. Calculates temporal means/differences over specified years
+3. Calculates temporal means/sums/differences over specified years
 4. Performs statistical testing (aggregated and per-gridcell)
 5. Creates spatial maps with:
    - Coastlines
@@ -104,7 +106,7 @@ python e3sm_plot_spatial_data.py elm_config.json eam_config.json
 ### Core Optional Parameters
 
 | Parameter | Type | Required | Default | Description |
-|-----------|------|---------|---------|-------------|
+|-----------|------|----------|---------|-------------|
 | `variables` | list or `'all'` | No | `'all'` | Variables to plot |
 | `plot_type` | string | No | `'absolute_difference'` | Plot type (see below) |
 | `start_year` | integer | No | `2071` | First year for temporal averaging |
@@ -112,13 +114,13 @@ python e3sm_plot_spatial_data.py elm_config.json eam_config.json
 | `time_calculation` | string | No | `'mean'` | `'mean'` or `'sum'` for temporal aggregation |
 | `grid_file` | string | No | `None` | **Required for EAM**, grid file path |
 | `netcdf_file_sets` | list | No | Auto-generated | Labels for ensemble file sets |
-| `mean_or_sum_if_over_a_single_dataset` | string | No | `'mean'` | For single file: `'mean'` or `'sum'` |
 
 **Plot Type Options:**
 - `'absolute_difference'` - Scenario minus control (default)
 - `'percent_difference'` - (Scenario - Control) / Control × 100
 - `'separate_plots'` - Individual plots for each scenario/ensemble
-
+- `'mean'` - Mean across multiple individual files
+- `'sum'` - Sum across multiple individual files
 
 ### Visual Customization
 
@@ -179,32 +181,16 @@ python e3sm_plot_spatial_data.py elm_config.json eam_config.json
 **Description:** Shows scenario minus control in original units
 
 **When to Use:**
-- Multiple files provided
+- Comparing two scenarios/ensembles
 - Want actual magnitude of changes
 - Variables where absolute change is meaningful
 
-**Processing:**
-- **Individual (simple list):** Averages all files, then subtracts first from average
-- **Ensemble (nested list):** Calculates ensemble mean for each set, then difference
+**Requirements:** Exactly 2 files/ensembles
 
 **Formula:**
 ```
-Difference = Scenario_ensemble_mean - Control_ensemble_mean
+Difference = Scenario - Control
 ```
-
-**Example:**
-```json
-{
-    "netcdf_files": [
-        ["control.nc", "control_2.nc", "control_3.nc"],
-        ["scenario.nc", "scenario_2.nc", "scenario_3.nc"]
-    ],
-    "netcdf_file_sets": ["Control", "Scenario"],
-    "plot_type": "absolute_difference"
-}
-```
-
-**Output:** GPP change of +2.5 gC/m²/month shown on map
 
 ---
 
@@ -217,22 +203,14 @@ Difference = Scenario_ensemble_mean - Control_ensemble_mean
 - Variables with widely varying magnitudes
 - Comparing fractional impacts
 
+**Requirements:** Exactly 2 files/ensembles
+
 **Formula:**
 ```
 % Difference = (Scenario - Control) / |Control| × 100
 ```
 
 **Auto-limits:** Sets colorbar to [-100, 100]% if max exceeds 100%
-
-**Example:**
-```json
-{
-    "netcdf_files": ["control.nc", "scenario.nc"],
-    "plot_type": "percent_difference"
-}
-```
-
-**Output:** GPP change of +15% shown on map
 
 ---
 
@@ -245,25 +223,123 @@ Difference = Scenario_ensemble_mean - Control_ensemble_mean
 - Side-by-side comparison in publications
 - Showing spatial patterns individually
 
+**Works with:** Any number of files/ensembles
+
+**Output:**
+- Individual plots: One map per file
+- Ensemble plots: One ensemble mean map per set
+
+---
+
+### 4. Mean (`plot_type: "mean"`)
+
+**Description:** Averages across multiple individual files
+
+**When to Use:**
+- Multiple files from same scenario (e.g., ensemble members)
+- Want to see average spatial pattern
+- Reducing noise across realizations
+
+**Requirements:** Simple list of files (not nested)
+
 **Processing:**
-- **Individual (simple list):** One map per file
-- **Ensemble (nested list):** One ensemble mean map per set
+```
+Mean = (File1 + File2 + ... + FileN) / N
+```
 
 **Example:**
 ```json
 {
-    "netcdf_files": [
-        ["control.nc", "control_2.nc"],
-        ["scenario.nc", "scenario_2.nc"]
-    ],
-    "netcdf_file_sets": ["Control", "Scenario"],
-    "plot_type": "separate_plots"
+    "netcdf_files": ["file1.nc", "file2.nc", "file3.nc", "file4.nc", "file5.nc"],
+    "plot_type": "mean"
 }
 ```
 
-**Output:**
-- `spatial_GPP_set_1.pdf` (Control ensemble mean)
-- `spatial_GPP_set_2.pdf` (Scenario ensemble mean)
+**Output:** Single map showing average across all 5 files
+
+---
+
+### 5. Sum (`plot_type: "sum"`)
+
+**Description:** Sums across multiple individual files
+
+**When to Use:**
+- Variables that should be aggregated (e.g., precipitation components)
+- Combining related variables
+- Total fluxes across ensemble
+
+**Requirements:** Simple list of files (not nested)
+
+**Processing:**
+```
+Sum = File1 + File2 + ... + FileN
+```
+
+**Example:**
+```json
+{
+    "netcdf_files": ["precip_conv.nc", "precip_large.nc"],
+    "plot_type": "sum",
+    "variables": ["PRECIP"]
+}
+```
+
+**Output:** Single map showing total precipitation (convective + large-scale)
+
+---
+
+## Individual vs Ensemble Plots
+
+### Individual Plots (Simple List)
+
+**Structure:** Flat list of files
+```json
+{
+    "netcdf_files": ["file1.nc", "file2.nc", "file3.nc"]
+}
+```
+
+**Processing Options:**
+- **2 files + `absolute_difference`:** Shows difference
+- **2 files + `percent_difference`:** Shows % difference
+- **N files + `separate_plots`:** Shows N individual maps
+- **N files + `mean`:** Shows average across N files
+- **N files + `sum`:** Shows sum across N files
+
+**Statistical Testing:** Aggregated only (when differencing)
+
+**No per-gridcell testing** (no ensemble structure)
+
+---
+
+### Ensemble Plots (Nested List)
+
+**Structure:** List of lists (rows = file sets)
+```json
+{
+    "netcdf_files": [
+        ["ctrl.nc", "ctrl_2.nc", "ctrl_3.nc"],
+        ["scen.nc", "scen_2.nc", "scen_3.nc"]
+    ],
+    "netcdf_file_sets": ["Control", "Scenario"]
+}
+```
+
+**Limitation:** Currently limited to **exactly 2 ensembles**
+
+**Processing:**
+- Calculates ensemble mean for each set
+- Then applies plot_type (absolute_difference, percent_difference, separate_plots)
+
+**Statistical Testing:**
+- Aggregated across all gridcells
+- Per-gridcell (ELM only) with stippling
+
+**Requirements for stippling:**
+- Nested list structure
+- ≥2 members per ensemble
+- ELM data only
+- `stippling_on: true`
 
 ---
 
@@ -271,15 +347,15 @@ Difference = Scenario_ensemble_mean - Control_ensemble_mean
 
 The script performs **two types of statistical tests**:
 
-### 1. Aggregated t-test (Always Performed)
+### 1. Aggregated t-test (Always Performed When Comparing)
 
 **What:** Tests if means differ across all gridcells combined
 
-**When:** Both individual and ensemble configurations
+**When:** Both individual and ensemble configurations with 2 files/sets
 
 **How:**
-- Takes all gridcell values for Control
-- Takes all gridcell values for Scenario
+- Takes all gridcell values for first file/ensemble
+- Takes all gridcell values for second file/ensemble
 - Performs two-sample t-test
 - Records p-value in file
 
@@ -299,8 +375,9 @@ GPP in Scenario: 1.234e-04
 
 **When:** 
 - Nested list configuration (ensemble)
-- ≥2 members per scenario
+- ≥2 members per ensemble
 - **ELM data only** (too slow for EAM unstructured grid)
+- `stippling_on: true`
 
 **How:**
 - At gridcell (45°N, 90°W): Compare Control ensemble vs Scenario ensemble
@@ -320,27 +397,20 @@ GPP in Scenario: 1.234e-04
 
 **Individual Files (simple list):**
 ```
-✓ Aggregated (all gridcells) - saved to file
-✗ Per-gridcell - not applicable (need ensemble)
+2 files + difference:
+  ✓ Aggregated (all gridcells) - saved to file
+  ✗ Per-gridcell - not applicable
+
+N files + mean/sum:
+  ✗ No statistical testing
 ```
 
-**Ensemble Files (nested list):**
+**Ensemble Files (nested list, 2 ensembles only):**
 ```
 ✓ Aggregated (all gridcells) - saved to file
 ✓ Per-gridcell (ELM only) - stippling on map
 ✗ Per-gridcell (EAM) - disabled (too slow)
 ```
-
-**P-Value File Contents:**
-```
-GPP in Full feedback: 2.345e-05
-NPP in Full feedback: 1.234e-03
-```
-
-**Stippling Controls:**
-- `stippling_on`: Enable/disable (default: false)
-- `p_value_threshold`: Significance level (default: 0.05)
-- `stippling_hatches`: Pattern style (default: 'xxxx')
 
 ---
 
@@ -362,11 +432,6 @@ Each row groups all ensemble members for one scenario:
 }
 ```
 
-**Structure:**
-- Row 1: All Control files
-- Row 2: All Full feedback files
-- Easy to see which files belong to each scenario
-
 ---
 
 ### Option 2: Organized by Ensemble Member
@@ -386,11 +451,6 @@ Each row contains one member from each scenario:
 }
 ```
 
-**Structure:**
-- Row 1: Member 1 for all scenarios
-- Row 2: Member 2 for all scenarios
-- Easy to add/remove ensemble members
-
 ---
 
 ### Automatic Detection
@@ -400,6 +460,8 @@ The script automatically detects which organization you're using.
 **Both produce identical results!** Use whichever is more intuitive.
 
 **Tip:** Always provide `netcdf_file_sets` to label your scenarios clearly.
+
+**Note:** Ensemble plots currently limited to 2 file sets.
 
 ---
 
@@ -471,7 +533,6 @@ The script automatically detects which organization you're using.
 - `spatial_GPP.pdf` - Control GPP map (2071-2090 mean)
 - `spatial_NPP.pdf` - Control NPP map
 - `spatial_NBP.pdf` - Control NBP map
-- `spatial_ER.pdf` - Control ER map
 - ... (all variables in NetCDF file)
 
 **Statistics panel on each map:**
@@ -483,9 +544,7 @@ Min: -2.34e-01
 Std: 2.67e+00
 ```
 
-**No statistical testing** (only one file, nothing to compare)
-
-**Use case:** Visualizing baseline/control spatial patterns
+**No statistical testing** (only one file)
 
 ---
 
@@ -503,8 +562,6 @@ Std: 2.67e+00
 **What This Creates:**
 
 Same as Example 1, but for Full feedback scenario
-
-**Use case:** Visualizing scenario spatial patterns independently
 
 ---
 
@@ -525,19 +582,16 @@ Same as Example 1, but for Full feedback scenario
 **What This Creates:**
 
 **Difference maps (Full feedback - Control):**
-- `spatial_GPP.pdf` - Difference map showing where GPP increased/decreased
 - Positive values (red): GPP increased in Full feedback
 - Negative values (blue): GPP decreased in Full feedback
 - White/near-zero: Little change
 
-**Example interpretation for GPP:**
-- Amazon: +5 to +10 gC/m²/month (strong increase, red)
-- Sahara: ±0.1 gC/m²/month (minimal change, white)
-- Northern Canada: +2 to +4 gC/m²/month (moderate increase, light red)
+**Example for GPP:**
+- Amazon: +5 to +10 gC/m²/month (strong increase)
+- Sahara: ±0.1 gC/m²/month (minimal change)
+- Northern Canada: +2 to +4 gC/m²/month (moderate increase)
 
-**Statistical testing:**
-- Aggregated t-test in `p_values.dat`
-- Example: `GPP: 1.234e-05` (highly significant globally)
+**Statistical testing:** Aggregated t-test in `p_values.dat`
 
 **No stippling** (simple list, not ensemble)
 
@@ -561,23 +615,55 @@ Same as Example 1, but for Full feedback scenario
 **What This Creates:**
 
 **Percent change maps:**
-- Shows relative change: (Full feedback - Control) / Control × 100
-- Highlights areas with large fractional changes
-
-**Example interpretation for GPP:**
 - Amazon: +25% to +40% (large relative increase)
 - Boreal forests: +10% to +15% (moderate relative increase)
-- Deserts: +/-500% (unreliable, very low base values)
 
-**Colorbar:** Often set to [-100, 100]% for readability
-
-**Statistical testing:** Same as Example 3 (aggregated only)
-
-**Use case:** Emphasizing relative impacts regardless of absolute magnitude
+**Statistical testing:** Aggregated only
 
 ---
 
-#### Example 5: Ensemble Absolute Difference (ELM Config #5)
+#### Example 5: Mean Across Multiple Files (ELM Config #5)
+
+**From JSON file:**
+```json
+{
+    "netcdf_files": [
+        "./full_feedback_spatial_data_elm.nc",
+        "./full_feedback_spatial_data_elm_2.nc",
+        "./full_feedback_spatial_data_elm_3.nc",
+        "./full_feedback_spatial_data_elm_4.nc",
+        "./full_feedback_spatial_data_elm_5.nc"
+    ],
+    "plot_directory": "./spatial_plots/elm_full_feedback_only_individual_mean",
+    "variables": ["HR", "NPP", "ZCO2"],
+    "use_latex": true,
+    "plot_type": "mean"
+}
+```
+
+**What This Creates:**
+
+**Average maps across 5 ensemble members:**
+- `spatial_HR.pdf` - Mean HR across 5 files
+- `spatial_NPP.pdf` - Mean NPP across 5 files
+- `spatial_ZCO2.pdf` - Mean ZCO2 across 5 files
+
+**Processing:**
+```
+For each gridcell:
+  Mean_GPP = (GPP_file1 + GPP_file2 + GPP_file3 + GPP_file4 + GPP_file5) / 5
+```
+
+**No statistical testing** (no comparison being made)
+
+**Use case:** 
+- Visualizing ensemble mean without needing control comparison
+- Showing average pattern across realizations
+- Publication plot of ensemble mean alone
+
+---
+
+#### Example 6: Ensemble Absolute Difference (ELM Config #6)
 
 **From JSON file:**
 ```json
@@ -596,24 +682,17 @@ Same as Example 1, but for Full feedback scenario
 **What This Creates:**
 
 **Ensemble mean difference maps:**
-- Calculates: (Full feedback ensemble mean) - (Control ensemble mean)
-- Each ensemble mean is average of 5 members
-
-**Example for GPP:**
 - Control ensemble mean: 120 ± 5 gC/m²/month (varies by location)
 - Full feedback ensemble mean: 128 ± 6 gC/m²/month
 - Difference map shows: +8 gC/m²/month
 
 **Statistical testing:**
 1. **Aggregated:** Global t-test in `p_values.dat`
-   - Example: `GPP in Full feedback: 3.456e-07`
-2. **Per-gridcell:** NO stippling by default (stippling_on: false)
-
-**Use case:** Robust difference estimates with ensemble uncertainty
+2. **Per-gridcell:** NO stippling (stippling_on not set)
 
 ---
 
-#### Example 6: Ensemble Percent Difference with Stippling (ELM Config #6)
+#### Example 7: Ensemble Percent Difference with Stippling (ELM Config #7)
 
 **From JSON file:**
 ```json
@@ -633,27 +712,20 @@ Same as Example 1, but for Full feedback scenario
 **What This Creates:**
 
 **Ensemble mean percent difference with significance:**
-- Shows % change: (Full feedback mean - Control mean) / Control mean × 100
-- **Stippling (xxxx pattern)** where p < 0.05 at individual gridcells
+- Shows % change with **stippling (xxxx pattern)** where p < 0.05
 
 **Example for GPP:**
 - Amazon basin: +35% change, **dense stippling** (highly significant)
-- Sahara: +5% change, no stippling (not significant due to high variability)
-- Boreal: +15% change, **moderate stippling** (significant in some gridcells)
-
-**Statistical testing:**
-1. **Aggregated:** `GPP in Full feedback: 2.345e-08`
-2. **Per-gridcell:** Stippling shows where specific locations differ significantly
+- Sahara: +5% change, no stippling (not significant)
+- Boreal: +15% change, **moderate stippling** (some gridcells significant)
 
 **Interpretation:**
 - Stippled regions: Changes are statistically robust at that location
 - Non-stippled regions: Changes may be due to natural variability
 
-**Use case:** Publication-quality significance testing showing where changes are reliable
-
 ---
 
-#### Example 7: Ensemble Separate Plots with Stippling (ELM Config #7)
+#### Example 8: Ensemble Separate Plots with Stippling (ELM Config #8)
 
 **From JSON file:**
 ```json
@@ -673,26 +745,16 @@ Same as Example 1, but for Full feedback scenario
 **What This Creates:**
 
 **Two separate ensemble mean maps:**
-- `spatial_GPP_set_1.pdf` - Control ensemble mean
-  - Shows absolute GPP values (e.g., 100-150 gC/m²/month)
-  - **Stippling:** Where Control ensemble has high confidence (low variability)
-  
-- `spatial_GPP_set_2.pdf` - Full feedback ensemble mean
-  - Shows absolute GPP values (e.g., 105-160 gC/m²/month)
-  - **Stippling:** Where Full feedback ensemble has high confidence
+- `spatial_GPP_set_1.pdf` - Control ensemble mean (100-150 gC/m²/month)
+- `spatial_GPP_set_2.pdf` - Full feedback ensemble mean (105-160 gC/m²/month)
 
-**Stippling meaning for separate plots:**
-- Tests where ensemble mean differs from individual members
-- Shows regions with consistent behavior across ensemble
-- Based on: |value - ensemble_mean| > N×std (default N=2)
-
-**Use case:** Side-by-side comparison showing absolute values with confidence indicators
+**Stippling meaning:** Shows regions with high ensemble confidence
 
 ---
 
 ### EAM Examples
 
-#### Example 8: Single Control Map (EAM Config #1)
+#### Example 9: Single Control Map (EAM Config #1)
 
 **From JSON file:**
 ```json
@@ -706,22 +768,47 @@ Same as Example 1, but for Full feedback scenario
 
 **What This Creates:**
 
-**Individual spatial maps for all EAM variables:**
-- `spatial_TREFHT.pdf` - Surface temperature map
+**Maps for all EAM variables:**
+- `spatial_TREFHT.pdf` - Surface temperature
 - `spatial_PRECC.pdf` - Convective precipitation
 - `spatial_PRECL.pdf` - Large-scale precipitation
 - `spatial_ZCO2.pdf` - CO₂ concentration
-- ... (all variables in EAM NetCDF file)
 
 **Key:** `grid_file` parameter **required** for EAM
 
-**Statistics panel:** Same as ELM examples
+---
 
-**No stippling** (single file)
+#### Example 10: Single Scenario Map (EAM Config #2)
+
+Same as Example 9, but for Full feedback scenario
 
 ---
 
-#### Example 9: Individual Percent Difference (EAM Config #4)
+#### Example 11: Individual Absolute Difference (EAM Config #3)
+
+**From JSON file:**
+```json
+{
+    "netcdf_files": [
+        "./control_spatial_data_eam.nc", 
+        "./full_feedback_spatial_data_eam.nc"
+    ],
+    "plot_directory": "./spatial_plots/eam_full_feedback_minus_control_individual_absolute_difference",
+    "use_latex": true,
+    "grid_file": "./eam_grid_file/ne30pg2_scrip_c20191218.nc"
+}
+```
+
+**What This Creates:**
+
+**Difference maps for EAM variables:**
+- Temperature differences
+- Precipitation changes
+- CO₂ concentration differences
+
+---
+
+#### Example 12: Individual Percent Difference (EAM Config #4)
 
 **From JSON file:**
 ```json
@@ -739,23 +826,54 @@ Same as Example 1, but for Full feedback scenario
 
 **What This Creates:**
 
-**Percent difference maps for EAM variables:**
-
-**Example for TREFHT (temperature):**
-- Arctic: +2% to +5% (enhanced warming)
-- Tropics: +0.5% to +1% (modest warming)
-- Oceans: +1% to +2% (moderate warming)
-
-**Example for PRECC (convective precipitation):**
-- Tropical rainbelts: +10% to +30% (intensification)
-- Subtropics: -5% to -10% (drying)
-- Monsoon regions: +15% to +25% (strengthening)
-
-**Statistical testing:** Aggregated only (no per-gridcell for EAM)
+**Percent change maps:**
+- TREFHT: +1% to +5% (temperature)
+- PRECC: +10% to +30% (convective precipitation intensification)
 
 ---
 
-#### Example 10: Ensemble Absolute Difference (EAM Config #5)
+#### Example 13: Sum Across Multiple Files (EAM Config #5)
+
+**From JSON file:**
+```json
+{
+    "netcdf_files": [
+        "./full_feedback_spatial_data_eam.nc",
+        "./full_feedback_spatial_data_eam_2.nc",
+        "./full_feedback_spatial_data_eam_3.nc",
+        "./full_feedback_spatial_data_eam_4.nc",
+        "./full_feedback_spatial_data_eam_5.nc"
+    ],
+    "plot_directory": "./spatial_plots/eam_full_feedback_only_individual_sum",
+    "variables": ["PRECIP", "PRECSL"],
+    "use_latex": true,
+    "plot_type": "sum",
+    "grid_file": "./eam_grid_file/ne30pg2_scrip_c20191218.nc"
+}
+```
+
+**What This Creates:**
+
+**Summed maps across 5 files:**
+- `spatial_PRECIP.pdf` - Sum of PRECIP across 5 files
+- `spatial_PRECSL.pdf` - Sum of PRECSL across 5 files
+
+**Processing:**
+```
+For each gridcell:
+  Sum_PRECIP = PRECIP_file1 + PRECIP_file2 + PRECIP_file3 + PRECIP_file4 + PRECIP_file5
+```
+
+**Use case:**
+- Combining precipitation components
+- Total fluxes across ensemble members
+- Aggregating related variables
+
+**No statistical testing** (no comparison)
+
+---
+
+#### Example 14: Ensemble Absolute Difference (EAM Config #6)
 
 **From JSON file:**
 ```json
@@ -775,24 +893,15 @@ Same as Example 1, but for Full feedback scenario
 **What This Creates:**
 
 **Ensemble mean difference maps for EAM:**
-
-**Example for TREFHT:**
-- Control ensemble mean: 288.5 ± 0.3 K (global average)
-- Full feedback ensemble mean: 290.2 ± 0.4 K
-- Difference map: +1.7 K average, varying spatially
+- TREFHT difference: +1.7 K average
   - Arctic: +3 to +5 K (strong amplification)
   - Tropics: +1 to +2 K
-  - Mid-latitudes: +1.5 to +2.5 K
 
-**Statistical testing:**
-- Aggregated: `TREFHT in Full feedback: 1.234e-12` (extremely significant)
-- **No per-gridcell stippling** (disabled for EAM)
-
-**Note:** Even without stippling, ensemble averaging provides robust estimates
+**Statistical testing:** Aggregated only (no stippling for EAM)
 
 ---
 
-#### Example 11: Ensemble Percent Difference NO Stippling (EAM Config #6)
+#### Example 15: Ensemble Percent Difference (EAM Config #7)
 
 **From JSON file:**
 ```json
@@ -810,24 +919,17 @@ Same as Example 1, but for Full feedback scenario
 }
 ```
 
-**Key:** `stippling_on: false` explicitly disables stippling (default for EAM anyway)
+**Key:** `stippling_on: false` (EAM limitation)
 
 **What This Creates:**
 
-Same as Example 10 but with percent differences instead of absolute
-
-**Example for PRECC:**
-- Tropical Pacific: +40% to +60% (strong convection increase)
+**Percent difference without stippling:**
+- PRECC: +40% to +60% (tropical convection)
 - Mediterranean: -20% to -30% (drying)
-- Southeast Asia monsoon: +30% to +50% (intensification)
-
-**No stippling shown** (computational limitation with EAM unstructured grid)
-
-**Interpretation:** Rely on ensemble averaging to reduce noise, use aggregated p-value for global significance
 
 ---
 
-#### Example 12: Ensemble Separate Plots (EAM Config #7)
+#### Example 16: Ensemble Separate Plots (EAM Config #8)
 
 **From JSON file:**
 ```json
@@ -848,12 +950,8 @@ Same as Example 10 but with percent differences instead of absolute
 **What This Creates:**
 
 **Two separate ensemble mean maps:**
-- `spatial_TREFHT_set_1.pdf` - Control temperature (288-290 K typical range)
+- `spatial_TREFHT_set_1.pdf` - Control temperature (288-290 K)
 - `spatial_TREFHT_set_2.pdf` - Full feedback temperature (289-291 K)
-
-**Use case:** Show absolute spatial patterns for each scenario side-by-side
-
-**No stippling** (EAM limitation)
 
 ---
 
@@ -868,26 +966,6 @@ Same as Example 10 but with percent differences instead of absolute
 {plot_directory}/spatial_{variable}_set_2.pdf  (separate_plots)
 ```
 
-**Example Output Directory (ELM):**
-```
-./spatial_plots/elm_ensemble_percent_difference/
-├── spatial_GPP.pdf
-├── spatial_NPP.pdf
-├── spatial_NBP.pdf
-├── spatial_ER.pdf
-└── p_values.dat
-```
-
-**Example Output Directory (EAM):**
-```
-./spatial_plots/eam_ensemble_absolute_difference/
-├── spatial_TREFHT.pdf
-├── spatial_PRECC.pdf
-├── spatial_PRECL.pdf
-├── spatial_ZCO2.pdf
-└── p_values.dat
-```
-
 ### P-Value Files
 
 **Purpose:** Records aggregated statistical significance across all gridcells
@@ -896,7 +974,6 @@ Same as Example 10 but with percent differences instead of absolute
 ```
 GPP in Full feedback: 1.234e-05
 NPP in Full feedback: 3.456e-03
-NBP in Full feedback: 5.678e-02
 ```
 
 **Location:** `{plot_directory}/p_values.dat`
@@ -910,23 +987,46 @@ NBP in Full feedback: 5.678e-02
 ### 1. Choose Appropriate Plot Type
 
 **Use `absolute_difference` when:**
-- Comparing scenarios
+- Comparing two scenarios/ensembles
 - Want actual magnitude of changes
 - Publishing quantitative results
 
 **Use `percent_difference` when:**
 - Emphasizing relative changes
 - Variables with varying baseline magnitudes
-- Highlighting fractional impacts
 
 **Use `separate_plots` when:**
 - Need to show absolute values for each scenario
 - Side-by-side comparison
-- Presenting individual spatial patterns
+
+**Use `mean` when:**
+- Multiple files from same scenario
+- Want average spatial pattern
+- Reducing noise
+
+**Use `sum` when:**
+- Aggregating related variables (e.g., precipitation components)
+- Total fluxes across files
 
 ---
 
-### 2. Temporal Averaging Period
+### 2. Individual vs Ensemble
+
+**Use individual (simple list) when:**
+- Comparing 2 files: absolute or percent difference
+- Averaging N files: mean or sum
+- N separate maps: separate_plots
+
+**Use ensemble (nested list) when:**
+- Need statistical significance testing
+- Per-gridcell confidence via stippling (ELM)
+- Robust ensemble mean comparison
+
+**Note:** Ensembles currently limited to 2 file sets
+
+---
+
+### 3. Temporal Averaging Period
 
 **Standard:** 20-year average (2071-2090)
 ```json
@@ -934,81 +1034,29 @@ NBP in Full feedback: 5.678e-02
 "end_year": 2090
 ```
 
-**End-of-century:** 30-year average
-```json
-"start_year": 2071,
-"end_year": 2100
-```
-
-**Mid-century:**
-```json
-"start_year": 2041,
-"end_year": 2060
-```
-
-**Why average?** Reduces interannual variability, shows robust climate signal
+**Why average?** Reduces interannual variability
 
 ---
 
-### 3. Stippling Strategy
+### 4. Stippling Strategy
 
 **For ELM ensemble plots:**
 ```json
 "stippling_on": true
 ```
 
-**Benefits:**
-- Shows where changes are statistically significant
-- Identifies robust vs noisy patterns
-- Publication-quality confidence visualization
+**Benefits:** Shows where changes are statistically significant
 
 **For EAM or individual plots:**
 ```json
 "stippling_on": false
 ```
 
-**Why:**
-- EAM: Too slow for unstructured grids
-- Individual: No ensemble for statistical testing
+**Why:** EAM too slow, individuals lack ensemble structure
 
 ---
 
-### 4. Colormap Selection
-
-**For differences (default):**
-```json
-"cmap": "bwr"  // Blue-White-Red
-```
-- Blue: Decreases
-- White: No change
-- Red: Increases
-
-**Alternative diverging:**
-```json
-"cmap": "RdBu_r"  // Red-Blue reversed
-"cmap": "PuOr"    // Purple-Orange
-```
-
-**For absolute values:**
-```json
-"cmap": "viridis"  // Sequential
-"cmap": "plasma"
-```
-
----
-
-### 5. EAM Grid Files
-
-**Check your simulation resolution:**
-- ne30: `ne30pg2_scrip_c20191218.nc`
-- ne120: `ne120pg2_scrip_c20200803.nc`
-- ne256: `ne256pg2_scrip_c20200803.nc`
-
-**Always provide correct grid file for EAM!**
-
----
-
-### 6. Variable Selection
+### 5. Variable Selection
 
 **Plot all:**
 ```json
@@ -1018,35 +1066,6 @@ NBP in Full feedback: 5.678e-02
 **Plot specific:**
 ```json
 "variables": ["GPP", "NPP", "NBP"]
-```
-
-**Recommendation:** Start specific for testing, expand to "all" for comprehensive analysis
-
----
-
-### 7. File Organization
-
-```
-project/
-├── data/
-│   ├── control_spatial_data_elm.nc
-│   ├── scenario_spatial_data_elm.nc
-│   ├── control_spatial_data_eam.nc
-│   ├── scenario_spatial_data_eam.nc
-│   └── grid_files/
-│       └── ne30pg2_scrip_c20191218.nc
-├── configs/
-│   ├── elm_plots.json
-│   └── eam_plots.json
-└── plots/
-    ├── elm/
-    │   ├── control/
-    │   ├── scenario/
-    │   └── difference/
-    └── eam/
-        ├── control/
-        ├── scenario/
-        └── difference/
 ```
 
 ---
@@ -1074,144 +1093,38 @@ TypeError: 'NoneType' object is not callable
 
 ### Issue 2: Stippling Not Appearing (EAM)
 
-**Symptom:** Expected stippling but none appears
-
 **Cause:** Stippling disabled for EAM (computational limitation)
 
-**Explanation:** Per-gridcell t-tests too slow for unstructured grids
-
-**Solution:** 
-- Accept limitation for EAM
-- Use aggregated p-values for global significance
-- Consider ELM data if per-gridcell testing critical
+**Solution:** Accept limitation or use ELM data
 
 ---
 
 ### Issue 3: Stippling Not Appearing (ELM)
 
-**Symptom:** Expected stippling but none appears on ELM plot
-
 **Possible Causes:**
 1. `stippling_on: false` (default)
 2. Simple list (not ensemble)
-3. All gridcells non-significant (p > 0.05)
+3. All gridcells non-significant
 
 **Solutions:**
-
-**Check configuration:**
 ```json
 "stippling_on": true  // Must enable
 ```
 
-**Verify ensemble format:**
-```json
-"netcdf_files": [
-    ["ctrl.nc", "ctrl_2.nc"],  // Nested list required
-    ["scen.nc", "scen_2.nc"]
-]
-```
-
-**Check p-values:**
-If aggregated p-value > 0.05, likely no gridcells significant either
+Verify nested list structure
 
 ---
 
-### Issue 4: File Not Found
+### Issue 4: Wrong Plot Type for Configuration
 
-**Error:**
-```
-FileNotFoundError: control_spatial_data_elm.nc
-```
+**Symptom:** Error or unexpected output
 
-**Solutions:**
-```bash
-# Verify file exists
-ls -la control_spatial_data_elm.nc
+**Cause:** Using incompatible plot_type
 
-# Use absolute paths
-"netcdf_files": "/absolute/path/to/file.nc"
-```
-
----
-
-### Issue 5: Variable Not Found
-
-**Error:**
-```
-KeyError: 'GPP'
-```
-
-**Solution:**
-```python
-import xarray as xr
-ds = xr.open_dataset('spatial_data.nc')
-print(list(ds.keys()))
-```
-
-Check exact variable names (case-sensitive)
-
----
-
-### Issue 6: Wrong Grid File
-
-**Symptom:** Distorted or incorrect map
-
-**Cause:** Grid file doesn't match simulation resolution
-
-**Solution:**
-- Verify simulation was ne30, ne120, etc.
-- Use corresponding grid file
-- Check grid file date matches data generation
-
----
-
-## Advanced Features
-
-### Per-Variable Configuration
-
-```json
-{
-    "variables": ["GPP", "NBP", "TREFHT"],
-    "cbar_limits": {
-        "GPP": [-5, 5],
-        "NBP": [-2, 2],
-        "TREFHT": [-3, 3]
-    },
-    "cmap": {
-        "GPP": "RdBu_r",
-        "NBP": "PuOr",
-        "TREFHT": "coolwarm"
-    }
-}
-```
-
----
-
-### Custom Projections
-
-```json
-"projection": "Robinson"           // Global (default)
-"projection": "PlateCarree"        // Equirectangular
-"projection": "Mollweide"          // Equal-area
-"projection": "NorthPolarStereo"   // Arctic
-"projection": "SouthPolarStereo"   // Antarctic
-```
-
----
-
-### Time Aggregation
-
-**Mean (default):**
-```json
-"time_calculation": "mean"
-```
-Use for: Temperature, CO₂ concentration
-
-**Sum:**
-```json
-"time_calculation": "sum"
-```
-Use for: Precipitation, fluxes
+**Rules:**
+- `absolute_difference`, `percent_difference`: Need exactly 2 files/ensembles
+- `mean`, `sum`: Simple list only (not nested)
+- `separate_plots`: Works with any configuration
 
 ---
 

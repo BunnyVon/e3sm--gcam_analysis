@@ -22,6 +22,19 @@
     },
     {
         "netcdf_files": [
+            "./../2025_DiVittorio_et_al_e3sm/full_feedback_spatial_data_elm.nc",
+            "./../2025_DiVittorio_et_al_e3sm/full_feedback_spatial_data_elm_2.nc",
+            "./../2025_DiVittorio_et_al_e3sm/full_feedback_spatial_data_elm_3.nc",
+            "./../2025_DiVittorio_et_al_e3sm/full_feedback_spatial_data_elm_4.nc",
+            "./../2025_DiVittorio_et_al_e3sm/full_feedback_spatial_data_elm_5.nc"
+        ],
+        "plot_directory": "./../2025_DiVittorio_et_al_e3sm/spatial_plots/elm_full_feedback_only_individual_mean",
+        "variables": ["HR", "NPP", "ZCO2"],
+        "use_latex": true,
+        "plot_type": "mean"
+    },
+    {
+        "netcdf_files": [
             ["./../2025_DiVittorio_et_al_e3sm/control_spatial_data_elm.nc", "./../2025_DiVittorio_et_al_e3sm/control_spatial_data_elm_2.nc",
             "./../2025_DiVittorio_et_al_e3sm/control_spatial_data_elm_3.nc", "./../2025_DiVittorio_et_al_e3sm/control_spatial_data_elm_4.nc",
             "./../2025_DiVittorio_et_al_e3sm/control_spatial_data_elm_5.nc"],

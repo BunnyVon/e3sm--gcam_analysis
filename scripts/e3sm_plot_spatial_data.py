@@ -26,7 +26,6 @@ default_inputs = {
     'end_year': 2090,
     'grid_file': None,
     'height': height_default,
-    'mean_or_sum_if_over_a_single_dataset': 'mean',
     'multiplier': 1,
     'p_value_file': "p_values.dat",
     'p_value_file_print_only_if_below_threshold': True,
@@ -71,11 +70,11 @@ def process_inputs(inputs):
             print(f"Note: NetCDF files were automatically transposed from 'organized by file set' format to 'organized by ensemble member' format.")
 
     # Turn the list of NetCDF files and their corresponding labels into a list of lists, if they are not already in that form.
-    for input_type in ['netcdf_files']:
-        if isinstance(inputs[input_type], str):
-            inputs[input_type] = [[inputs[input_type]]]
-        elif isinstance(inputs[input_type], list) and not check_is_list_of_lists(inputs[input_type]):
-            inputs[input_type] = [inputs[input_type]]
+    if not check_is_list_of_lists(inputs['netcdf_files']):
+        if isinstance(inputs['netcdf_files'], str):
+            inputs['netcdf_files'] = [[inputs['netcdf_files']]]
+        elif isinstance(inputs['netcdf_files'], list):
+            inputs['netcdf_files'] = [inputs['netcdf_files']]
 
     # Read one of the NetCDF files into an xarray Dataset so that we can later get the variables contained in them and the units of these variables.
     ds = xr.open_dataset(inputs['netcdf_files'][0][0])
@@ -171,7 +170,6 @@ def plot_spatial_data_eam(inputs, grid_file):
     cmap_color = inputs['cmap']
     end_year = inputs['end_year']
     height = inputs['height']
-    mean_or_sum_if_over_a_single_dataset = inputs['mean_or_sum_if_over_a_single_dataset']
     multiplier = inputs['multiplier']
     netcdf_files = inputs['netcdf_files']
     p_value_file = inputs['p_value_file']
@@ -195,11 +193,27 @@ def plot_spatial_data_eam(inputs, grid_file):
     # Store the grid file in an uxarray Dataset.
     grid = ux.open_grid(grid_file)
 
+    # We either have individual plots, in which case there could be multiple files arranged like [[file1, file2, file3, ...]],
+    # or we could have ensemble plots, in which case there are at most two data sets, but potentially multiple files in each of the sets.
+    # The preprocessing done earlier has formatted the files into a list of lists so that they are in the form:
+    #   For individual plots: [[file1, file2, file3, ...]]    
+    #   For ensemble plots: [["Control", "Full feedback"], ["Control_2", "Full feedback_2"], ...]
+    num_files_in_each_set = len(netcdf_files)
+    num_file_sets = len(netcdf_files[0])
+    
+    # Note that unlike time series, it is not meaningful to have a spatial plot with more than two ensembles, 
+    # which is why we are restricting the total number of data sets to 2 when producing ensemble plots.
+    if (num_files_in_each_set == 1) or (num_file_sets == 2):
+        pass
+    else:
+        error_message = "Error: For spatial plots, either there should be only one file per data set (individual plots)" \
+            + " or there should be at most two data sets (ensemble plots)."
+        print(error_message)
+        sys.exit(1)
+
     # Read each of the NetCDF output files, which are arranged in a list of lists (2D matrix), into an uxarray DataArray and then add each of these 
     # DataArrays to a single uxarray Dataset that will store the data from all of the files. To form the DataArrays, calculate either the mean or sum 
     # between the start and end years for each lat/lon coordinate. We will later display some function of this mean or sum on the spatial plot.
-    num_files_in_each_set = len(netcdf_files)
-    num_file_sets = len(netcdf_files[0])
     uxds = ux.UxDataset()
     for file_set_index in range(num_file_sets):
         for file_index in range(num_files_in_each_set):
@@ -222,7 +236,7 @@ def plot_spatial_data_eam(inputs, grid_file):
                         uxda *= time_multipliers[index]
                         break
             # If there is more than one data set, modify the labels so that we know which data set corresponds to which variable of the DataFrame.
-            if num_file_sets == 2:
+            if num_file_sets >= 2:
                 uxda = uxda.rename(f'{variable}_{file_index}_{file_set_index}')
             uxds[uxda.name] = uxda
             # Delete the temporary NetCDF file now that the data have been read.
@@ -232,9 +246,16 @@ def plot_spatial_data_eam(inputs, grid_file):
     uxDataArrays_to_plot = []
     df = uxds.to_dataframe()
 
-    # Note that unlike time series, it is not meaningful to have a spatial plot with more than two data sets or ensembles, 
-    # which is why we are restricting the total number of data sets to 2.
-    if num_file_sets == 2:
+    # If we have only one file per set, possible options are to take either the mean or sum over all files for each lat/lon coordinate.
+    if num_files_in_each_set == 1 and (plot_type == 'mean' or plot_type == 'sum'):
+        if plot_type == 'mean':
+            df = df.mean(axis=1)
+        elif plot_type == 'sum':
+            df = df.sum(axis=1)
+        uxDataArrays_to_plot.append(convert_xarray_to_uxarray(df.to_xarray(), grid, variable=variable))
+    
+    # If we have two data sets, we can plot either the absolute difference, percent difference, or the two data sets separately.
+    elif num_file_sets == 2:
         # Take the mean over all files for each lat/lon coordinate in each data set.
         columns_control_set = [column for column in df.columns if column.endswith(f'_0')]
         columns_test_set = [column for column in df.columns if column.endswith(f'_1')]
@@ -261,21 +282,13 @@ def plot_spatial_data_eam(inputs, grid_file):
             # Plot the two data sets individually in their own separate plots. 
             uxDataArrays_to_plot.append(convert_xarray_to_uxarray(df_control_set.to_xarray(), grid, variable=variable))
             uxDataArrays_to_plot.append(convert_xarray_to_uxarray(df_test_set.to_xarray(), grid, variable=variable))
-    
-    # If we have only one data set (but potentially multiple files in the set), take the mean or sum over all files for each lat/lon coordinate.
-    elif num_file_sets == 1:
-        if mean_or_sum_if_over_a_single_dataset == 'mean':
-            df = df.mean(axis=1)
-        elif mean_or_sum_if_over_a_single_dataset == 'sum':
-            df = df.sum(axis=1)
-        uxDataArrays_to_plot.append(convert_xarray_to_uxarray(df.to_xarray(), grid, variable=variable))
 
     # If stippling_on is True, meaning we want to add markers on plot to indicate potential regions of statistical significance, 
     if stippling_on:
         uxds['lat'] = grid.face_lat
         uxds['lon'] = grid.face_lon
         # If there is more than one file per data set (meaning that we have an ensemble) and we do not want separate plots,
-        # we can compare the two data sets by performing a t-test at each individual lat/lon coordinate and later add stippling.
+        # we can compare the two data sets by performing a t-test at each individual lat/lon coordinate and later adding stippling.
         if num_files_in_each_set >= 2 and plot_type != 'separate_plots':
             df = uxds.to_dataframe()
             df = df.groupby(['lat', 'lon']).mean()
@@ -383,7 +396,6 @@ def plot_spatial_data_elm(inputs):
     cmap_color = inputs['cmap']
     end_year = inputs['end_year']
     height = inputs['height']
-    mean_or_sum_if_over_a_single_dataset = inputs['mean_or_sum_if_over_a_single_dataset']
     multiplier = inputs['multiplier']
     netcdf_files = inputs['netcdf_files']
     p_value_file = inputs['p_value_file']
@@ -403,6 +415,24 @@ def plot_spatial_data_elm(inputs):
     title_size = inputs['title_size']
     use_latex = inputs['use_latex']
     width = inputs['width'] 
+
+    # We either have individual plots, in which case there could be multiple files arranged like [[file1, file2, file3, ...]],
+    # or we could have ensemble plots, in which case there are at most two data sets, but potentially multiple files in each of the sets.
+    # The preprocessing done earlier has formatted the files into a list of lists so that they are in the form:
+    #   For individual plots: [[file1, file2, file3, ...]]    
+    #   For ensemble plots: [["Control", "Full feedback"], ["Control_2", "Full feedback_2"], ...]
+    num_files_in_each_set = len(netcdf_files)
+    num_file_sets = len(netcdf_files[0])
+    
+    # Note that unlike time series, it is not meaningful to have a spatial plot with more than two ensembles, 
+    # which is why we are restricting the total number of data sets to 2 when producing ensemble plots.
+    if (num_files_in_each_set == 1) or (num_file_sets == 2):
+        pass
+    else:
+        error_message = "Error: For spatial plots, either there should be only one file per data set (individual plots)" \
+            + " or there should be at most two data sets (ensemble plots)."
+        print(error_message)
+        sys.exit(1)
 
     # Read each of the NetCDF output files, which are arranged in a list of lists (2D matrix), into an xarray DataArray and then add each of these 
     # DataArrays to a single Pandas DataFrame that will store the data from all of the files. To form the DataArrays, calculate either the mean or sum 
@@ -427,16 +457,24 @@ def plot_spatial_data_elm(inputs):
                         da *= time_multipliers[index]
                         break
             # If there is more than one data set, modify the labels so that we know which data set corresponds to which column of the DataFrame.
-            if num_file_sets == 2:
+            if num_file_sets >= 2:
                 da = da.rename(f'{variable}_{file_index}_{file_set_index}')
             df = pd.concat([df, da.to_dataframe().dropna()], axis=1)
 
     # Initialize list that will store all the DataArrays that we will want to plot for the variable.
     dataArrays_to_plot = []
 
-    # Note that unlike time series, it is not meaningful to have a spatial plot with more than two data sets or ensembles, 
-    # which is why we are restricting the total number of data sets to 2.
-    if num_file_sets == 2:
+    # If we have only one file per set, possible options are to take either the mean or sum over all files for each lat/lon coordinate.
+    if num_files_in_each_set == 1 and (plot_type == 'mean' or plot_type == 'sum'):
+        if plot_type == 'mean':
+            df = df.mean(axis=1)
+        elif plot_type == 'sum':
+            df = df.sum(axis=1)
+        da = df.to_xarray()
+        dataArrays_to_plot.append(da)
+
+    # If we have two data sets, we can plot either the absolute difference, percent difference, or the two data sets separately.
+    elif num_file_sets == 2:
         # Take the mean over all files for each lat/lon coordinate in each data set.
         columns_control_set = [column for column in df.columns if column.endswith(f'_0')]
         columns_test_set = [column for column in df.columns if column.endswith(f'_1')]
@@ -444,7 +482,7 @@ def plot_spatial_data_elm(inputs):
         df_test_set = df[columns_test_set].mean(axis=1)
 
         # If there is more than one file per data set (meaning that we have an ensemble) and we do not want separate plots,
-        # we can compare the two data sets by performing a t-test at each individual lat/lon coordinate and later add stippling.
+        # we can compare the two data sets by performing a t-test at each individual lat/lon coordinate and later adding stippling.
         if num_files_in_each_set >= 2 and stippling_on and plot_type != 'separate_plots':
             # Perform this per-pixel t-test only if we do not want separate plots and if stippling_on is True (want to add p-value markers on plot).
             da_pvalues = df.apply(perform_ttest, columns_set_1=columns_control_set, columns_set_2=columns_test_set, axis=1).fillna(1).to_xarray()
@@ -474,15 +512,6 @@ def plot_spatial_data_elm(inputs):
             # Plot the two data sets individually in their own separate plots. 
             dataArrays_to_plot.append(df_control_set.to_xarray())
             dataArrays_to_plot.append(df_test_set.to_xarray())
-
-    # If we have only one data set (but potentially multiple files in the set), take the mean or sum over all files for each lat/lon coordinate.
-    elif num_file_sets == 1:
-        if mean_or_sum_if_over_a_single_dataset == 'mean':
-            df = df.mean(axis=1)
-        elif mean_or_sum_if_over_a_single_dataset == 'sum':
-            df = df.sum(axis=1)
-        da = df.to_xarray()
-        dataArrays_to_plot.append(da)
 
     # Iterate over all dataArrays in the list to create a plot for each one.
     for da_index, da in enumerate(dataArrays_to_plot):

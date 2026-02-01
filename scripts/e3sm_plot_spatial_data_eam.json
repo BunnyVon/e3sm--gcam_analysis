@@ -26,6 +26,20 @@
     },
     {
         "netcdf_files": [
+            "./../2025_DiVittorio_et_al_e3sm/full_feedback_spatial_data_eam.nc",
+            "./../2025_DiVittorio_et_al_e3sm/full_feedback_spatial_data_eam_2.nc",
+            "./../2025_DiVittorio_et_al_e3sm/full_feedback_spatial_data_eam_3.nc",
+            "./../2025_DiVittorio_et_al_e3sm/full_feedback_spatial_data_eam_4.nc",
+            "./../2025_DiVittorio_et_al_e3sm/full_feedback_spatial_data_eam_5.nc"
+        ],
+        "plot_directory": "./../2025_DiVittorio_et_al_e3sm/spatial_plots/eam_full_feedback_only_individual_sum",
+        "variables": ["PRECIP", "PRECSL"],
+        "use_latex": true,
+        "plot_type": "sum",
+        "grid_file": "./../2025_DiVittorio_et_al_e3sm/eam_grid_file/ne30pg2_scrip_c20191218.nc"
+    },
+    {
+        "netcdf_files": [
             ["./../2025_DiVittorio_et_al_e3sm/control_spatial_data_eam.nc", "./../2025_DiVittorio_et_al_e3sm/control_spatial_data_eam_2.nc",
             "./../2025_DiVittorio_et_al_e3sm/control_spatial_data_eam_3.nc", "./../2025_DiVittorio_et_al_e3sm/control_spatial_data_eam_4.nc",
             "./../2025_DiVittorio_et_al_e3sm/control_spatial_data_eam_5.nc"],
