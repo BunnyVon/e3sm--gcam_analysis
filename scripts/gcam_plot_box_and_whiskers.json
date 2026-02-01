@@ -4,7 +4,7 @@
         "scenarios": ["Control"],
         "categories": ["BioenergyCrop", "Rice", "SugarCrop", "Soybean", "Wheat"],
         "y_scale": "log",
-        "plot_directory": "./../2025_DiVittorio_et_al_gcam/box_plots/individual_plots",
+        "plot_directory": "./../2025_DiVittorio_et_al_gcam/box_plots/individual",
         "plot_name": "box_plot_ag_commodity_no_hue.pdf",
         "use_latex": true
     },
@@ -15,7 +15,7 @@
         "categories": ["BioenergyCrop", "Rice", "SugarCrop", "Soybean", "Wheat"],
         "regions": ["Global", "USA", "Brazil", "Canada"],
         "y_scale": "log",
-        "plot_directory": "./../2025_DiVittorio_et_al_gcam/box_plots/individual_plots",
+        "plot_directory": "./../2025_DiVittorio_et_al_gcam/box_plots/individual",
         "plot_name": "box_plot_ag_commodity_hue_region.pdf",
         "use_latex": true
     },
@@ -26,7 +26,7 @@
         "categories": ["BioenergyCrop", "Rice", "SugarCrop", "Soybean", "Wheat"],
         "regions": ["USA", "Brazil", "Canada"],
         "y_scale": "log",
-        "plot_directory": "./../2025_DiVittorio_et_al_gcam/box_plots/individual_plots",
+        "plot_directory": "./../2025_DiVittorio_et_al_gcam/box_plots/individual",
         "plot_name": "box_plot_ag_commodity_hue_scenario.pdf",
         "use_latex": true
     },
@@ -38,7 +38,7 @@
         "categories": ["BioenergyCrop", "Rice", "SugarCrop", "Soybean", "Wheat"],
         "regions": ["USA", "Brazil", "Canada"],
         "y_scale": "log",
-        "plot_directory": "./../2025_DiVittorio_et_al_gcam/box_plots/individual_plots",
+        "plot_directory": "./../2025_DiVittorio_et_al_gcam/box_plots/individual",
         "plot_name": "box_plot_ag_commodity_hue_sector.pdf",
         "use_latex": true
     },
@@ -49,7 +49,7 @@
         "categories": ["BioenergyCrop", "Rice", "SugarCrop", "Soybean", "Wheat"],
         "regions": ["USA", "Brazil", "Canada"],
         "plot_percent_difference": true,
-        "plot_directory": "./../2025_DiVittorio_et_al_gcam/box_plots/individual_plots",
+        "plot_directory": "./../2025_DiVittorio_et_al_gcam/box_plots/individual",
         "plot_name": "box_plot_ag_commodity_percent_difference.pdf",
         "use_latex": true
     },
@@ -60,7 +60,7 @@
         "categories": ["crop", "BioenergyCrop", "Rice", "SugarCrop", "Soybean", "Wheat"],
         "regions": ["USA", "Brazil", "Canada"],
         "key_columns": ["scenario", "region", "year"],
-        "plot_directory": "./../2025_DiVittorio_et_al_gcam/box_plots/individual_plots",
+        "plot_directory": "./../2025_DiVittorio_et_al_gcam/box_plots/individual",
         "plot_name": "box_plot_ag_commodity_landtype_groups.pdf",
         "y_scale": "log",
         "use_latex": true
@@ -74,7 +74,7 @@
         "regions": ["USA", "Brazil", "Canada"],
         "value_label": "vegetation",
         "y_label": "vegetation scalars",
-        "plot_directory": "./../2025_DiVittorio_et_al_gcam/box_plots/individual_plots",
+        "plot_directory": "./../2025_DiVittorio_et_al_gcam/box_plots/individual",
         "plot_name": "box_plot_scalars_vegetation.pdf",
         "use_latex": true
     },
@@ -89,7 +89,7 @@
         "region_label": "basin",
         "value_label": "vegetation",
         "y_label": "vegetation scalars",
-        "plot_directory": "./../2025_DiVittorio_et_al_gcam/box_plots/individual_plots",
+        "plot_directory": "./../2025_DiVittorio_et_al_gcam/box_plots/individual",
         "plot_name": "box_plot_scalars_vegetation_landtype_groups_basin.pdf",
         "use_latex": true
     },
@@ -106,7 +106,7 @@
         "key_columns": ["scenario", "region", "basin", "year"],
         "value_label": "vegetation",
         "y_label": "vegetation scalars",
-        "plot_directory": "./../2025_DiVittorio_et_al_gcam/box_plots/ensemble_plots",
+        "plot_directory": "./../2025_DiVittorio_et_al_gcam/box_plots/ensemble",
         "plot_name": "box_plot_scalars_vegetation.pdf",
         "use_latex": true
     },
@@ -125,7 +125,7 @@
         "y_label": "vegetation scalars",
         "plot_percent_difference": true, 
         "y_limits": [-20, 100],
-        "plot_directory": "./../2025_DiVittorio_et_al_gcam/box_plots/ensemble_plots",
+        "plot_directory": "./../2025_DiVittorio_et_al_gcam/box_plots/ensemble",
         "plot_name": "box_plot_scalars_vegetation_percent_difference.pdf",
         "use_latex": true
     },
@@ -144,7 +144,7 @@
         "y_label": "Global land area (thousands km$^2$)",
         "mean_or_sum_if_more_than_one_row_in_same_landtype_group": "sum",
         "y_limits": [0.1, 3000],
-        "plot_directory": "./../2025_DiVittorio_et_al_gcam/box_plots/ensemble_plots",
+        "plot_directory": "./../2025_DiVittorio_et_al_gcam/box_plots/ensemble",
         "plot_name": "box_plot_land_allocation.pdf",
         "use_latex": true
     },
@@ -165,7 +165,7 @@
         "mean_or_sum_if_more_than_one_row_in_same_landtype_group": "sum",
         "plot_percent_difference": true,
         "y_limits": [-20, 100],
-        "plot_directory": "./../2025_DiVittorio_et_al_gcam/box_plots/ensemble_plots",
+        "plot_directory": "./../2025_DiVittorio_et_al_gcam/box_plots/ensemble",
         "plot_name": "box_plot_land_allocation_percent_difference.pdf",
         "use_latex": true
     }

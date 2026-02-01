@@ -4,14 +4,14 @@
         "scenarios": ["Control", "Full feedback"],
         "categories_to_exclude": ["UnmanagedLand", "Forest"],
         "y_scale": "log",
-        "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/individual_plots",
+        "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/individual",
         "use_latex": true
     },
     {
         "output_file": "./../2025_DiVittorio_et_al_gcam/ag_commodity_prices_processed.csv",
         "scenarios": ["Control", "Full feedback"],
         "categories_to_exclude": ["UnmanagedLand", "Forest"],
-        "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/individual_plots_percent_difference",
+        "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/individual_percent_difference",
         "plot_percent_difference": true,
         "use_latex": true
     },
@@ -20,7 +20,7 @@
         "scenarios": ["Control"],
         "categories_to_exclude": ["UnmanagedLand", "Forest"],
         "y_scale": "log",
-        "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/individual_plots_control_only",
+        "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/individual_control_only",
         "use_latex": true
     },
     {
@@ -31,7 +31,7 @@
         "legend_x_offset": 1.4,
         "legend_num_columns": 1,
         "y_scale": "log",
-        "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/individual_plots_regions",
+        "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/individual_regions",
         "use_latex": true
     },
     {
@@ -43,7 +43,7 @@
         "scenario_sets": ["Control", "Full feedback"],
         "categories": ["Rice", "Soybean", "Wheat"],
         "y_scale": "log",
-        "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/ensemble_plots",
+        "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/ensemble",
         "legend_num_columns": 1,
         "legend_x_offset": 1.4,
         "use_latex": true
@@ -56,7 +56,7 @@
         ],
         "scenario_sets": ["Control", "Full feedback"],
         "categories": ["Rice", "Soybean", "Wheat"],
-        "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/ensemble_plots_percent_difference",
+        "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/ensemble_percent_difference",
         "legend_num_columns": 1,
         "legend_x_offset": 1.2,
         "plot_percent_difference": true,
@@ -65,7 +65,7 @@
     {
         "output_file": "./../2025_DiVittorio_et_al_gcam/co2_emissions_regions_processed.csv",
         "scenarios": ["Control", "Full feedback"],
-        "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/individual_plots",
+        "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/individual",
         "aggregation_type_in_each_year": "sum",
         "legend_num_columns": 1,
         "use_latex": true
@@ -77,7 +77,7 @@
         "regions": ["Global", "EU-15", "Japan", "India"],
         "legend_x_offset": 1.45,
         "legend_num_columns": 1,
-        "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/individual_plots_regions",
+        "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/individual_regions",
         "aggregation_type_in_each_year": "sum",
         "use_latex": true
     },
@@ -89,7 +89,7 @@
         ],
         "scenario_sets": ["Control", "Full feedback"],
         "categories": ["agricultural energy use", "construction energy use", "trn_aviation_intl", "refining"],
-        "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/ensemble_plots",
+        "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/ensemble",
         "aggregation_type_in_each_year": "sum",
         "legend_num_columns": 1,
         "legend_x_offset": 1.55,
@@ -103,7 +103,7 @@
         ],
         "scenario_sets": ["Control", "Full feedback"],
         "categories": ["agricultural energy use", "construction energy use", "trn_aviation_intl", "refining"],
-        "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/ensemble_plots_percent_difference",
+        "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/ensemble_percent_difference",
         "aggregation_type_in_each_year": "sum",
         "legend_num_columns": 1,
         "legend_x_offset": 1.35,
@@ -113,7 +113,7 @@
     {
         "output_file": "./../2025_DiVittorio_et_al_gcam/scalars_control+full_feedback.csv",
         "scenarios": ["Full feedback"],
-        "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/individual_plots_full_feedback_only",
+        "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/individual_full_feedback_only",
         "plot_name": "time_series_vegetation_scalars.pdf",
         "categories": ["crop", "forest", "shrub", "pasture", "grass"],
         "category_label": "landtype",
@@ -127,7 +127,7 @@
     {
         "output_file": "./../2025_DiVittorio_et_al_gcam/scalars_control+full_feedback.csv",
         "scenarios": ["Full feedback"],
-        "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/individual_plots_full_feedback_only",
+        "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/individual_full_feedback_only",
         "plot_name": "time_series_soil_scalars.pdf",
         "categories": ["crop", "forest", "shrub", "pasture", "grass"],
         "category_label": "landtype",
@@ -143,7 +143,7 @@
         "scenarios": [
             ["Control", "Control_2", "Control_3", "Control_4", "Control_5"]
         ],
-        "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/ensemble_plots_control_only",
+        "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/ensemble_control_only",
         "plot_name": "time_series_vegetation_scalars.pdf",
         "scenario_sets": ["Control"],
         "categories": ["crop", "forest", "shrub", "pasture", "grass"],
@@ -161,7 +161,7 @@
             ["Control", "Control_2", "Control_3", "Control_4", "Control_5"],
             ["Full feedback", "Full feedback_2", "Full feedback_3", "Full feedback_4", "Full feedback_5"]
         ],
-        "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/ensemble_plots",
+        "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/ensemble",
         "plot_name": "time_series_vegetation_scalars.pdf",
         "scenario_sets": ["Control", "Full feedback"],
         "categories": ["crop", "forest", "shrub", "pasture", "grass"],
@@ -179,7 +179,7 @@
             ["Control", "Control_2", "Control_3", "Control_4", "Control_5"],
             ["Full feedback", "Full feedback_2", "Full feedback_3", "Full feedback_4", "Full feedback_5"]
         ],
-        "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/ensemble_plots_percent_difference",
+        "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/ensemble_percent_difference",
         "plot_name": "time_series_vegetation_scalars.pdf",
         "scenario_sets": ["Control", "Full feedback"],
         "categories": ["crop", "forest", "shrub", "pasture", "grass"],
@@ -197,7 +197,7 @@
             ["Control", "Control_2", "Control_3", "Control_4", "Control_5"],
             ["Full feedback", "Full feedback_2", "Full feedback_3", "Full feedback_4", "Full feedback_5"]
         ],
-        "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/ensemble_plots",
+        "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/ensemble",
         "scenario_sets": ["Control", "Full feedback"],
         "categories": ["crop", "forest", "shrub", "pasture", "grass"],
         "category_label": "landtype",
@@ -216,7 +216,7 @@
             ["Control", "Control_2", "Control_3", "Control_4", "Control_5"],
             ["Full feedback", "Full feedback_2", "Full feedback_3", "Full feedback_4", "Full feedback_5"]
         ],
-        "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/ensemble_plots",
+        "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/ensemble",
         "scenario_sets": ["Control", "Full feedback"],
         "categories": ["crop", "forest", "shrub", "pasture", "grass"],
         "category_label": "landtype",
@@ -231,7 +231,7 @@
     {
         "output_file": "./../2025_DiVittorio_et_al_gcam/land_allocation_processed_original_crop_names.csv",
         "scenarios": ["Control"],
-        "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/individual_plots_control_only/",
+        "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/individual_control_only/",
         "categories": ["crop", "forest", "shrub", "pasture", "grass"],
         "category_label": "landtype",
         "landtype_groups": "original",
@@ -246,7 +246,7 @@
     {
         "output_file": "./../2025_DiVittorio_et_al_gcam/land_allocation_processed.csv",
         "scenarios": ["Control"],
-        "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/individual_plots_control_only/",
+        "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/individual_control_only/",
         "categories": ["crop", "forest", "shrub", "pasture", "grass"],
         "category_label": "landtype",
         "mean_or_sum_if_more_than_one_row_in_same_landtype_group": "sum",

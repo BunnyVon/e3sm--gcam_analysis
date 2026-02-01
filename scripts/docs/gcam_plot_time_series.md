@@ -608,8 +608,8 @@ Each inner list is one ensemble member. Scenarios at the same position across in
 
 **Examples:**
 ```json
-"plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/individual_plots"
-"plot_directory": "./output/ensemble_plots"
+"plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/individual"
+"plot_directory": "./output/ensemble"
 ```
 
 **Behavior:**
@@ -930,7 +930,7 @@ All font sizes specified in **points** (from utility_plots.py).
     "scenarios": ["Control", "Full feedback"],
     "categories_to_exclude": ["UnmanagedLand", "Forest"],
     "y_scale": "log",
-    "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/individual_plots",
+    "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/individual",
     "use_latex": true
 }
 ```
@@ -951,7 +951,7 @@ All font sizes specified in **points** (from utility_plots.py).
     "output_file": "./../2025_DiVittorio_et_al_gcam/ag_commodity_prices_processed.csv",
     "scenarios": ["Control", "Full feedback"],
     "categories_to_exclude": ["UnmanagedLand", "Forest"],
-    "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/individual_plots_percent_difference",
+    "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/individual_percent_difference",
     "plot_percent_difference": true,
     "use_latex": true
 }
@@ -978,7 +978,7 @@ All font sizes specified in **points** (from utility_plots.py).
     "legend_x_offset": 1.4,
     "legend_num_columns": 1,
     "y_scale": "log",
-    "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/individual_plots_regions",
+    "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/individual_regions",
     "use_latex": true
 }
 ```
@@ -1005,7 +1005,7 @@ All font sizes specified in **points** (from utility_plots.py).
     "scenario_sets": ["Control", "Full feedback"],
     "categories": ["Rice", "Soybean", "Wheat"],
     "y_scale": "log",
-    "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/ensemble_plots",
+    "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/ensemble",
     "legend_num_columns": 1,
     "legend_x_offset": 1.4,
     "use_latex": true
@@ -1033,7 +1033,7 @@ All font sizes specified in **points** (from utility_plots.py).
     ],
     "scenario_sets": ["Control", "Full feedback"],
     "categories": ["Rice", "Soybean", "Wheat"],
-    "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/ensemble_plots_percent_difference",
+    "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/ensemble_percent_difference",
     "legend_num_columns": 1,
     "legend_x_offset": 1.2,
     "plot_percent_difference": true,
@@ -1056,7 +1056,7 @@ All font sizes specified in **points** (from utility_plots.py).
 {
     "output_file": "./../2025_DiVittorio_et_al_gcam/co2_emissions_regions_processed.csv",
     "scenarios": ["Control", "Full feedback"],
-    "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/individual_plots",
+    "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/individual",
     "aggregation_type_in_each_year": "sum",
     "legend_num_columns": 1,
     "use_latex": true
@@ -1082,7 +1082,7 @@ All font sizes specified in **points** (from utility_plots.py).
     "regions": ["Global", "EU-15", "Japan", "India"],
     "legend_x_offset": 1.45,
     "legend_num_columns": 1,
-    "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/individual_plots_regions",
+    "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/individual_regions",
     "aggregation_type_in_each_year": "sum",
     "use_latex": true
 }
@@ -1103,7 +1103,7 @@ All font sizes specified in **points** (from utility_plots.py).
 {
     "output_file": "./../2025_DiVittorio_et_al_gcam/scalars_control+full_feedback.csv",
     "scenarios": ["Full feedback"],
-    "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/individual_plots_full_feedback_only",
+    "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/individual_full_feedback_only",
     "plot_name": "time_series_vegetation_scalars.pdf",
     "categories": ["crop", "forest", "shrub", "pasture", "grass"],
     "category_label": "landtype",
@@ -1132,7 +1132,7 @@ All font sizes specified in **points** (from utility_plots.py).
 {
     "output_file": "./../2025_DiVittorio_et_al_gcam/scalars_control+full_feedback.csv",
     "scenarios": ["Full feedback"],
-    "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/individual_plots_full_feedback_only",
+    "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/individual_full_feedback_only",
     "plot_name": "time_series_soil_scalars.pdf",
     "categories": ["crop", "forest", "shrub", "pasture", "grass"],
     "category_label": "landtype",
@@ -1162,7 +1162,7 @@ All font sizes specified in **points** (from utility_plots.py).
     "scenarios": [
         ["Control", "Control_2", "Control_3", "Control_4", "Control_5"]
     ],
-    "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/ensemble_plots_control_only",
+    "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/ensemble_control_only",
     "plot_name": "time_series_vegetation_scalars.pdf",
     "scenario_sets": ["Control"],
     "categories": ["crop", "forest", "shrub", "pasture", "grass"],
@@ -1194,7 +1194,7 @@ All font sizes specified in **points** (from utility_plots.py).
         ["Control", "Control_2", "Control_3", "Control_4", "Control_5"],
         ["Full feedback", "Full feedback_2", "Full feedback_3", "Full feedback_4", "Full feedback_5"]
     ],
-    "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/ensemble_plots",
+    "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/ensemble",
     "scenario_sets": ["Control", "Full feedback"],
     "categories": ["crop", "forest", "shrub", "pasture", "grass"],
     "category_label": "landtype",
@@ -1232,7 +1232,7 @@ All font sizes specified in **points** (from utility_plots.py).
         ["Control_4", "Full feedback_4"],
         ["Control_5", "Full feedback_5"]
     ],
-    "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/ensemble_plots",
+    "plot_directory": "./../2025_DiVittorio_et_al_gcam/time_series_plots/ensemble",
     "scenario_sets": ["Control", "Full feedback"],
     "categories": ["crop", "forest", "shrub", "pasture", "grass"],
     "category_label": "landtype",
