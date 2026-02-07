@@ -222,6 +222,7 @@ percent_difference = ((value_2 - value_1) / value_1) × 100
 | `height` | number | No | `8` inches | Positive number | Figure height |
 | `use_latex` | boolean | No | `false` | `true`, `false` | LaTeX text rendering |
 | `produce_png` | boolean | No | `false` | `true`, `false` | Also create PNG |
+| `title_size` | number | No | `24` points | Positive number | Plot title font size |
 | `x_tick_label_size` | number | No | `20` points | Positive number | X-axis tick font size |
 | `y_tick_label_size` | number | No | `20` points | Positive number | Y-axis tick font size |
 
@@ -1403,6 +1404,7 @@ config_notes.txt:
     'start_year': 2070,
     'stippling_hatches': 'xxxx',
     'stippling_on': True,
+    'title_size': 24,  # points (from utility_plots.py)
     'use_latex': False,  # from utility_plots.py
     'value_label': 'value',
     'width': 10,  # inches (from utility_plots.py)

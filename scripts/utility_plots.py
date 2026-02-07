@@ -40,6 +40,26 @@ linestyle_tuples_default = [
 """ Markers (https://matplotlib.org/stable/gallery/lines_bars_and_markers/marker_reference.html). """
 markers_default = ['o', 'v', '^', '<', '>', '8', 's', 'p', '*', 'h', 'H', 'D', 'd', 'P', 'X', '1', '2', '3', '4', '+', 'x', '|']
 
+def setup_plot_params(options):
+    """
+    Sets up matplotlib parameters before creating a plot.
+    This function should be called BEFORE creating fig, ax to ensure LaTeX and font sizes are properly initialized.
+    
+    Parameters:
+        options: Dictionary that contains plotting options like use_latex, tick label sizes, etc.
+        
+    Returns:
+        N/A.
+    """
+    if options.get('use_latex', use_latex_default):
+        # Use LaTeX fonts for figures.
+        plt.rc('text', usetex=True)
+        plt.rc('font', family='serif', weight='bold')
+    
+    # Set tick label sizes.
+    plt.rcParams['xtick.labelsize'] = options.get('x_tick_label_size', tick_label_size_default)
+    plt.rcParams['ytick.labelsize'] = options.get('y_tick_label_size', tick_label_size_default)
+
 def create_contour_plot(x, y, z, options):
     """
     Creates a contour plot.
@@ -102,10 +122,16 @@ def set_figure_options(fig, ax, options):
     Returns:
         N/A.
     """
+    # For backward compatibility, set up plot parameters here if not already done.
+    # This ensures existing code continues to work, but new code can call setup_plot_params() first.
     if options.get('use_latex', use_latex_default):
         # Use LaTeX fonts for figures and set font size of tick labels.
         plt.rc('text', usetex=True)
         plt.rc('font', family='serif', weight='bold')
+        # Set tick label sizes immediately after LaTeX setup.
+        plt.rcParams['xtick.labelsize'] = options.get('x_tick_label_size', tick_label_size_default)
+        plt.rcParams['ytick.labelsize'] = options.get('y_tick_label_size', tick_label_size_default)
+    
     legend_on = options.get('legend_on', legend_on_default)
     if legend_on:
         legend_num_columns = options.get('legend_num_columns', legend_num_columns_default)
@@ -123,9 +149,7 @@ def set_figure_options(fig, ax, options):
                    frameon=False, loc='center right', bbox_to_anchor=(legend_x_offset, 0.5), ncol=legend_num_columns)
             
     ax.set_xlabel(options['x_label'], fontsize=options.get('x_label_size', axis_label_size_default))
-    plt.rcParams['xtick.labelsize'] = options.get('x_tick_label_size', tick_label_size_default)
     ax.set_ylabel(options['y_label'], fontsize=options.get('y_label_size', axis_label_size_default))
-    plt.rcParams['ytick.labelsize'] = options.get('y_tick_label_size', tick_label_size_default)
 
     x_scale = options.get('x_scale', scale_default)
     if x_scale:

@@ -214,11 +214,7 @@ def plot_box_and_whiskers(inputs):
     plot_options.update(zip(['legend_num_columns'], [legend_num_columns]))
 
     # Use LaTeX fonts for figures and set font size of tick labels.
-    if use_latex:
-        plt.rc('text', usetex=True)
-        plt.rc('font', family='serif', weight='bold')
-    plt.rcParams['xtick.labelsize'] = x_tick_label_size
-    plt.rcParams['ytick.labelsize'] = y_tick_label_size
+    setup_plot_params(plot_options)
 
     # Read the file, select rows between the start and end years, apply user-specified multiplier, create the figure and axis objects for the plot.
     df = read_file_into_dataframe(output_file)

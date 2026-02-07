@@ -49,6 +49,7 @@ default_inputs = {
     'width': width_default,   
     'x_tick_label_size': tick_label_size_default,   
     'y_tick_label_size': tick_label_size_default,
+    'title_size': axis_label_size_default,
     'year_label': 'year'            
 }
 
@@ -182,6 +183,7 @@ def plot_spatial_data(inputs):
     stippling_hatches = inputs['stippling_hatches']
     stippling_on = inputs['stippling_on']
     title = inputs['title']
+    title_size = inputs['title_size']
     use_latex = inputs['use_latex']
     value_label = inputs['value_label']
     width = inputs['width']
@@ -196,9 +198,7 @@ def plot_spatial_data(inputs):
     plot_options.update(zip(['x_tick_label_size', 'y_tick_label_size', 'use_latex'], [x_tick_label_size, y_tick_label_size, use_latex]))
 
     # Use LaTeX fonts for figures and set font size of tick labels.
-    if use_latex:
-        plt.rc('text', usetex=True)
-        plt.rc('font', family='serif', weight='bold')
+    setup_plot_params(plot_options)
 
     # Read the data file into a Pandas DataFrame and select rows between the start and end years.
     df = read_file_into_dataframe(output_file)
@@ -334,7 +334,7 @@ def plot_spatial_data(inputs):
 
     # Create figure and axis objects for the plot, set the title and colorbar limits.
     fig, ax = plt.subplots(nrows=1, ncols=1)
-    ax.set_title(title)
+    ax.set_title(title, fontdict={'fontsize': title_size})
     if cbar_limits:
         vmin, vmax = cbar_limits[0], cbar_limits[1]
     else:

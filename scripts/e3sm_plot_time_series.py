@@ -397,11 +397,7 @@ def plot_time_series(inputs):
     plot_options.update(zip(['produce_png'], [produce_png]))
 
     # Use LaTeX fonts for figures and set font size of tick labels.
-    if use_latex:
-        plt.rc('text', usetex=True)
-        plt.rc('font', family='serif', weight='bold')
-    plt.rcParams['xtick.labelsize'] = x_tick_label_size
-    plt.rcParams['ytick.labelsize'] = y_tick_label_size
+    setup_plot_params(plot_options)
 
     # Figure and axis objects for annual time series (+ possibly including seasons), seasons separately, and monthly time series plots.
     fig, ax = plt.subplots(nrows=1, ncols=1)

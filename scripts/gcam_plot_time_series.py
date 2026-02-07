@@ -242,11 +242,7 @@ def plot_time_series(inputs):
     plot_options.update(zip(['produce_png', 'legend_x_offset', 'legend_place_outside'], [produce_png, legend_x_offset, legend_place_outside]))
 
     # Use LaTeX fonts for figures and set font size of tick labels.
-    if use_latex:
-        plt.rc('text', usetex=True)
-        plt.rc('font', family='serif', weight='bold')
-    plt.rcParams['xtick.labelsize'] = x_tick_label_size
-    plt.rcParams['ytick.labelsize'] = y_tick_label_size
+    setup_plot_params(plot_options)
 
     # Create an empty DataFrame that will later be used to store all of the time series data and to calculate their statistics.
     df_all_time_series = pd.DataFrame()
