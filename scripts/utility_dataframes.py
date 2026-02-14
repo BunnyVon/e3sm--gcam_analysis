@@ -113,17 +113,26 @@ def get_matching_column_in_dataframe(df, variable, all_matches=False):
     """
     all_matching_columns = []
     for column in df.columns:
-        units_in_column = column.find(' (') != -1
-        if units_in_column and variable + ' (' in column:
+        column_str = str(column).strip()
+        # Check for exact match with units pattern: "VARIABLE (unit)"
+        if column_str.startswith(variable + ' (') and column_str.endswith(')'):
             if not all_matches:
-                return column
+                return column_str
             else:
-                all_matching_columns.append(column)
-        if not units_in_column and variable in column:
+                all_matching_columns.append(column_str)
+        # Check for exact variable name match (no units)
+        elif column_str == variable:
             if not all_matches:
-                return column
+                return column_str  
             else:
-                all_matching_columns.append(column)
+                all_matching_columns.append(column_str)
+        # Check if variable name is contained in column (fallback)
+        elif variable in column_str:
+            if not all_matches:
+                return column_str
+            else:
+                all_matching_columns.append(column_str)
+    
     if all_matching_columns:
         return all_matching_columns
     else:
@@ -180,7 +189,15 @@ def read_file_into_dataframe(file_name, clean_up_df=False):
     if file_name.endswith('.csv'):
         df = pd.read_csv(file_name)
     else:
-        df = pd.read_fwf(file_name)
+        # For these E3SM data files, the columns are space-separated but some column names contain spaces
+        # We need to use a regex that splits on multiple spaces but preserves single spaces within column names
+        try:
+            # Read with regex separator that handles multiple spaces
+            df = pd.read_csv(file_name, sep=r'\s{2,}', engine='python')
+        except:
+            # If that fails, fall back to the standard approach
+            df = pd.read_fwf(file_name, header=0)
+    
     if clean_up_df:
         df = clean_up_dataframe(df)
     return df
@@ -264,21 +281,46 @@ def write_dataframe_to_fwf(file_name, df, keep_index_column=False, width_index_c
     Returns:
         N/A.
     """
-    # Write the contents to the file.
-    with open(file_name, 'w') as file:
-        file.write(df.__repr__())
+    # Calculate appropriate column widths
+    col_widths = {}
+    for col in df.columns:
+        # Get the maximum width needed for this column (header vs data)
+        header_width = len(str(col))
+        if df[col].dtype in ['int64', 'float64'] or pd.api.types.is_numeric_dtype(df[col]):
+            # For numeric columns, format as scientific notation and find max width
+            data_widths = [len(f'{val:+.8e}') for val in df[col].dropna()]
+            data_width = max(data_widths) if data_widths else 15
+        else:
+            # For text columns, find max string length
+            data_width = max([len(str(val)) for val in df[col].dropna()]) if len(df) > 0 else len(str(col))
+        
+        # Use the larger of header width or data width, with minimum 4 for Year column
+        if 'Year' in col:
+            col_widths[col] = max(header_width, data_width, 4)  # Ensure Year column is at least 4 wide
+        else:
+            col_widths[col] = max(header_width, data_width)
     
-    # Remove the index column by deleting the number of characters equal to the width of the column.
-    # This includes the space between it and the next column.
-    if (keep_index_column == False):
-
-        # If the width of the index column has not been specified in the call to this function, set it based on the number of lines in the file.
-        if not width_index_column:
-            num_lines = len(df)
-            if num_lines > 1:
-                width_index_column = int(np.log10(num_lines-1) + 2)
-            else:
-                width_index_column = 2
-
-        for line in fileinput.input(files=(file_name), inplace=True):
-            sys.stdout.write(line[width_index_column:])
+    # Write the contents to the file with proper formatting
+    with open(file_name, 'w') as file:
+        # Write header
+        header_parts = []
+        for col in df.columns:
+            header_parts.append(f'{col:>{col_widths[col]}}')
+        file.write('  '.join(header_parts) + '\n')
+        
+        # Write data rows
+        for _, row in df.iterrows():
+            row_parts = []
+            for col in df.columns:
+                val = row[col]
+                if pd.isna(val):
+                    formatted_val = 'NaN'
+                elif df[col].dtype in ['int64', 'float64'] or pd.api.types.is_numeric_dtype(df[col]):
+                    if abs(val) < 1e-4 or abs(val) >= 1e4:
+                        formatted_val = f'{val:+.8e}'
+                    else:
+                        formatted_val = f'{val:+.8f}'
+                else:
+                    formatted_val = str(val)
+                row_parts.append(f'{formatted_val:>{col_widths[col]}}')
+            file.write('  '.join(row_parts) + '\n')
