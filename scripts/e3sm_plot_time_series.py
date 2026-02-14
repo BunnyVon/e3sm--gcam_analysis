@@ -85,23 +85,35 @@ def process_inputs(inputs):
         file = inputs['output_files'][0]
     elif isinstance(inputs['output_files'], dict):
         file = inputs['output_files'][list(inputs['output_files'].keys())[0]]
+    
+    print(f"\\nDEBUG: Reading sample file to check available variables: {file}")
     df = read_file_into_dataframe(file)
+    print(f"DEBUG: Sample file shape: {df.shape}")
+    print(f"DEBUG: Available columns in data file: {list(df.columns)}")
+    print(f"DEBUG: Sample data (first 3 rows):")
+    print(df.head(3))
 
     # If the user entered the string 'all' for the variables or no input at all for the variables, assume that they want to make plots for
     # all columns (all variables) that are in the DataFrame, except for the Year and Month columns.
     if 'variables' not in inputs:
         inputs['variables'] = None
     variables = inputs['variables']
+    
+    print(f"DEBUG: Requested variables: {variables}")
+    
     if not variables or variables == 'all':
         variables = get_columns_without_units_in_dataframe(df)
         variables.remove('Year')
         if 'Month' in variables:
             variables.remove('Month')
         inputs['variables'] = variables
+        print(f"DEBUG: Using all available variables (excluding Year/Month): {variables}")
     # If the user entered a string indicating a single variable, put that string in a list.
     if isinstance(variables, str):
         variables = [variables]
         inputs['variables'] = variables
+    
+    print(f"DEBUG: Final variables list to process: {variables}")
 
     # Add keys for plotting options that have not been specified in the inputs dictionary, and set to an empty dictionary or use default values.
     for key in default_inputs.keys():
@@ -222,10 +234,10 @@ def plot_seasons(include_seasons, ax, df, x, output_label, plot_colors, linestyl
                 condition = (df['Month'] >= month_geq) & (df['Month'] <= month_leq)
             # If we have multiple datasets to plot, calculate the standard deviation across the datasets for each year for each of the seasons.
             if isinstance(columns, list):
-                y = df[condition].groupby('Year', as_index=False).mean()[columns].mean(axis=1)
-                y_std = df[condition].groupby('Year', as_index=False).mean()[columns].std(axis=1)
+                y = df[condition].groupby('Year', as_index=False).mean(numeric_only=True)[columns].mean(axis=1)
+                y_std = df[condition].groupby('Year', as_index=False).mean(numeric_only=True)[columns].std(axis=1)
             else:
-                y = df[condition].groupby('Year', as_index=False).mean()[columns]
+                y = df[condition].groupby('Year', as_index=False).mean(numeric_only=True)[columns]
             # If the reference data is not None or not empty, we assume that the user wants to perform a percent difference calculation.
             if reference_data:
                 if file_or_file_set_index == 0:
@@ -257,15 +269,47 @@ def read_file_into_single_variable_dataframe(file, variable, start_year, end_yea
     Returns:
         DataFrame containing the data for the variable and also the column in the DataFrame for that variable if return_column is True.
     """
+    print(f"DEBUG: Processing variable '{variable}' from file '{file}'")
     df = read_file_into_dataframe(file)
+    print(f"DEBUG: File columns available: {list(df.columns)}")
+    
     df = df[(df['Year'] >= start_year) & (df['Year'] <= end_year)]
+    print(f"DEBUG: Data shape after year filtering ({start_year}-{end_year}): {df.shape}")
+    
     # Find the column label for the variable, reduce the DataFrame to that column (plus columns for Year and Month).
     column = get_matching_column_in_dataframe(df, variable)
+    if column is None:
+        print(f"ERROR: Variable '{variable}' not found in data file {file}")
+        print(f"Available columns: {list(df.columns)}")
+        # Check for partial matches
+        partial_matches = [col for col in df.columns if variable.lower() in col.lower() or col.lower() in variable.lower()]
+        if partial_matches:
+            print(f"Possible partial matches: {partial_matches}")
+        raise ValueError(f"Variable '{variable}' not found in data file {file}")
+    
+    print(f"DEBUG: Found matching column: '{column}' for variable '{variable}'")
+    
     if 'Month' in df.columns:
         df = df[['Year', 'Month', column]]
     else:
         df = df[['Year', column]]
+    
+    # Convert the column to numeric, handling any string concatenation issues
+    original_count = len(df)
+    df[column] = pd.to_numeric(df[column], errors='coerce')
+    # Remove rows with NaN values that couldn't be converted
+    df = df.dropna(subset=[column])
+    nan_count = original_count - len(df)
+    if nan_count > 0:
+        print(f"WARNING: Removed {nan_count} rows with non-numeric data for variable '{variable}'")
+    
+    if df.empty:
+        print(f"ERROR: No valid data found for variable '{variable}' after processing")
+        raise ValueError(f"No valid numeric data found for variable '{variable}' in file {file}")
+    
+    print(f"DEBUG: Final data shape for '{variable}': {df.shape}")
     df[column] *= multiplier
+    
     if return_column:
         return df, column
     else:
@@ -322,6 +366,10 @@ def plot_time_series(inputs):
     # This function creates time series plots for a single variable, and so it assumes that there is only one variable in the inputs dictionary.
     start_time = time.time()
     variable = inputs['variable']
+    
+    print(f"\n{'='*60}")
+    print(f"STARTING PLOT GENERATION FOR VARIABLE: {variable}")
+    print(f"{'='*60}")
 
     # Extract all plotting options for both annual and monthly time series plots.
     areas_in_thousands_km2 = inputs['areas_in_thousands_km2']
@@ -375,22 +423,22 @@ def plot_time_series(inputs):
     y_tick_label_size = inputs['y_tick_label_size']
 
     # For area variables that are in units of km^2, plot them in units of thousands of km^2 if specified to do so.
-    if areas_in_thousands_km2 and 'AREA' in variable and 'km^2' in y_label:
+    if areas_in_thousands_km2 and 'AREA' in variable and y_label is not None and 'km^2' in y_label:
         multiplier = 1/1000
         y_label = y_label.replace('km^2', rf'thousands km$^2$')
 
     # Fix the labels involving m^2 or km^2 so that they get rendered properly.
-    if 'm^2' in y_label:
+    if y_label is not None and 'm^2' in y_label:
         y_label = y_label.replace('m^2', rf'm$^2$')
 
     # Initialize dictionary to store the data from the first file or first file set, which will serve as the reference for percent difference 
     # calculations. Also update the units in the y-axis label if plotting a percent difference.
     reference_data = {}
-    if plot_percent_difference:
+    if plot_percent_difference and y_label is not None:
         y_label = replace_inside_parentheses(y_label, rf'($\%$ difference)')
 
     # Set the plotting options.
-    plot_options = dict(width=width, height=height, name=plot_name, x_label='Year', y_label=fr'{y_label}')
+    plot_options = dict(width=width, height=height, name=plot_name, x_label='Year', y_label=fr'{y_label if y_label is not None else variable}')
     plot_options.update(zip(['x_scale', 'y_scale', 'x_limits', 'y_limits', 'use_latex'], [x_scale, y_scale, x_limits, y_limits, use_latex]))
     plot_options.update(zip(['x_tick_label_size', 'y_tick_label_size', 'legend_on'], [x_tick_label_size, y_tick_label_size, legend_on]))
     plot_options.update(zip(['x_label_size', 'y_label_size', 'legend_label_size'], [x_label_size, y_label_size, legend_label_size]))
@@ -423,6 +471,8 @@ def plot_time_series(inputs):
 
         # Get the total number of files and iterate over each file.
         num_files = len(output_files)
+        current_column_name = None  # Track the column name with units for statistical analysis
+        
         for file_index in range(num_files):
 
             # Get the label and line color for this output file.
@@ -431,13 +481,27 @@ def plot_time_series(inputs):
             line_color = plot_colors[file_index]
 
             # Time series data can be either averaged or summed over each month of the year.
-            df, column = read_file_into_single_variable_dataframe(file, variable, start_year, end_year, multiplier, return_column=True)
+            try:
+                df, column = read_file_into_single_variable_dataframe(file, variable, start_year, end_year, multiplier, return_column=True)
+                if df.empty or column is None:
+                    print(f"SKIP: Empty dataframe or no column found for variable '{variable}' in file '{file}'")
+                    continue
+                print(f"SUCCESS: Loaded variable '{variable}' from file '{file}' with {len(df)} data points")
+                
+                # Store the full column name with units for statistical analysis
+                if current_column_name is None:
+                    current_column_name = column
+                    
+            except Exception as e:
+                print(f"ERROR: Failed to process variable '{variable}' from file '{file}': {str(e)}")
+                continue
             if monthly_aggregation_type == 'mean':
-                y = df.groupby('Year', as_index=False).mean()[column]
+                y = df.groupby('Year', as_index=False).mean(numeric_only=True)[column]
             elif monthly_aggregation_type == 'sum':
                 # Update the labels accordingly if a sum.
-                y = df.groupby('Year', as_index=False).sum()[column]
-                plot_options['y_label'] = y_label.replace('/month', '/year')
+                y = df.groupby('Year', as_index=False).sum(numeric_only=True)[column]
+                if y_label is not None:
+                    plot_options['y_label'] = y_label.replace('/month', '/year')
             
             # If plotting a percent difference with respect to the first file, store the data for that file and calculate the percent difference.
             if plot_percent_difference:
@@ -447,7 +511,7 @@ def plot_time_series(inputs):
                 y = (y - reference_data['annual'])/(reference_data['annual'] + EPSILON)*100
                     
             # Plot the annual time series, including possibly the error bars. 
-            x = df.groupby('Year', as_index=False).mean()['Year']
+            x = df.groupby('Year', as_index=False).mean(numeric_only=True)['Year']
             # Do not include the first file if plotting a percent difference. But include it in the plot otherwise.
             if not plot_percent_difference or file_index != 0:
                 ax.plot(x, y, label=output_label, color=line_color, linestyle=linestyle_tuples[0][1], linewidth=linewidth)
@@ -455,7 +519,7 @@ def plot_time_series(inputs):
             if file_index == 0:
                 x_series = pd.Series(x, name='Year')
                 df_all_annual_time_series = pd.concat([df_all_annual_time_series, x_series], axis=1)
-            y_series = pd.Series(y, name=f'{column}_{file_index}')
+            y_series = pd.Series(y, name=f'{current_column_name}_{file_index}')
             df_all_annual_time_series = pd.concat([df_all_annual_time_series, y_series], axis=1)
 
             # Add time series for one or more seasonal averages to the annual plot if specified to do so.
@@ -474,8 +538,8 @@ def plot_time_series(inputs):
             if monthly_time_series_plot:
                 df = read_file_into_single_variable_dataframe(file, variable, monthly_time_series_start_year, 
                                                                 monthly_time_series_end_year, multiplier, return_column=False)
-                y = df.groupby('Month', as_index=False).mean()[column]
-                x = (df.groupby('Month', as_index=False).mean()['Month']).to_numpy()
+                y = df.groupby('Month', as_index=False).mean(numeric_only=True)[column]
+                x = (df.groupby('Month', as_index=False).mean(numeric_only=True)['Month']).to_numpy()
                 if plot_percent_difference:
                     if file_index == 0:
                         reference_data['monthly'] = y
@@ -488,7 +552,7 @@ def plot_time_series(inputs):
                 if file_index == 0:
                     x_series = pd.Series(x, name='Month')
                     df_all_monthly_time_series = pd.concat([df_all_monthly_time_series, x_series], axis=1)
-                y_series = pd.Series(y, name=f'{column}_{file_index}')
+                y_series = pd.Series(y, name=f'{current_column_name}_{file_index}')
                 df_all_monthly_time_series = pd.concat([df_all_monthly_time_series, y_series], axis=1)
 
         # Calculate the mean and standard deviation (for error bars) across all annual and monthly time series. Perform t-tests.
@@ -515,13 +579,23 @@ def plot_time_series(inputs):
                     error = df[columns].std(axis=1)*std_multiplier
                     axis.fill_between(x, y-error, y+error, color='k', alpha=error_bars_alpha)
             # Perform t-test to compare the entire annual or monthly time series in the first file (assumed to be control) vs. other files.
-            if not df.empty:
-                control_data = df[column + '_0']
-                for file_index in range(1, num_files):
-                    output_file = output_files[file_index]
-                    test_data = df[column + f'_{file_index}']
-                    ttest = stats.ttest_ind(control_data, test_data)
-                    print_p_values(ttest, variable, p_value_threshold, p_value_file, output_file, p_value_file_print_only_if_below_threshold)
+            if not df.empty and num_files > 1 and current_column_name and time_column == 'Year':
+                # Only do statistical analysis for annual data, and only once
+                try:
+                    # Look for columns that match the pattern: full_column_name_index
+                    control_column = f'{current_column_name}_0'  # current_column_name already includes units like 'ER (PgC/month)'
+                    if control_column in df.columns:
+                        control_data = df[control_column].dropna()
+                        for file_idx in range(1, num_files):
+                            test_column = f'{current_column_name}_{file_idx}' 
+                            if test_column in df.columns:
+                                output_file = output_files[file_idx] if isinstance(output_files[file_idx], str) else str(output_files[file_idx])
+                                test_data = df[test_column].dropna()
+                                if len(control_data) > 1 and len(test_data) > 1:
+                                    ttest = stats.ttest_ind(control_data, test_data)
+                                    print_p_values(ttest, variable, p_value_threshold, p_value_file, output_file, p_value_file_print_only_if_below_threshold)
+                except Exception as e:
+                    print(f"WARNING: Statistical analysis failed for {variable}: {str(e)}")
 
     # Option 2: ensemble plots, in which the outputs are subdivided into groups of curves, where each group (ensemble) represents a set of files.
     elif check_is_list_of_lists(output_files) and plot_type == 'ensemble':
@@ -535,19 +609,27 @@ def plot_time_series(inputs):
             line_color = plot_colors[file_set_index]
 
             # Calculate the mean over all files in this set. Time series data can be either averaged or summed over each month of the year.
-            df, columns = read_file_set_into_single_variable_dataframe(output_files, file_set_index, variable, start_year, end_year, multiplier)
+            try:
+                df, columns = read_file_set_into_single_variable_dataframe(output_files, file_set_index, variable, start_year, end_year, multiplier)
+                if df.empty or not columns:
+                    print(f"SKIP: Empty dataframe or no columns found for variable '{variable}' in file set {file_set_index}")
+                    continue
+                print(f"SUCCESS: Loaded variable '{variable}' from file set {file_set_index} with {len(df)} data points")
+            except Exception as e:
+                print(f"ERROR: Failed to process variable '{variable}' from file set {file_set_index}: {str(e)}")
+                continue
             if monthly_aggregation_type == 'mean':
-                y = df.groupby('Year', as_index=False).mean()[columns].mean(axis=1)
-                y_std = df.groupby('Year', as_index=False).mean()[columns].std(axis=1)
+                y = df.groupby('Year', as_index=False).mean(numeric_only=True)[columns].mean(axis=1)
+                y_std = df.groupby('Year', as_index=False).mean(numeric_only=True)[columns].std(axis=1)
                 # Join the annual time series data from the current set into the larger DataFrame.
-                df_all_annual_time_series = pd.concat([df_all_annual_time_series, df.groupby('Year', as_index=False).mean()], axis=1)
+                df_all_annual_time_series = pd.concat([df_all_annual_time_series, df.groupby('Year', as_index=False).mean(numeric_only=True)], axis=1)
             elif monthly_aggregation_type == 'sum':
-                y = df.groupby('Year', as_index=False).sum()[columns].mean(axis=1)
-                y_std = df.groupby('Year', as_index=False).sum()[columns].std(axis=1)
+                y = df.groupby('Year', as_index=False).sum(numeric_only=True)[columns].mean(axis=1)
+                y_std = df.groupby('Year', as_index=False).sum(numeric_only=True)[columns].std(axis=1)
                 # Update the labels accordingly if a sum.
                 plot_options['y_label'] = y_label.replace('/month', '/year')
                 # Join the annual time series data from the current set into the larger DataFrame.
-                df_all_annual_time_series = pd.concat([df_all_annual_time_series, df.groupby('Year', as_index=False).sum()], axis=1)
+                df_all_annual_time_series = pd.concat([df_all_annual_time_series, df.groupby('Year', as_index=False).sum(numeric_only=True)], axis=1)
 
             # If plotting a percent difference with respect to the first file set, store the data for that set and calculate the percent difference.
             if plot_percent_difference:
@@ -558,7 +640,7 @@ def plot_time_series(inputs):
                 y_std = y_std/(reference_data['annual'] + EPSILON)*100
 
             # Plot the annual time series, including possibly the error bars. 
-            x = df.groupby('Year', as_index=False).mean()['Year']
+            x = df.groupby('Year', as_index=False).mean(numeric_only=True)['Year']
             # Do not include the first file set if plotting a percent difference. Include it in the plot otherwise.
             if not plot_percent_difference or file_set_index != 0:
                 ax.plot(x, y, label=output_label, color=line_color, linestyle=linestyle_tuples[0][1], linewidth=linewidth)
@@ -583,9 +665,9 @@ def plot_time_series(inputs):
             # Create the monthly time series plot for the variable if specified to do so.
             if monthly_time_series_plot:
                 df, columns = read_file_set_into_single_variable_dataframe(output_files, file_set_index, variable, start_year, end_year, multiplier)
-                y = df.groupby('Month', as_index=False).mean()[columns].mean(axis=1)
-                y_std = df.groupby('Month', as_index=False).mean()[columns].std(axis=1)
-                x = (df.groupby('Month', as_index=False).mean()['Month']).to_numpy()
+                y = df.groupby('Month', as_index=False).mean(numeric_only=True)[columns].mean(axis=1)
+                y_std = df.groupby('Month', as_index=False).mean(numeric_only=True)[columns].std(axis=1)
+                x = (df.groupby('Month', as_index=False).mean(numeric_only=True)['Month']).to_numpy()
                 x = np.vectorize(MONTH_NUM_TO_NAME.get)(x)
                 if plot_percent_difference:
                     if file_set_index == 0:
@@ -599,7 +681,7 @@ def plot_time_series(inputs):
                         ax_monthly.fill_between(x, y-error, y+error, color=line_color, alpha=error_bars_alpha)
                     ax_monthly.tick_params(axis='x', labelrotation=45)
                 # Join the monthly time series data from the current file into the larger DataFrame.
-                df_all_monthly_time_series = pd.concat([df_all_monthly_time_series, df.groupby('Month', as_index=False).mean()], axis=1)
+                df_all_monthly_time_series = pd.concat([df_all_monthly_time_series, df.groupby('Month', as_index=False).mean(numeric_only=True)], axis=1)
 
         # Calculate the mean and error bars for each of the annual and monthly time series data set ensembles. Perform multiple different t-tests.
         conditions = [include_annual_mean_across_all_sets, monthly_time_series_plot and include_monthly_mean_across_all_sets]
@@ -683,7 +765,8 @@ def plot_time_series(inputs):
     plt.close(fig_monthly)
     end_time = time.time()
     elapsed_time = end_time - start_time
-    print(f"Elapsed time for producing plots for {variable} in {plot_directory}: {elapsed_time:.2f} seconds")
+    print(f"COMPLETED: Plots for {variable} in {plot_directory}: {elapsed_time:.2f} seconds")
+    print(f"{'='*60}")
 
 
 ###---------------Begin execution---------------###
@@ -707,7 +790,12 @@ if __name__ == '__main__':
     list_of_inputs = []
     for index in range(len(inputs)):
         # Process the inputs to fill in missing plotting input choices with default values, etc., and add to the list of dictionaries.
-        list_of_inputs.extend(process_inputs(inputs[index]))
+        processed_inputs = process_inputs(inputs[index])
+        print(f"Processed {len(processed_inputs)} variables from input {index+1}: {[inp['variable'] for inp in processed_inputs]}")
+        list_of_inputs.extend(processed_inputs)
+    
+    print(f"\nTotal variables to process: {len(list_of_inputs)}")
+    print(f"Variables: {[inp['variable'] for inp in list_of_inputs]}")
 
     # Delete all the p-value files before we do any calculations to start a fresh run.
     for inputs in list_of_inputs:
@@ -715,9 +803,23 @@ if __name__ == '__main__':
         if os.path.exists(file): 
             os.remove(file)
 
-    # Create all of the times series plots in parallel.
-    with multiprocessing.Pool(processes=multiprocessing.cpu_count()) as pool:
-        pool.map(plot_time_series, list_of_inputs)
+    # Create all the times series plots sequentially for debugging (instead of parallel)
+    print(f"\nStarting plot generation for {len(list_of_inputs)} variables...")
+    success_count = 0
+    error_count = 0
+    
+    for i, inputs_single in enumerate(list_of_inputs):
+        try:
+            print(f"\n--- Processing variable {i+1}/{len(list_of_inputs)}: {inputs_single['variable']} ---")
+            plot_time_series(inputs_single)
+            success_count += 1
+        except Exception as e:
+            error_count += 1
+            print(f"CRITICAL ERROR: Failed to create plot for variable '{inputs_single['variable']}': {str(e)}")
+            import traceback
+            traceback.print_exc()
+    
+    print(f"\\nPlot generation summary: {success_count} successful, {error_count} failed")
 
     # Sort all the p-value files alphabetically.
     for inputs in list_of_inputs:
