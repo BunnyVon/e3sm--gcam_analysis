@@ -246,7 +246,9 @@ def extract_time_series_from_netcdf_files(simulation_path, output_file, netcdf_s
         # Use multiprocessing to extract data from all the files. Put the data from each file into DataFrame, store all such DataFrames in a list.
         arguments = list(zip(netcdf_files, [variables[index]]*len(netcdf_files), [lat_lon_aggregation_types[index]]*len(netcdf_files), 
                              [regions[index]]*len(netcdf_files)))
-        with multiprocessing.Pool(processes=multiprocessing.cpu_count()) as pool:
+        # Limit processes to reduce memory pressure - use at most 16 processes or half of available CPUs
+        max_processes = min(16, multiprocessing.cpu_count() // 2) 
+        with multiprocessing.Pool(processes=max_processes) as pool:
             dataframes_for_each_nc_file = list(pool.starmap(extract_netcdf_file_into_dataframe, arguments))
         
         # Concatenate all DataFrames in the list together to form a single DataFrame for this NetCDF type. Sort by year and month.
