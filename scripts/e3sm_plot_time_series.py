@@ -301,7 +301,7 @@ def read_file_set_into_single_variable_dataframe(output_files, file_set_index, v
         else:
             df = pd.merge(df, df_for_this_file, on=['Year'], how='inner')
     # After the join operation, there will be multiple columns for the variable. Return the list of all of these columns along with the DataFrame.
-    columns = get_matching_column_in_dataframe(df, variable, all_matches=True)
+    columns = get_matching_column_in_dataframe(df, variable, get_all_matches=True)
     return df, columns
 
 def plot_time_series(inputs):
@@ -619,7 +619,7 @@ def plot_time_series(inputs):
                 df_all_data_set_means = pd.DataFrame()
 
                 # Get all columns except for time and find the columns for the first (assumed to be control) set/ensemble. Calculate control set mean.
-                columns = get_matching_column_in_dataframe(df, variable, all_matches=True)
+                columns = get_matching_column_in_dataframe(df, variable, get_all_matches=True)
                 columns_control_set = [column for column in columns if column.endswith(f'_0')]
                 df_control_mean = df[columns_control_set].mean(axis=1)
 
@@ -716,7 +716,9 @@ if __name__ == '__main__':
             os.remove(file)
 
     # Create all of the times series plots in parallel.
-    with multiprocessing.Pool(processes=multiprocessing.cpu_count()) as pool:
+    # Limit processes to reduce memory pressure - use at most 16 processes or half of available CPUs.
+    max_processes = min(16, multiprocessing.cpu_count() // 2) 
+    with multiprocessing.Pool(processes=max_processes) as pool:
         pool.map(plot_time_series, list_of_inputs)
 
     # Sort all the p-value files alphabetically.

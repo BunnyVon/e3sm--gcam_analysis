@@ -146,7 +146,9 @@ def extract_time_series_from_netcdf_file(inputs):
     # Use multiprocessing to extract data from the file for each individual year. 
     # Put the data from each year into DataFrame and store all such DataFrames in a list.
     arguments = list(zip([file]*num_years, [variables]*num_years, [region]*num_years, range(start_year, end_year+1)))
-    with multiprocessing.Pool(processes=multiprocessing.cpu_count()) as pool:
+    # Limit processes to reduce memory pressure - use at most 16 processes or half of available CPUs.
+    max_processes = min(16, multiprocessing.cpu_count() // 2) 
+    with multiprocessing.Pool(processes=max_processes) as pool:
         dataframes_for_each_year = list(pool.starmap(extract_netcdf_file_into_dataframe_single_year, arguments))
 
     # Concatenate all DataFrames in the list together to form a single DataFrame over all years. Sort by year.

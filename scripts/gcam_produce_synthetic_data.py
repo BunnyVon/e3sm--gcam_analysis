@@ -79,7 +79,9 @@ if __name__ == '__main__':
     inputs = list(zip(files, all_scenarios, scenario_labels, columns_to_modify, num_variations_for_each_scenario))
 
     # Produce data for each file in parallel.
-    with multiprocessing.Pool(processes=multiprocessing.cpu_count()) as pool:
+    # Limit processes to reduce memory pressure - use at most 16 processes or half of available CPUs.
+    max_processes = min(16, multiprocessing.cpu_count() // 2) 
+    with multiprocessing.Pool(processes=max_processes) as pool:
         pool.map(produce_synthetic_time_series, inputs)
     
     # Print the total execution time needed to produce all the sets.

@@ -99,35 +99,28 @@ def get_columns_without_units_in_dataframe(df):
             columns_without_units.append(column[:stop_index])
     return columns_without_units
 
-def get_matching_column_in_dataframe(df, variable, all_matches=False):
+def get_matching_column_in_dataframe(df, variable, get_all_matches=False):
     """
     Returns the column name(s) in a Pandas DataFrame that matches the variable.
 
     Parameters:
         df: The input DataFrame.
         variable: Variable name to search for in the column names.
-        all_matches: If True, all columns that matches the variable will be returned. If False, only the first matching column will be returned.
+        get_all_matches: If True, all columns that matches the variable will be returned. If False, only the first matching column will be returned.
 
     Returns:
         The matching column name(s), or None if no match is found.
     """
     all_matching_columns = []
     for column in df.columns:
-        units_in_column = column.find(' (') != -1
-        if units_in_column and variable + ' (' in column:
-            if not all_matches:
+        units_in_column = ' (' in column
+        is_match = (units_in_column and variable + ' (' in column) or \
+                    (not units_in_column and variable in column)
+        if is_match:
+            if not get_all_matches:
                 return column
-            else:
-                all_matching_columns.append(column)
-        if not units_in_column and variable in column:
-            if not all_matches:
-                return column
-            else:
-                all_matching_columns.append(column)
-    if all_matching_columns:
-        return all_matching_columns
-    else:
-        return None
+            all_matching_columns.append(column)
+    return all_matching_columns or None
 
 def move_columns_next_to_each_other_in_dataframe(df, column1, column2):
     """
@@ -251,7 +244,7 @@ def write_dataframe_to_file(df, file_name):
     else:
         write_dataframe_to_fwf(file_name, df)
 
-def write_dataframe_to_fwf(file_name, df, keep_index_column=False, width_index_column=None):
+def write_dataframe_to_fwf(file_name, df, keep_index_column=False):
     """ 
     Writes the contents of a Pandas DataFrame to an output file in fixed-width format (fwf), omitting the index column if specified to do so.
 
@@ -259,26 +252,12 @@ def write_dataframe_to_fwf(file_name, df, keep_index_column=False, width_index_c
         file_name: Complete path and name of the output file.
         df: DataFrame in which the data to be written to the output file are stored.
         keep_index_column: Specifies whether to print the index column in the output file.
-        width_index_column: Specifies the number of characters that span the width of the index column.
 
     Returns:
         N/A.
     """
-    # Write the contents to the file.
-    with open(file_name, 'w') as file:
-        file.write(df.__repr__())
+    df_str = df.to_string(index=keep_index_column)
     
-    # Remove the index column by deleting the number of characters equal to the width of the column.
-    # This includes the space between it and the next column.
-    if (keep_index_column == False):
-
-        # If the width of the index column has not been specified in the call to this function, set it based on the number of lines in the file.
-        if not width_index_column:
-            num_lines = len(df)
-            if num_lines > 1:
-                width_index_column = int(np.log10(num_lines-1) + 2)
-            else:
-                width_index_column = 2
-
-        for line in fileinput.input(files=(file_name), inplace=True):
-            sys.stdout.write(line[width_index_column:])
+    # Write the contents to the file.
+    with open(file_name, 'w', encoding='utf-8') as file:
+        file.write(df_str)
