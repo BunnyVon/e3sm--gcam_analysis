@@ -97,9 +97,7 @@ def add_areas_to_file(inputs):
                                                scenarios, geographies, categories))
 
     # Add areas for each subset of the data (each tuple in the Cartesian product) in parallel. Store the subsets in a list of DataFrames.
-    # Limit processes to reduce memory pressure - use at most 16 processes or half of available CPUs.
-    max_processes = min(16, multiprocessing.cpu_count() // 2) 
-    with multiprocessing.Pool(processes=max_processes) as pool:
+    with multiprocessing.Pool(processes=MAX_PROCESSES) as pool:
         dataframes_for_each_subset = list(pool.starmap(add_areas_to_subset_of_file, cartesian_product))
 
     # Concatenate all DataFrames in the list together to form a single DataFrame for this file. Sort by all the given key columns.

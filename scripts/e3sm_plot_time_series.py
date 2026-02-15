@@ -716,9 +716,7 @@ if __name__ == '__main__':
             os.remove(file)
 
     # Create all of the times series plots in parallel.
-    # Limit processes to reduce memory pressure - use at most 16 processes or half of available CPUs.
-    max_processes = min(16, multiprocessing.cpu_count() // 2) 
-    with multiprocessing.Pool(processes=max_processes) as pool:
+    with multiprocessing.Pool(processes=MAX_PROCESSES) as pool:
         pool.map(plot_time_series, list_of_inputs)
 
     # Sort all the p-value files alphabetically.

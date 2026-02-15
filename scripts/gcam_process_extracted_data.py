@@ -3,6 +3,7 @@ import multiprocessing
 import pandas as pd
 import sys
 import time
+from utility_constants import MAX_PROCESSES
 from utility_dataframes import read_file_into_dataframe, write_dataframe_to_file
 from utility_gcam import modify_crop_names
 
@@ -75,9 +76,7 @@ if __name__ == '__main__':
             list_of_inputs.extend(json.load(f))
 
     # Produce data for each file in parallel.
-    # Limit processes to reduce memory pressure - use at most 16 processes or half of available CPUs.
-    max_processes = min(16, multiprocessing.cpu_count() // 2) 
-    with multiprocessing.Pool(processes=max_processes) as pool:
+    with multiprocessing.Pool(processes=MAX_PROCESSES) as pool:
         pool.map(process_extracted_data, list_of_inputs)
     
     # Print the total execution time needed to process/compile the scalars for all files.

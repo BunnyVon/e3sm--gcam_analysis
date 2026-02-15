@@ -1,3 +1,5 @@
+import math
+import multiprocessing
 import numpy as np
 
 """ Unit conversion factors. """
@@ -43,3 +45,6 @@ SURF_AREA = 4 * (4.0 * np.arctan(1.0)) * 6371007 * 6371007
 """ Dictionary between month number and name. """
 MONTH_NUM_TO_NAME = {1: 'January', 2: 'February', 3: 'March', 4: 'April', 5: 'May', 6: 'June',
                      7: 'July', 8: 'August', 9: 'September', 10: 'October', 11: 'November', 12: 'December'}
+
+""" Limit the number of processes to reduce memory pressure - use at most 16 cores or half of the available ones. """ 
+MAX_PROCESSES = min(16, math.ceil(multiprocessing.cpu_count() / 2))

@@ -357,9 +357,7 @@ if __name__ == '__main__':
         list_of_inputs.append(process_inputs(inputs[index]))
 
     # Create all of the box plots in parallel.
-    # Limit processes to reduce memory pressure - use at most 16 processes or half of available CPUs.
-    max_processes = min(16, multiprocessing.cpu_count() // 2) 
-    with multiprocessing.Pool(processes=max_processes) as pool:
+    with multiprocessing.Pool(processes=MAX_PROCESSES) as pool:
         pool.map(plot_box_and_whiskers, list_of_inputs)
     
     # Print the total execution time to produce all the plots.
