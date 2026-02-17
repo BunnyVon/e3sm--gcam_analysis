@@ -9,6 +9,56 @@ import sys
 import os
 from pathlib import Path
 
+# Add parent directory to path to import utility modules
+# Try multiple possible locations for the utility files
+script_dir = os.path.dirname(os.path.abspath(__file__))
+possible_paths = [
+    os.path.join(script_dir, '..'),  # Parent directory (default case)
+    '/global/cfs/cdirs/e3sm/feng809/s2d/compr',  # Known working location
+    script_dir  # Same directory
+]
+
+for path in possible_paths:
+    if os.path.exists(os.path.join(path, 'utility_e3sm_netcdf.py')):
+        sys.path.insert(0, path)
+        break
+
+try:
+    from utility_e3sm_netcdf import get_regional_bounds
+    REGION_VALIDATION_AVAILABLE = True
+except ImportError:
+    print("⚠ Could not import utility_e3sm_netcdf - region validation disabled")
+    REGION_VALIDATION_AVAILABLE = False
+
+def validate_region_names(regions):
+    """Validate that region names are recognized by utility_e3sm_netcdf."""
+    if not REGION_VALIDATION_AVAILABLE:
+        return []
+    
+    issues = []
+    for region in regions:
+        if region is None:
+            continue  # None regions are valid (global)
+        
+        # Test if region is recognized by checking bounds
+        import io
+        from contextlib import redirect_stdout
+        
+        # Capture any warning output from get_regional_bounds
+        f = io.StringIO()
+        with redirect_stdout(f):
+            bounds = get_regional_bounds(region)
+        
+        output = f.getvalue()
+        
+        # Check if it fell back to global bounds (output contains warning)
+        if "Did not recognize" in output:
+            issues.append(f"Region '{region}' not recognized - will use global bounds")
+        else:
+            print(f"✓ Region '{region}' recognized: bounds {bounds}")
+    
+    return issues
+
 def dry_run_test(json_file):
     """Test the extraction function setup without processing files."""
     
@@ -25,6 +75,7 @@ def dry_run_test(json_file):
         return False
     
     # Test each entry's validation logic (without imports)
+    all_valid = True
     for i, entry in enumerate(data):
         print(f"\n--- Testing Entry {i+1} ---")
         
@@ -41,7 +92,7 @@ def dry_run_test(json_file):
         if len(variables) != len(netcdf_substrings):
             print(f"✗ VALIDATION FAIL: Length mismatch")
             print(f"   variables={len(variables)}, netcdf_substrings={len(netcdf_substrings)}")
-            return False
+            all_valid = False
         else:
             print(f"✓ Length validation: PASS")
         
@@ -57,13 +108,25 @@ def dry_run_test(json_file):
         # Additional validation
         if len(lat_lon_aggregation_types) != len(variables):
             print(f"✗ Aggregation types length mismatch: {len(lat_lon_aggregation_types)} vs {len(variables)}")
-            return False
+            all_valid = False
         
         if len(regions) != len(variables):
             print(f"✗ Regions length mismatch: {len(regions)} vs {len(variables)}")
-            return False
+            all_valid = False
         
         print(f"✓ All parameter lengths consistent")
+        
+        # Validate region names if present
+        if regions and any(r is not None for r in regions):
+            print(f"Checking region names...")
+            region_issues = validate_region_names(regions)
+            if region_issues:
+                print(f"⚠ Region validation warnings:")
+                for issue in region_issues:
+                    print(f"  • {issue}")
+                all_valid = False
+            else:
+                print(f"✓ All regions recognized")
         
         # Test file path access
         sim_path = Path(entry.get('simulation_path', ''))
@@ -77,8 +140,11 @@ def dry_run_test(json_file):
             print(f"  Group {idx+1}: {len(variables[idx])} variables, substring {netcdf_substrings[idx]}")
     
     print("\n" + "=" * 60)
-    print("✓ All validations passed! Ready for SLURM submission.")
-    return True
+    if all_valid:
+        print("✓ All validations passed! Ready for SLURM submission.")
+    else:
+        print("✗ Configuration has issues - fix before submitting")
+    return all_valid
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
