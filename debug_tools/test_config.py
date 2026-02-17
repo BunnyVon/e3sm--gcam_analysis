@@ -9,6 +9,55 @@ import sys
 import os
 from pathlib import Path
 
+# Add parent directory to path to import utility modules
+# Try multiple possible locations for the utility files
+script_dir = os.path.dirname(os.path.abspath(__file__))
+possible_paths = [
+    os.path.join(script_dir, '..'),  # Parent directory (default case)
+    '/global/cfs/cdirs/e3sm/feng809/s2d/compr',  # Known working location
+    script_dir  # Same directory
+]
+
+for path in possible_paths:
+    if os.path.exists(os.path.join(path, 'utility_e3sm_netcdf.py')):
+        sys.path.insert(0, path)
+        break
+
+try:
+    from utility_e3sm_netcdf import get_regional_bounds
+    REGION_VALIDATION_AVAILABLE = True
+except ImportError:
+    print("⚠ Could not import utility_e3sm_netcdf - region validation disabled")
+    REGION_VALIDATION_AVAILABLE = False
+
+def validate_region_names(regions):
+    """Validate that region names are recognized by utility_e3sm_netcdf."""
+    if not REGION_VALIDATION_AVAILABLE:
+        return []
+    
+    issues = []
+    for region in regions:
+        if region is None:
+            continue  # None regions are valid (global)
+        
+        # Test if region is recognized by checking bounds
+        import io
+        from contextlib import redirect_stdout
+        
+        # Capture any warning output from get_regional_bounds
+        f = io.StringIO()
+        with redirect_stdout(f):
+            bounds = get_regional_bounds(region)
+        
+        output = f.getvalue()
+        
+        # Check if it fell back to global bounds (output contains warning)
+        if "Did not recognize" in output:
+            issues.append(f"Region '{region}' not recognized - will use global bounds")
+        else:
+            print(f"✓ Region '{region}' recognized: bounds {bounds}")
+    
+    return issues
 def test_json_config(json_file):
     """Test JSON configuration for common issues."""
     
@@ -73,6 +122,18 @@ def test_json_config(json_file):
             print(f"Output directory: {output_path}")
             if not output_path.exists():
                 print(f"⚠ Output directory doesn't exist, will be created")
+        
+        # Validate region names if present
+        if 'regions' in entry and entry['regions']:
+            print(f"Checking region names...")
+            region_issues = validate_region_names(entry['regions'])
+            if region_issues:
+                print(f"⚠ Region validation warnings:")
+                for issue in region_issues:
+                    print(f"  • {issue}")
+                all_valid = False
+            else:
+                print(f"✓ All regions recognized")
     
     print("\n" + "=" * 60)
     if all_valid:

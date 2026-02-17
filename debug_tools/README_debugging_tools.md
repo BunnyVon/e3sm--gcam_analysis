@@ -39,6 +39,7 @@ Three local testing tools that run in **seconds to minutes** instead of hours:
 - ✅ Simulation paths exist
 - ✅ NetCDF files found in directories
 - ✅ Output directories accessible
+- ✅ **Region names are recognized** (validates against `utility_e3sm_netcdf.py`)
 
 **Usage**:
 ```bash
@@ -65,6 +66,7 @@ python test_config.py e3sm_extract_time_series_h0_regs.json
 - ✅ Default parameter creation logic
 - ✅ Parameter consistency across all entries
 - ✅ File path accessibility
+- ✅ **Region names are recognized** (validates against `utility_e3sm_netcdf.py`)
 
 **Usage**:
 ```bash
@@ -151,14 +153,36 @@ sbatch submit_e3sm_time_series.sh
 **Error**: `Did not recognize the selected region`
 ```json
 {
-  "regions": [["amazon", "boam", "tena"]]  // ❌ Should be separate entries
+  "regions": ["boam"]  // ❌ Invalid region name
+}
+```
+**Caught by**: `test_config.py`, `dry_run_test.py`
+**Output**:
+```
+⚠ Region validation warnings:
+  • Region 'boam' not recognized - will use global bounds
+✗ Configuration has issues - fix before submitting
+```
+**Should be**:
+```json
+{
+  "regions": ["bona"]  // ✅ Valid: Boreal North America
+}
+```
+**Valid regions**: `amazon`, `bona`, `tena`, `boas`, `eqas`, `noam`, `soam`, `euro`, `afrc`, `asia`, etc.
+
+### ✗ Nested Region Lists
+**Error**: `Did not recognize the selected region`  
+```json
+{
+  "regions": [["amazon", "bona", "tena"]]  // ❌ Should be separate entries
 }
 ```
 **Should be**:
 ```json
 [
   {"regions": ["amazon"], "output_file": "amazon.dat"},
-  {"regions": ["boam"], "output_file": "boam.dat"}
+  {"regions": ["bona"], "output_file": "bona.dat"}
 ]
 ```
 **Caught by**: `small_data_test.py`
@@ -250,7 +274,7 @@ rm -f test_config_small.json output/test_*.dat
 
 **"Did not recognize the selected region"**
 - Each region needs its own configuration entry
-- Valid regions: `amazon`, `boam`, `tena`, `boas`, `eqas`, `noam`, `soam`, `conus`, etc.
+- Valid regions: `amazon`, `bona`, `tena`, `boas`, `eqas`, `noam`, `soam`, `conus`, etc.
 
 **Tests pass but SLURM job still fails**
 - Check SLURM resource requirements (memory, time limits)
